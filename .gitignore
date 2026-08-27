@@ -1,0 +1,6 @@
+model/df_arena/ 
+data/ 
+output/ 
+__pycache__/ 
+*.onnx 
+submit.zip 
