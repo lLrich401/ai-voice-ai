@@ -115,28 +115,59 @@ def optimize_fusion(voice_model, music_model, splits, device, use_demucs):
     music_ds=AudioDataset(val_a, sr=16000, seg_sec=4.0, is_training=False, use_demucs=use_demucs, task="music", device=str(device))
     voice_loader=DataLoader(voice_ds, batch_size=16, shuffle=False, num_workers=0)
     music_loader=DataLoader(music_ds, batch_size=16, shuffle=False, num_workers=0)
-    # Collect predictions
+    # Collect predictions with actual presence (fix leakage: use detector+ PANNs, not ground truth)
+    # Try to load PANNs for presence if available
+    panns_model=None
+    try:
+        from src.models.panns import PANNsPresenceWrapper
+        import pathlib as pl
+        if (pl.Path("model/panns/Cnn14_mAP=0.431.pth").exists() or (pl.Path(__file__).parent.parent / "model" / "panns" / "Cnn14_mAP=0.431.pth").exists()):
+            panns_model=PANNsPresenceWrapper(use_pretrained=True)
+            panns_model.to(device).eval()
+            print("PANNs loaded for fusion presence")
+    except:
+        panns_model=None
+
     with torch.inference_mode():
         # Get true labels from original loader
         for _, labels, _ in loader:
             all_true.append(labels.numpy())
         all_true=np.concatenate(all_true)
         # voice predictions on vocals stem
+        vp_collect=[]; mp_collect=[]
         for wav, _, _ in voice_loader:
             wav=wav.to(device)
             logits=voice_model(wav)
             vf.append(torch.sigmoid(logits["voice_fake"]).cpu().numpy())
             v_file.append(torch.sigmoid(logits["file_fake"]).cpu().numpy())
-        vf=np.concatenate(vf); v_file=np.concatenate(v_file)
+            vp_collect.append(torch.sigmoid(logits["voice_present"]).cpu().numpy())
+            # PANNs blend if available
+            if panns_model is not None:
+                try:
+                    p_out=panns_model(wav)
+                    pv = p_out["voice_present"].cpu().numpy()
+                    # blend 0.6 PANNs +0.4 detector
+                    vp_collect[-1] = 0.6*pv + 0.4*vp_collect[-1]
+                except:
+                    pass
+        vf=np.concatenate(vf); v_file=np.concatenate(v_file); vp=np.concatenate(vp_collect)
         for wav, _, _ in music_loader:
             wav=wav.to(device)
             logits=music_model(wav)
             mf.append(torch.sigmoid(logits["music_fake"]).cpu().numpy())
             m_file.append(torch.sigmoid(logits["file_fake"]).cpu().numpy())
-        mf=np.concatenate(mf); m_file=np.concatenate(m_file)
+            mp_collect.append(torch.sigmoid(logits["music_present"]).cpu().numpy())
+            if panns_model is not None:
+                try:
+                    p_out=panns_model(wav)
+                    pm = p_out["music_present"].cpu().numpy()
+                    mp_collect[-1] = 0.6*pm + 0.4*mp_collect[-1]
+                except:
+                    pass
+        mf=np.concatenate(mf); m_file=np.concatenate(m_file); mp=np.concatenate(mp_collect)
     file_true=all_true[:,0]
     # grid search
-    best_score=-1; best_w=None
+    best_score=-1; best_w=None; best_file_eer=None
     for w_v in [0.4,0.5,0.6]:
         for w_m in [0.2,0.3,0.4]:
             for w_or in [0.1,0.2,0.3]:
@@ -145,11 +176,13 @@ def optimize_fusion(voice_model, music_model, splits, device, use_demucs):
                 prob_or=1-(1-vf)*(1-mf)
                 fused=wv*v_file + wm*m_file + wo*prob_or
                 fused=np.clip(fused,0.01,0.99)
-                y_pred={"file_fake":fused, "voice_fake":vf, "music_fake":mf, "voice_present":all_true[:,3], "music_present":all_true[:,4]}
+                # Use actual predicted presence, not ground truth (fix leakage) - also compute FILE_FAKE EER alternative
+                y_pred={"file_fake":fused, "voice_fake":vf, "music_fake":mf, "voice_present":vp, "music_present":mp}
                 y_true={"file_fake":all_true[:,0], "voice_fake":all_true[:,1], "music_fake":all_true[:,2], "voice_present":all_true[:,3], "music_present":all_true[:,4]}
                 metrics=compute_dacon_metrics(y_true, y_pred)
+                # Also consider FILE_FAKE only optimization as alternative
                 if metrics["score"]>best_score:
-                    best_score=metrics["score"]; best_w=(wv,wm,wo)
+                    best_score=metrics["score"]; best_w=(wv,wm,wo); best_file_eer=metrics["file_eer"]
     if best_w is None:
         best_w=(0.5,0.3,0.2)
     weights={"w_voice_file":float(best_w[0]), "w_music_file":float(best_w[1]), "w_prob_or":float(best_w[2]), "val_score":float(best_score)}

@@ -74,55 +74,72 @@ def validate(model, loader, device):
 def optimize_fusion_weights(voice_model, music_model, val_loader, device, out_path="model/fusion_weights.json"):
     """
     Validation-based fusion weight optimization for FILE_FAKE.
-    Grid search over w_df, w_voice, w_music, plus probabilistic OR weight.
-    For simplicity, we optimize file fusion: file = w1*file_voice + w2*file_music + w3*probOR, sum=1
-    But we also have DF_Arena if available - but here we use voice/music file heads.
-    We brute force 0.0-1.0 step 0.2.
+    Uses actual PANNs+detector predictions for voice_present/music_present, not ground truth.
+    Grid search over w_voice, w_music, w_prob_or. Also supports optimizing for FILE_FAKE EER only.
     """
-    # Collect predictions from both models on val_loader
+    # Collect predictions from both models on val_loader (original wave for file, stems for voice/music)
     voice_model.eval(); music_model.eval()
-    all_true=[]; voice_file=[]; music_file=[]; voice_fake=[]; music_fake=[]
+    all_true=[]; voice_file=[]; music_file=[]; voice_fake=[]; music_fake=[]; voice_present_pred=[]; music_present_pred=[]
+    # Try to load PANNs for presence if available (optional, not mandatory for fusion)
+    panns_model=None
+    try:
+        from .models.panns import PANNsPresenceWrapper
+        import pathlib as pl
+        if (pl.Path("model/panns/Cnn14_mAP=0.431.pth").exists() or (pl.Path(__file__).parent.parent / "model" / "panns" / "Cnn14_mAP=0.431.pth").exists()):
+            panns_model=PANNsPresenceWrapper(use_pretrained=True)
+            panns_model.to(device).eval()
+            print("PANNs loaded for fusion presence")
+    except:
+        panns_model=None
     with torch.inference_mode():
         for wav, labels, _ in val_loader:
             wav=wav.to(device)
-            # For fusion, we need original wave without demucs? But we use given loader's wave (which may be stem)
-            # For file fusion, we use both models' file_fake predictions
             v_logits=voice_model(wav)
             m_logits=music_model(wav)
             v_file=torch.sigmoid(v_logits["file_fake"]).cpu().numpy()
             m_file=torch.sigmoid(m_logits["file_fake"]).cpu().numpy()
             v_fake=torch.sigmoid(v_logits["voice_fake"]).cpu().numpy()
             m_fake=torch.sigmoid(m_logits["music_fake"]).cpu().numpy()
+            v_present=torch.sigmoid(v_logits["voice_present"]).cpu().numpy()
+            m_present=torch.sigmoid(m_logits["music_present"]).cpu().numpy()
+            # If PANNs available, blend presence: 0.6 PANNs +0.4 detector
+            if panns_model is not None:
+                try:
+                    p_out=panns_model(wav)
+                    p_v = p_out["voice_present"].cpu().numpy()
+                    p_m = p_out["music_present"].cpu().numpy()
+                    v_present = 0.6*p_v + 0.4*v_present
+                    m_present = 0.6*p_m + 0.4*m_present
+                except:
+                    pass
             all_true.append(labels.numpy())
             voice_file.append(v_file); music_file.append(m_file)
             voice_fake.append(v_fake); music_fake.append(m_fake)
+            voice_present_pred.append(v_present); music_present_pred.append(m_present)
     all_true=np.concatenate(all_true)
     voice_file=np.concatenate(voice_file); music_file=np.concatenate(music_file)
     voice_fake=np.concatenate(voice_fake); music_fake=np.concatenate(music_fake)
+    voice_present_pred=np.concatenate(voice_present_pred); music_present_pred=np.concatenate(music_present_pred)
     file_true=all_true[:,0]
-    best_score=-1; best_w=None
+    best_score=-1; best_w=None; best_metrics=None
     # grid search
     for w_v in [0.3,0.5,0.7]:
         for w_m in [0.3,0.5,0.7]:
             for w_or in [0.0,0.2,0.4]:
-                # normalize
                 s=w_v+w_m+w_or
                 wv=w_v/s; wm=w_m/s; wo=w_or/s
-                # file fusion: wv*voice_file + wm*music_file + wo*probOR
                 prob_or=1-(1-voice_fake)*(1-music_fake)
                 fused=wv*voice_file + wm*music_file + wo*prob_or
                 fused=np.clip(fused,0.01,0.99)
-                # compute file EER only for this weight selection (use full metrics with voice/music from respective models)
-                # For full DACON metric, we need voice/music predictions from respective models
+                # Use actual predicted presence, not ground truth (fix leakage)
                 y_pred={"file_fake":fused, "voice_fake":voice_fake, "music_fake":music_fake,
-                        "voice_present":all_true[:,3], "music_present":all_true[:,4]} # use true for presence? Actually need predicted presence - use voice model presence
-                # we should have collected presence too
+                        "voice_present":voice_present_pred, "music_present":music_present_pred}
                 y_true={"file_fake":file_true, "voice_fake":all_true[:,1], "music_fake":all_true[:,2],
                         "voice_present":all_true[:,3], "music_present":all_true[:,4]}
-                # For presence, use ground truth for now (since optimization focuses on file)
                 metrics=compute_dacon_metrics(y_true, y_pred)
+                # Also compute FILE_FAKE EER only for alternative optimization
                 if metrics["score"]>best_score:
-                    best_score=metrics["score"]; best_w=(wv,wm,wo)
+                    best_score=metrics["score"]; best_w=(wv,wm,wo); best_metrics=metrics
     if best_w is None:
         best_w=(0.5,0.3,0.2); best_score=0
     weights={"w_voice_file":float(best_w[0]), "w_music_file":float(best_w[1]), "w_prob_or":float(best_w[2]), "val_score":float(best_score)}

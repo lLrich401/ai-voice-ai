@@ -124,25 +124,72 @@ def _extract_generator(path: pathlib.Path):
 
 def scan_real_datasets(data_root="data/raw", manifest_path="data/manifest.csv"):
     """
-    Scan data/raw recursively for real datasets downloaded via scripts/download_datasets.py
-    Returns DataFrame with columns: path, file_fake, voice_fake, music_fake, voice_present, music_present,
-    speaker_id, generator, source, dataset
+    Load official manifest if exists (written by scripts/download_datasets.py with HF metadata),
+    otherwise scan data/raw and fallback to path inference (warning: not official).
+    Official manifest contains HF metadata: file_fake, voice_fake, music_fake, voice_present, music_present,
+    speaker_id, generator, source, dataset, hf_id, original_id - created by downloader preserving ASVspoof bonafide/spoof,
+    WaveFake generator, FakeMusicCaps real/fake & generator.
     """
+    mp = pathlib.Path(manifest_path)
+    # If manifest exists and was created by new downloader (has hf_id column), use it directly
+    if mp.exists():
+        try:
+            df_existing = pd.read_csv(mp)
+            if "hf_id" in df_existing.columns and len(df_existing)>0:
+                # Verify files still exist (except MIX)
+                # Filter to existing files
+                mask = df_existing["path"].apply(lambda p: p.startswith("MIX::") or pathlib.Path(p).exists())
+                if mask.all():
+                    print(f"Loaded official manifest {mp} {len(df_existing)} rows (HF metadata preserved, no path inference)")
+                    # Ensure dtypes
+                    for c in ["file_fake","voice_fake","music_fake","voice_present","music_present"]:
+                        if c in df_existing.columns:
+                            df_existing[c] = df_existing[c].astype(int)
+                    return df_existing
+                else:
+                    missing = (~mask).sum()
+                    print(f"Manifest {mp} has {missing} missing files, rescanning and merging")
+                    # Keep existing rows that exist, rescan missing?
+                    df_existing = df_existing[mask].reset_index(drop=True)
+                    # Continue to scan for additional files not in manifest
+                    existing_paths = set(df_existing["path"].tolist())
+                # Fall through to scan additional files, but keep official labels for existing
+            else:
+                print(f"Manifest {mp} exists but no hf_id column (legacy path-inference), will rescan with official logic")
+                existing_paths = set()
+                df_existing = pd.DataFrame()
+        except Exception as e:
+            print(f"Failed to load manifest {mp}: {e}, rescanning")
+            existing_paths = set()
+            df_existing = pd.DataFrame()
+    else:
+        existing_paths = set()
+        df_existing = pd.DataFrame()
+
+    # Scan files for any new files not in manifest
     root = pathlib.Path(data_root)
     if not root.exists():
+        if len(df_existing)>0:
+            print(f"data_root {root} not found, returning existing manifest {len(df_existing)} rows")
+            return df_existing
         raise FileNotFoundError(f"data_root {root} not found. Run scripts/download_datasets.py")
     audio_files = []
     for ext in ["*.wav","*.mp3","*.flac","*.m4a","*.ogg"]:
         audio_files.extend(list(root.rglob(ext)))
     audio_files = sorted(set(audio_files))
-    if len(audio_files)==0:
+    if len(audio_files)==0 and len(df_existing)==0:
         raise FileNotFoundError(f"No audio files found in {root}. Run scripts/download_datasets.py --datasets librispeech_dev wavefake fma_small etc")
+    # Filter to files not already in manifest
+    new_files = [af for af in audio_files if str(af) not in existing_paths]
+    if len(new_files)==0 and len(df_existing)>0:
+        print(f"No new files, using existing manifest {len(df_existing)} rows")
+        return df_existing
+    print(f"Scanning {len(new_files)} new files not in manifest (fallback path inference - WARNING: should use downloader for official labels)")
     rows=[]
-    for af in audio_files:
+    for af in new_files:
         labels = _infer_labels_from_path(af)
         speaker = _extract_speaker_id(af)
         generator = _extract_generator(af)
-        # source dataset folder
         rel = af.relative_to(root).parts[0] if len(af.relative_to(root).parts)>0 else "unknown"
         rows.append({
             "path": str(af),
@@ -155,8 +202,16 @@ def scan_real_datasets(data_root="data/raw", manifest_path="data/manifest.csv"):
             "generator": generator,
             "source": rel,
             "dataset": rel,
+            "hf_id": "path_inference_fallback",
+            "original_id": af.stem,
         })
-    df = pd.DataFrame(rows)
+    df_new = pd.DataFrame(rows)
+    if len(df_existing)>0 and len(df_new)>0:
+        df = pd.concat([df_existing, df_new], ignore_index=True)
+    elif len(df_existing)>0:
+        df = df_existing
+    else:
+        df = df_new
     # also handle mixed: create synthetic mixes from real voice+music for file_fake training
     # We create mixed samples by pairing: for each voice sample, pair with random music sample with SNR -5~10dB
     # This generates additional rows with voice_present=1, music_present=1, file_fake = OR
@@ -184,11 +239,14 @@ def scan_real_datasets(data_root="data/raw", manifest_path="data/manifest.csv"):
                     "music_fake": int(m["music_fake"]),
                     "voice_present": 1,
                     "music_present": 1,
-                    "speaker_id": v["speaker_id"],  # leakage group follows voice speaker
+                    "speaker_id": f"{v['speaker_id']}+{m['speaker_id']}",  # leakage group includes BOTH voice and music source
                     "generator": f"{v['generator']}+{m['generator']}",
                     "source": f"mix_{v['source']}_{m['source']}",
                     "dataset": "mix",
+                    "hf_id": f"mix_{v.get('hf_id','')}+{m.get('hf_id','')}",
+                    "original_id": f"mix_{v.get('original_id','')}_{m.get('original_id','')}",
                 })
+            # Rebuild df from updated rows (which includes original + new mixed)
             df = pd.DataFrame(rows)
     # save manifest
     pathlib.Path(manifest_path).parent.mkdir(parents=True, exist_ok=True)
@@ -339,12 +397,22 @@ class AudioDataset(Dataset):
         self.device=device
         # For HTDemucs, lazy load separator
         self.separator=None
+        self.separator_type="none"
         if use_demucs:
             try:
-                from .models.demucs_wrapper import get_separator
-                self.separator=get_separator(device=device)
-            except:
-                self.separator=None
+                from .models.demucs_wrapper import get_separator, HTDemucsSeparator
+                self.separator=get_separator(device=device, verbose=True)
+                # Check if actually loaded HTDemucs vs fallback
+                if self.separator is not None and getattr(self.separator, 'use_demucs', False):
+                    self.separator_type="htdemucs"
+                    print(f"AudioDataset task={task} using HTDemucs separator on {device}")
+                else:
+                    # HTDemucs not loaded but use_demucs requested -> fail
+                    raise RuntimeError("HTDemucs not available (demucs package not installed or model failed to load) but --use_demucs was specified. Install demucs or run without --use_demucs.")
+            except RuntimeError:
+                raise
+            except Exception as e:
+                raise RuntimeError(f"Failed to initialize HTDemucs separator for task={task} use_demucs=True: {e}. Install demucs or remove --use_demucs flag.")
 
     def __len__(self): return len(self.df)
 
@@ -411,18 +479,23 @@ class AudioDataset(Dataset):
                 wave=apply_codec_sim(wave, sr=self.sr)
             elif augment=="telephone" or augment=="tel":
                 wave=apply_telephone_sim(wave, sr=self.sr)
-            # HTDemucs stem separation
-            if self.use_demucs and self.separator is not None and not path_str.startswith("MIX::"):
-                # only apply for single-source or mix if not already handled
-                try:
-                    vocals, music = self.separator.separate(wave, sr=self.sr)
-                    if self.task=="voice":
-                        wave=vocals
-                    elif self.task=="music":
-                        wave=music
-                    # for multitask/file keep original
-                except:
+            # HTDemucs stem separation - mandatory if use_demucs=True
+            if self.use_demucs:
+                if path_str.startswith("MIX::"):
+                    # MIX already handled in _load_and_separate, skip HTDemucs
                     pass
+                else:
+                    if self.separator is None or getattr(self.separator, 'use_demucs', False)==False:
+                        raise RuntimeError(f"HTDemucs separator not available for task={self.task} but --use_demucs specified (separator_type={self.separator_type})")
+                    try:
+                        vocals, music = self.separator.separate(wave, sr=self.sr)
+                        if self.task=="voice":
+                            wave=vocals
+                        elif self.task=="music":
+                            wave=music
+                        # for multitask/file keep original
+                    except Exception as e:
+                        raise RuntimeError(f"HTDemucs separation failed for {path_str}: {e}")
         # segment
         seg_len=int(self.seg_sec*self.sr)
         if len(wave) < seg_len:

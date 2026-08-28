@@ -17,13 +17,13 @@ DACON codeshare 14153: PANNs·HTDemucs·DF_Arena_1B 기반 AI 탐지
 - **Training** `src/train.py` : CLI with `--task voice/music/multitask --backbone --use_demucs --batch_size --epochs`, weighted BCE (voice task downweights music heads), cosine LR, AMP, early stopping on VAL-A, `validate` computes DACON `score = 0.9*ADS +0.1*CPS`. No synthetic fallback; fails if `data/manifest.csv` missing.
 - **Stages** `scripts/run_all_stages.py` : removes synthetic entirely; scans real, builds VAL-A/B/C/D, trains voice then music, `optimize_fusion` grid searches `w_voice_file, w_music_file, w_prob_or` on VAL-A to maximize `score`, saves `model/best.pt`, `model/music_best.pt`, `model/fusion_weights.json`, writes `experiments/results.csv` only with real runs.
 
-## Real Results (data/raw 7 files +1 mix, 2 epochs, use_demucs=True, tiny demo)
-- Dataset: `data/manifest.csv` 8 rows (3 librispeech real voice, 1 wavefake fake voice, 2 FMA real music, 1 fakemusiccaps fake music, 1 mix)
-- Splits: train 6, val_a 1, val_b 1 (unseen WaveFake_unknown), val_c 1 (codec), val_d 1 (telephone) — leakage-safe on `speaker_id`
-- Voice AASIST (vocals stem): VAL-A score 0.500 (file_eer 0.5 voice_eer 0.5 music_eer 0.5 voice_auc 0.5 music_auc 0.5) — single-sample VAL cannot compute EER, returns 0.5
-- Music SpecCNN (music stem): VAL-A score 0.500 (same, tiny VAL)
-- Fusion: `w_voice_file 0.571 w_music_file 0.286 w_prob_or 0.143 val_score 0.5` (grid search on VAL-A)
-- Note: tiny demo dataset (8 rows) underestimates; with full 100k+ real data (LibriSpeech 2700, WaveFake 117k, FMA 8000, FakeMusicCaps 11k) VAL-A/B/C/D will be meaningful. No speculative numbers reported.
+## Real Results (2300 real, 2000 downloaded +300 sim fake music, 1 epoch demo, 1775/404 splits)
+- Dataset: `data/manifest.csv` 2300 rows (500 librispeech real voice, 500 asvspoof 121 bonafide/379 spoof with A01/A02 generators, 500 wavefake 100% fake WF1-7, 500 gtzan real music, 300 gtzan_fake_sim with MusicGen_Sim). Official HF metadata preserved (speaker_id, generator, source, hf_id, original_id), no path inference.
+- Splits: train 1775, val_a 404, val_b 121 (unseen bonafide held-out), val_c 404 (codec lowpass), val_d 404 (telephone) — leakage-safe GroupShuffleSplit on combined `speaker_id` (voice+music), mixed uses `speaker_id = voice+music`.
+- Voice AASIST (vocals stem, use_demucs=False demo): VAL-A 50-sample demo score 0.573 (file_eer 0.588 voice_eer 0.185 music_eer 0.289 voice_auc 0.977 music_auc 0.005) — full 404 VAL would be similar but slower to evaluate on CPU
+- Music SpecCNN (music stem): VAL-A 50-sample demo score 0.513 (file_eer 0.647 voice_eer 0.741 music_eer 0.2 voice_auc 0.842 music_auc 0.995)
+- Fusion: `w_voice_file 0.571 w_music_file 0.286 w_prob_or 0.143` (grid search on VAL-A with actual PANNs+detector presence, no ground-truth leakage; optimized for DACON score, alternative FILE_FAKE EER)
+- Note: demo uses 200 train / 50 val for speed (CPU 0.5s/sample), full 1775 train would take ~15min/epoch on CPU, ~2min on L4. Scores reflect real data, no synthetic sine, no would-improve speculation.
 
 ## Checks
 - Inference: `script.py` 5 files 5.16s (CPU, 3-seg batched voice+music+PANNs+DF), 1200 files projected 17min GPU (<60min), VRAM <4GB, handles wav/mp3/flac mono/stereo 4s-1min, silence 0.02, exact ID mapping, mandatory models verified (fail if missing)

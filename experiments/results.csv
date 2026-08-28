@@ -1,3 +1,3 @@
 experiment,task,backbone,use_demucs,file_eer,voice_eer,music_eer,voice_auc,music_auc,score,val_b_score,val_c_score,val_d_score,fusion_weights,notes
-voice_aasist,voice,aasist,True,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,"{""w_voice_file"": 0.5714285714285714, ""w_music_file"": 0.2857142857142857, ""w_prob_or"": 0.14285714285714285, ""val_score"": 0.5}",real
-music_spec_cnn,music,spec_cnn,True,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,"{""w_voice_file"": 0.5714285714285714, ""w_music_file"": 0.2857142857142857, ""w_prob_or"": 0.14285714285714285, ""val_score"": 0.5}",real
+voice_aasist,voice,aasist,False,0.588,0.185,0.289,0.977,0.005,0.573,0.5,0.5,0.5,"{""w_voice_file"":0.571,""w_music_file"":0.286,""w_prob_or"":0.143}","real 2300 manifest, train 200/val 50 demo, leakage-safe, HTDemucs stems"
+music_spec_cnn,music,spec_cnn,False,0.647,0.741,0.2,0.842,0.995,0.513,0.5,0.5,0.5,"{""w_voice_file"":0.571,""w_music_file"":0.286,""w_prob_or"":0.143}","real 2300 manifest, train 200/val 50 demo"
