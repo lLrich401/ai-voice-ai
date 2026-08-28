@@ -1,0 +1,19 @@
+.aider*
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.env
+.DS_Store
+Thumbs.db
+# Large binaries - GitHub 100MB limit
+submit.zip
+*.onnx
+model/df_arena/*.onnx
+model/df_arena/.cache/
+data/raw/
+output/
+experiments/results.csv
+# Keep small checkpoints (<100MB) - uncomment if you want LFS for them
+# *.pt
