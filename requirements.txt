@@ -10,3 +10,7 @@ tqdm>=4.65.0
 transformers>=4.30.0
 onnxruntime>=1.15.0
 onnx>=1.15.0
+# Optional for full baseline (offline fallback if not installed):
+# demucs>=4.0.0  # HTDemucs – if not installed, librosa hpss is used (fast, offline)
+# torchlibrosa  # PANNs original – not required (torchaudio used)
+
