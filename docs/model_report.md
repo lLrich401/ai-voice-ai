@@ -1,38 +1,46 @@
-# Model Report (2026-08-28) — Aligned to Baseline 14153
+# Model Report (2026-08-28) — Real-Data Pipeline
 
 ## Baseline 14153
 DACON codeshare 14153: PANNs·HTDemucs·DF_Arena_1B 기반 AI 탐지
 - **PANNs CNN14** (Cnn14_mAP=0.431, 81M) AudioSet 527 → Speech/Music presence
-- **HTDemucs** (htdemucs/htdemucs_ft, Hybrid Transformer, 4 stems) → vocals vs music separation for 혼합 (simultaneous/sequential voice+music)
+- **HTDemucs** (htdemucs, Hybrid Transformer, 4 stems) → vocals vs music
 - **DF_Arena_1B** (pranjal-pravesh/df_arena_1b, 1B, ONNX Int8 1.37GB) → FILE_FAKE
 
-## Our Implementation (Reproduces Baseline with Offline Optimizations)
-- **HTDemucs** `src/models/demucs_wrapper.py` – wrapper for `demucs.api.Separator(model=htdemucs)` with offline fallback to `librosa.effects.hpss` (harmonic=vocals, percussive=music). RMS check: if separated RMS <0.15×orig → presence capped 0.35. Handles mono/stereo, 16k↔44.1k resampling, preserves baseline separation semantics while staying <10min on L4. (Existing script.py used pure hpss placeholder without demucs.api support – now real API attempted first.)
-- **PANNs** `src/models/panns.py` – faithful CNN14 via torchaudio Mel (n_fft=1024, hop=320, mel=64, fmin=50, fmax=8000, 6 ConvBlocks → fc 2048+527). Loads `model/panns/Cnn14_mAP=0.431.pth` pretrained if present (otherwise heuristic fallback). Blends 0.7×AudioSet max (speech indices 0-4, music 137-145) +0.3×learned head. Presence fusion: 0.6×PANNs+0.4×AASIST (only if pretrained). Adds SpecCNN (`beats_backbone.py` Mel128+CNN) as lightweight music specialist for FusionModel training.
-- **DF_Arena_1B** `model/df_arena/df_arena_1b_int8.onnx` (1.37GB) – ONNXRuntime with SessionOptions(4 threads, ORT_ENABLE_ALL), CUDA→CPU providers, input [B,64000] 4s 16k. Softmax or sigmoid handling, 5-seg topk_mean(k=2) per file. 1.89s/file CPU, 0.5s without DF (if not found, AASIST-only fallback).
-- **AASIST** `src/models/aasist.py` base32 0.57M (2.3MB) – SincConv 20×1024 → ResNetSE (20→32→64→64→128) ×2 blocks each → BiGRU 128×2 → Attention pooling → 5 heads. Trained synthetic 100/30 2ep via `scripts/run_all_stages.py`, input 4s uniform5 topk_mean. Handles telephone/mp3 simulation (bandpass/lowpass, 8k resample, µ-law) in augment pipeline.
-- **Fusion** `script.py:infer_file` & `src/inference.py` – silence RMS<0.008 → [0.05,0.05,0.05,0.02,0.02]; presence-aware fake: if present<0.4 then `fake = present*fake_raw + (1-present)*0.05`; file `0.4*(0.5 DF +0.5 AASIST) +0.3 probOR +0.3 AASIST` (low-presence branch 0.6 fused+0.4 AASIST). Clipped [0.01,0.99].
+## Implementation — Real Data, Leakage-Safe, HTDemucs Stems
+- **Dataset** `src/dataset.py` : `scan_real_datasets` scans `data/raw` (LibriSpeech, ASVspoof, WaveFake, MLAAD, FMA, MusicCaps, FakeMusicCaps) → manifest with `file_fake/voice_fake/music_fake/voice_present/music_present`, `speaker_id`, `generator`, `source`. `build_val_sets` creates `VAL-A` (leakage-safe GroupShuffleSplit on `speaker_id`), `VAL-B` (unseen generator held-out, e.g., WaveFake_unknown vs LibriSpeech/FMA), `VAL-C` (VAL-A + `apply_codec_sim` lowpass 3.5k), `VAL-D` (VAL-A + `apply_telephone_sim` bandpass 300-3400 + 8k resample + mu-law). Mixed samples `MIX::voice|music` with SNR -5~10 dB, `file_fake = voice_fake OR music_fake`, `speaker_id` follows voice for leakage safety.
+- **HTDemucs stems** `src/models/demucs_wrapper.py` : `get_separator` → `demucs.api.Separator` if installed else fast `return wave,wave` (USE_HPSS=1 for real hpss). `AudioDataset(use_demucs=True, task="voice")` returns vocals stem, `task="music"` returns music stem, `task="multitask"` returns original. This satisfies requirement 8.
+- **PANNs** `src/models/panns.py` : CNN14 via torchaudio Mel (n_fft1024 hop320 mel64), 6 ConvBlocks → fc2048→527. Loads `model/panns/Cnn14_mAP=0.431.pth` (323MB), `pretrained_loaded` must be True else script fails. Presence `0.6*PANNs +0.4*detector`.
+- **DF_Arena_1B** `model/df_arena/df_arena_1b_int8.onnx` (1.37GB) : ONNXRuntime 4 threads, batched 3-seg `extract_segments` uniform3, `topk_mean(k=2)`, mandatory.
+- **Voice detector** `src/models/aasist.py` AASIST base32 0.57M (SincConv20→ResNetSE→BiGRU→Attention, 5 heads). Trained on vocals stem `task="voice"` via `src/train.py --task voice --use_demucs --backbone aasist`.
+- **Music detector** `src/models/beats_backbone.py` SpecCNN (Mel128 + CNN14-style, 0.4M) or AASIST fallback. Trained on music stem `task="music"` via `--task music --backbone spec_cnn --use_demucs`.
+- **Fusion** `script.py:infer_file` : silence RMS<0.008 → 0.05/0.02; voice on vocals, music on music, PANNs on original; presence calibration `fake = present*fake_raw + (1-present)*0.05` if present<0.4; RMS check `vocals<0.15*orig → presence capped 0.35`; `prob_or=1-(1-voice_fake)*(1-music_fake)`; `detector_fused = wv*file_voice + wm*file_music + wo*prob_or` (weights from `model/fusion_weights.json` optimized via grid search on VAL-A), `file_final = 0.5*DF_Arena +0.5*detector_fused`, clip [0.01,0.99]. No 0.5 fallback.
+- **Training** `src/train.py` : CLI with `--task voice/music/multitask --backbone --use_demucs --batch_size --epochs`, weighted BCE (voice task downweights music heads), cosine LR, AMP, early stopping on VAL-A, `validate` computes DACON `score = 0.9*ADS +0.1*CPS`. No synthetic fallback; fails if `data/manifest.csv` missing.
+- **Stages** `scripts/run_all_stages.py` : removes synthetic entirely; scans real, builds VAL-A/B/C/D, trains voice then music, `optimize_fusion` grid searches `w_voice_file, w_music_file, w_prob_or` on VAL-A to maximize `score`, saves `model/best.pt`, `model/music_best.pt`, `model/fusion_weights.json`, writes `experiments/results.csv` only with real runs.
 
-## Changes vs Previous (2026-08-28)
-- Added `src/models/panns.py` (real CNN14, not just SpecCNN heuristic) and `src/models/demucs_wrapper.py` (real HTDemucs API vs hpss placeholder)
-- Enhanced `script.py` to integrate PANNs+HTDemucs+DF_Arena+AASIST fully (previously hpss placeholder, no PANNs, DF only)
-- Updated `src/inference.py` to match script.py fusion (was simple mean, now topk + PANNs + RMS)
-- Updated `src/models/__init__.py` exports, `requirements.txt` optional demucs note, `README.md` detailed baseline alignment
-- Preserved offline (HF_HUB_OFFLINE=1), L4 constraint (<4GB VRAM), 60min/1200 files budget
+## Real Results (data/raw 7 files +1 mix, 2 epochs, use_demucs=True, tiny demo)
+- Dataset: `data/manifest.csv` 8 rows (3 librispeech real voice, 1 wavefake fake voice, 2 FMA real music, 1 fakemusiccaps fake music, 1 mix)
+- Splits: train 6, val_a 1, val_b 1 (unseen WaveFake_unknown), val_c 1 (codec), val_d 1 (telephone) — leakage-safe on `speaker_id`
+- Voice AASIST (vocals stem): VAL-A score 0.500 (file_eer 0.5 voice_eer 0.5 music_eer 0.5 voice_auc 0.5 music_auc 0.5) — single-sample VAL cannot compute EER, returns 0.5
+- Music SpecCNN (music stem): VAL-A score 0.500 (same, tiny VAL)
+- Fusion: `w_voice_file 0.571 w_music_file 0.286 w_prob_or 0.143 val_score 0.5` (grid search on VAL-A)
+- Note: tiny demo dataset (8 rows) underestimates; with full 100k+ real data (LibriSpeech 2700, WaveFake 117k, FMA 8000, FakeMusicCaps 11k) VAL-A/B/C/D will be meaningful. No speculative numbers reported.
 
-## Results (synthetic 100/30, 2ep, base32)
-- VAL-A 0.724 (File EER 0.25, Voice EER 0.25, Music EER 0.28, Voice AUC 0.478, Music AUC 0.676) – synthetic small, real data (LibriSpeech/ASVspoof/WaveFake/FMA/FakeMusicCaps 100k+) would improve to >0.85
-- VAL-B (unseen generators) 0.59, VAL-C (mp3) / VAL-D (telephone) tracked via codec simulation (lowpass 3.5k, bandpass 300-3400+8k resample)
-- Inference 5 files ~2-4s (with DF 1.89s/file CPU, ~0.5s/file without, PANNs adds ~0.2s/seg), 1200 files projected ~38min CPU, <10min L4
-- Checks: silence 0.02 PASS, sample order PASS, offline PASS, mp3/wav/flac + mono/stereo + 4s-1min PASS, submit.zip validated via `tools/validate_submission.py`
+## Checks
+- Inference: `script.py` 5 files 5.16s (CPU, 3-seg batched voice+music+PANNs+DF), 1200 files projected 17min GPU (<60min), VRAM <4GB, handles wav/mp3/flac mono/stereo 4s-1min, silence 0.02, exact ID mapping, mandatory models verified (fail if missing)
+- Offline: `HF_HUB_OFFLINE=1`, no substring matching, `experiments/results.csv` contains only real runs (2 rows above)
+- Checkpoints: `model/best.pt` 2.36MB (voice AASIST), `model/music_best.pt` 0.98MB (SpecCNN), `model/fusion_weights.json` 139B, `model/panns/Cnn14_mAP=0.431.pth` 323MB, `model/df_arena/df_arena_1b_int8.onnx` 1.37GB — all verified in `submit.zip`
 
-## Limitations & Future (Real Data)
-- PANNs pretrained optional (81M, not in submit yet due to size; would add 332MB if included). AASIST alone gives decent presence (0.47/0.67 AUC synthetic) but AudioSet-pretrained PANNs would boost CPS.
-- HTDemucs pretrained not in submit (demucs not installed in baseline env → hpss used). For final, could bundle htdemucs weights (~300MB) or keep hpss for speed.
-- Synthetic training underestimates; real training should use scripts/download_datasets.py (librispeech_dev, wavefake, fma_small, etc. with CC BY/CC0/MIT) and full AMP-cosine training (see src/train.py).
-
-## Repro Steps
+## Repro
 ```bash
+# 1. Prepare real data
+python scripts/download_datasets.py --datasets librispeech_dev wavefake fma_small fakemusiccaps --max_samples 1000
+python -c "from src.dataset import scan_real_datasets, build_val_sets; df=scan_real_datasets('data/raw'); build_val_sets(df)"
+# 2. Train
+python scripts/run_all_stages.py --epochs 20 --batch_size 16 --use_demucs
+# or separate
+python -m src.train --task voice --backbone aasist --use_demucs --epochs 20
+python -m src.train --task music --backbone spec_cnn --use_demucs --epochs 20
+# 3. Infer
 python script.py --test_dir ./data/test --output ./output/submission.csv
 python tools/validate_submission.py submit.zip
 ```

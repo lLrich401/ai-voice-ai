@@ -1,7 +1,3 @@
-experiment,backbone,file_eer,voice_eer,music_eer,voice_auc,music_auc,score,val_unseen,inference_time,notes
-stageA_aasist_synth100,aasist_16,0.167,0.133,0.269,0.827,0.873,0.813,0.626,0.5s/file,synthetic100_2ep
-stageB_placeholder,beats,0.167,0.133,0.269,0.827,0.873,0.813,0.626,0.5s/file,BEATs would improve music EER to 0.15
-stageA_aasist,aasist_16,0.2777777777777778,0.1428571428571429,0.28,0.8653846153846154,0.8914027149321266,0.7615250808015513,0.6955708239129292,0.5s/file,synthetic400
-stageB_music,beats,synthetic,mp3+tel,4s,,0.2777777777777778,0.1428571428571429,0.28,0.8653846153846154,0.8914027149321266,0.7615250808015513,0.6955708239129292,0.5s/file,BEATs would improve music EER
-stageA_aasist,aasist_16,0.25,0.25,0.28,0.4782608695652174,0.6759259259259259,0.7246093397745572,0.5906482333456019,0.5s/file,synthetic400
-stageB_music,beats,synthetic,mp3+tel,4s,,0.25,0.25,0.28,0.4782608695652174,0.6759259259259259,0.7246093397745572,0.5906482333456019,0.5s/file,BEATs would improve music EER
+experiment,task,backbone,use_demucs,file_eer,voice_eer,music_eer,voice_auc,music_auc,score,val_b_score,val_c_score,val_d_score,fusion_weights,notes
+voice_aasist,voice,aasist,True,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,"{""w_voice_file"": 0.5714285714285714, ""w_music_file"": 0.2857142857142857, ""w_prob_or"": 0.14285714285714285, ""val_score"": 0.5}",real
+music_spec_cnn,music,spec_cnn,True,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,"{""w_voice_file"": 0.5714285714285714, ""w_music_file"": 0.2857142857142857, ""w_prob_or"": 0.14285714285714285, ""val_score"": 0.5}",real

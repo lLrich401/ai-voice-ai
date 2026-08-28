@@ -1,0 +1,2 @@
+path,file_fake,voice_fake,music_fake,voice_present,music_present,speaker_id,generator,source,dataset,augment
+data\raw\wavefake\test_001_fake.wav,1,1,0,1,0,wavefake_9dd3,WaveFake_unknown,wavefake,wavefake,none

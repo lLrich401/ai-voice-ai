@@ -12,6 +12,7 @@ submit.zip
 *.onnx
 model/df_arena/*.onnx
 model/df_arena/.cache/
+model/panns/*.pth
 data/raw/
 output/
 experiments/results.csv

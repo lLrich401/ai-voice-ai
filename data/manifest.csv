@@ -1,0 +1,9 @@
+path,file_fake,voice_fake,music_fake,voice_present,music_present,speaker_id,generator,source,dataset
+data\raw\fakemusiccaps\test_003_fake.mp3,1,0,1,0,1,music_fake,FakeMusic_unknown,fakemusiccaps,fakemusiccaps
+data\raw\fma_small\test_003.mp3,0,0,0,0,1,fma_tes,FMA,fma_small,fma_small
+data\raw\fma_small\test_004.flac,0,0,0,0,1,fma_tes,FMA,fma_small,fma_small
+data\raw\librispeech_dev\test_001.wav,0,0,0,1,0,libri_141e6c,LibriSpeech,librispeech_dev,librispeech_dev
+data\raw\librispeech_dev\test_002.wav,0,0,0,1,0,libri_598d04,LibriSpeech,librispeech_dev,librispeech_dev
+data\raw\librispeech_dev\test_005.wav,0,0,0,1,0,libri_db2d27,LibriSpeech,librispeech_dev,librispeech_dev
+data\raw\wavefake\test_001_fake.wav,1,1,0,1,0,wavefake_9dd3,WaveFake_unknown,wavefake,wavefake
+MIX::data\raw\librispeech_dev\test_005.wav|data\raw\fma_small\test_004.flac,0,0,0,1,1,libri_db2d27,LibriSpeech+FMA,mix_librispeech_dev_fma_small,mix

@@ -1,0 +1,2 @@
+path,file_fake,voice_fake,music_fake,voice_present,music_present,speaker_id,generator,source,dataset,augment
+data\raw\librispeech_dev\test_001.wav,0,0,0,1,0,libri_141e6c,LibriSpeech,librispeech_dev,librispeech_dev,telephone
