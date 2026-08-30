@@ -208,6 +208,7 @@ class PANNsPresenceWrapper(nn.Module):
         self.music_head = nn.Linear(2048, 1)
         # Try load pretrained
         self.pretrained_loaded = False
+        self.load_stats = None
         if use_pretrained:
             self._try_load_pretrained()
 
@@ -230,7 +231,24 @@ class PANNsPresenceWrapper(nn.Module):
                     state = self.panns.state_dict()
                     filtered = {k: v for k, v in ckpt.items() if k in state and state[k].shape == v.shape}
                     missing = self.panns.load_state_dict(filtered, strict=False)
-                    print(f"PANNs loaded {len(filtered)}/{len(state)} from {p} missing {len(missing.missing_keys)}")
+                    checkpoint_elements = sum(value.numel() for value in ckpt.values()
+                                              if hasattr(value, "numel"))
+                    loaded_elements = sum(value.numel() for value in filtered.values())
+                    key_coverage = len(filtered) / max(1, len(ckpt))
+                    element_coverage = loaded_elements / max(1, checkpoint_elements)
+                    required = ("conv_block1.conv1.weight", "conv_block6.conv2.weight",
+                                "fc1.weight", "fc_audioset.weight")
+                    missing_core = [key for key in required if key not in filtered]
+                    self.load_stats = {
+                        "checkpoint_keys": len(ckpt), "loaded_keys": len(filtered),
+                        "key_coverage": key_coverage, "checkpoint_elements": checkpoint_elements,
+                        "loaded_elements": loaded_elements, "element_coverage": element_coverage,
+                        "missing_core": missing_core,
+                    }
+                    if element_coverage < 0.98 or key_coverage < 0.98 or missing_core:
+                        raise RuntimeError(f"PANNs checkpoint coverage validation failed: {self.load_stats}")
+                    print(f"PANNs coverage keys={len(filtered)}/{len(ckpt)} "
+                          f"elements={element_coverage:.4%} missing_core={missing_core}")
                     self.pretrained_loaded = True
                     return True
                 except Exception as e:

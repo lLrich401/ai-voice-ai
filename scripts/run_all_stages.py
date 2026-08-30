@@ -19,9 +19,10 @@ def run(command):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=5)
+    parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch_size", type=int, default=32)
-    parser.add_argument("--calibration_per_split", type=int, default=60)
+    parser.add_argument("--calibration_per_split", type=int, default=0,
+                        help="0 uses the complete independent fusion calibration split")
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--use_demucs", action="store_true")
     args = parser.parse_args()

@@ -18,7 +18,8 @@ def test_segment_and_feature_fusion_are_identical_and_not_presence_gated():
     m = np.array([[0.3, 0.2, 0.6, 0.4, 0.8], [0.5, 0.2, 0.8, 0.4, 0.9]])
     p = {"voice_present": np.array([0.05, 0.1]), "music_present": np.array([0.8, 0.9])}
     weights = {"w_voice_file": 0.0, "w_music_file": 0.5, "w_prob_or": 0.5,
-               "w_df_arena": 0.25, "w_df_component": 0.5, "w_panns_presence": 0.0}
+               "w_df_arena": 0.25, "w_df_voice_component": 0.5,
+               "w_df_music_component": 0.5, "w_panns_presence": 0.0}
     combined = script._combine_predictions(0.8, v, m, p, weights)
     direct = script.fuse_prediction_features(
         0.8, 0.8, 0.7, 0.5, 0.4, 0.15, 0.85, 0.075, 0.85, weights)
@@ -29,6 +30,57 @@ def test_segment_and_feature_fusion_are_identical_and_not_presence_gated():
     low_presence = script._combine_predictions(0.8, v, m, p_low, weights)
     assert low_presence[1] == combined[1]  # voice-fake ranking is not gated
     assert all(script.OUTPUT_EPS <= x <= 1.0 - script.OUTPUT_EPS for x in combined)
+
+
+def test_df_voice_and_music_component_weights_are_independent():
+    common = dict(file_fake_df=0.9, voice_fake_model=0.1, music_fake_model=0.2,
+                  file_voice=0.3, file_music=0.4, voice_present_model=0.5,
+                  music_present_model=0.6, voice_present_panns=0.5,
+                  music_present_panns=0.6)
+    voice_only = script.fuse_prediction_features(
+        **common, fusion_weights={"w_df_voice_component": 1.0,
+                                  "w_df_music_component": 0.0})
+    music_only = script.fuse_prediction_features(
+        **common, fusion_weights={"w_df_voice_component": 0.0,
+                                  "w_df_music_component": 1.0})
+    assert voice_only[1] == pytest.approx(0.9)
+    assert voice_only[2] == pytest.approx(0.2)
+    assert music_only[1] == pytest.approx(0.1)
+    assert music_only[2] == pytest.approx(0.9)
+
+
+def test_skipped_df_is_neutral_for_component_fusion():
+    feature = {"df": 0.99, "df_used": False, "vf": 0.1, "mf": 0.2,
+               "vfile": 0.3, "mfile": 0.4, "vp_model": 0.5,
+               "mp_model": 0.6, "vp_panns": 0.5, "mp_panns": 0.6}
+    weights = {"w_voice_file": 1.0, "w_music_file": 0.0, "w_prob_or": 0.0,
+               "w_df_arena": 0.0, "w_df_voice_component": 1.0,
+               "w_df_music_component": 1.0, "w_panns_presence": 0.0}
+    result = script.fuse_feature_record(feature, weights)
+    assert result[0] == pytest.approx(0.3)
+    assert result[1] == pytest.approx(0.1)
+    assert result[2] == pytest.approx(0.2)
+
+
+def test_adaptive_df_second_crop_is_distant_and_conditioned():
+    wave = np.zeros(20 * 16000, dtype=np.float32)
+    wave[0:64600] = 0.5
+    wave[-64600:] = 0.4
+    _, second, primary_start, second_start = script._df_arena_crop_candidates(wave)
+    assert second is not None
+    assert abs(second_start - primary_start) >= max(script.DF_INPUT_SAMPLES // 2, 2 * 16000)
+    assert script.should_use_adaptive_df_second_crop(12.0, 0.5, 0.25, 0.75)
+    assert not script.should_use_adaptive_df_second_crop(11.9, 0.5, 0.25, 0.75)
+    assert not script.should_use_adaptive_df_second_crop(20.0, 0.9, 0.25, 0.75)
+
+
+def test_all_five_probabilities_are_finite_and_clipped():
+    result = script.fuse_prediction_features(
+        2.0, -1.0, 3.0, 2.0, -1.0, np.nan, 3.0, 0.5, 0.5,
+        {"w_df_voice_component": 0.0, "w_df_music_component": 0.0,
+         "w_panns_presence": 1.0})
+    assert np.isfinite(result).all()
+    assert all(script.OUTPUT_EPS <= value <= 1.0 - script.OUTPUT_EPS for value in result)
 
 
 def test_exact_sample_mapping_and_output_shape():

@@ -24,7 +24,7 @@ import soundfile as sf
 TARGET_SR=16000
 SEG_SEC=4.0
 OUTPUT_EPS=1e-6
-PIPELINE_VERSION="dacon236749-20260830-v3"
+PIPELINE_VERSION="dacon236749-20260831-v5"
 # DF-Arena model card: input length 64,600 at 16 kHz and logits ordered as
 # [spoof, bonafide].  FAKE therefore always maps to class index 0.
 DF_INPUT_SAMPLES=64600
@@ -118,6 +118,14 @@ def select_aux_segments(wave, sr=16000, seg_sec=4.0):
     return [candidates[i] for i in selected]
 
 
+def limit_aux_segments(segments, maximum):
+    if maximum is None or int(maximum) <= 0 or len(segments) <= int(maximum):
+        return segments
+    energies=[float(np.mean(np.asarray(segment,dtype=np.float32)**2)) for segment in segments]
+    selected=sorted(np.argsort(energies)[-int(maximum):].tolist())
+    return [segments[index] for index in selected]
+
+
 # Backwards-compatible name for external notebooks.
 select_aux_segment=select_aux_segments
 
@@ -179,15 +187,17 @@ def df_arena_predict(sess, wave, sr=16000, seg_sec=DF_SEG_SEC):
     probs=df_arena_fake_probability(logits)
     return aggregate_predictions(probs, method="topk_mean", top_k=2)
 
-def _df_arena_segments(wave, sr=16000, seg_sec=DF_SEG_SEC):
-    """Select one high-information crop for the CPU-heavy 1B detector."""
+def _df_arena_crop_candidates(wave, sr=16000, seg_sec=DF_SEG_SEC):
+    """Return primary/secondary high-energy crops and their start samples."""
     seg_len=int(round(seg_sec*sr))
     if len(wave) <= seg_len:
         # Tile-repeat rather than zero-pad, matching DF-Arena preprocessing.
         if len(wave)==0:
-            return [np.zeros(seg_len,dtype=np.float32)]
+            crop=np.zeros(seg_len,dtype=np.float32)
+            return crop,None,0,None
         repeats=(seg_len+len(wave)-1)//len(wave)
-        return [np.tile(wave,repeats)[:seg_len]]
+        crop=np.tile(wave,repeats)[:seg_len]
+        return crop,None,0,None
     # Scan 1-second hops using cumulative energy and choose the strongest
     # window.  This avoids feeding silence while requiring only one 1B-model
     # forward pass per file.
@@ -199,22 +209,66 @@ def _df_arena_segments(wave, sr=16000, seg_sec=DF_SEG_SEC):
     cumulative=np.concatenate(([0.0],np.cumsum(squared)))
     energies=[cumulative[start+seg_len]-cumulative[start] for start in starts]
     best=starts[int(np.argmax(energies))]
-    return [wave[best:best+seg_len]]
+    minimum_distance=max(seg_len//2,2*sr)
+    eligible=[(energy,start) for energy,start in zip(energies,starts)
+              if abs(start-best)>=minimum_distance]
+    second=max(eligible)[1] if eligible else None
+    return wave[best:best+seg_len],(wave[second:second+seg_len] if second is not None else None),best,second
 
-def df_arena_predict_batch(sess, waves, sr=16000, seg_sec=DF_SEG_SEC):
+
+def _df_arena_segments(wave, sr=16000, seg_sec=DF_SEG_SEC):
+    primary,_,_,_=_df_arena_crop_candidates(wave,sr,seg_sec)
+    return [primary]
+
+
+def should_use_adaptive_df_second_crop(duration_sec, primary_fake_probability,
+                                       low=0.25, high=0.75, minimum_duration=12.0):
+    return (float(duration_sec)>=float(minimum_duration)
+            and float(low)<float(primary_fake_probability)<float(high))
+
+def df_arena_predict_batch(sess, waves, sr=16000, seg_sec=DF_SEG_SEC,
+                           adaptive_config=None, return_details=False):
     """Run DF_Arena for several files in one ONNX Runtime call.
 
     This preserves the per-file crops and top-k aggregation from
     ``df_arena_predict`` while substantially reducing GPU launch overhead.
     """
-    bounds=[]; flat=[]
-    for wave in waves:
-        start=len(flat)
-        flat.extend(_df_arena_segments(wave, sr, seg_sec))
-        bounds.append((start,len(flat)))
-    logits=sess.run(None,{sess.get_inputs()[0].name:np.stack(flat).astype(np.float32)})[0]
-    probs=df_arena_fake_probability(logits)
-    return [aggregate_predictions(probs[start:end], method="topk_mean", top_k=2) for start,end in bounds]
+    config={"enabled":True,"low":0.25,"high":0.75,"minimum_duration":12.0,
+            "aggregation":"mean","force_second_for_long":False}
+    if adaptive_config:
+        config.update(adaptive_config)
+    candidates=[_df_arena_crop_candidates(wave,sr,seg_sec) for wave in waves]
+    primary_batch=np.stack([item[0] for item in candidates]).astype(np.float32)
+    primary=df_arena_fake_probability(
+        sess.run(None,{sess.get_inputs()[0].name:primary_batch})[0])
+    selected=[]
+    for index,(wave,item,score) in enumerate(zip(waves,candidates,primary)):
+        has_second=item[1] is not None
+        trigger=config["enabled"] and has_second and (
+            config.get("force_second_for_long",False)
+            or should_use_adaptive_df_second_crop(len(wave)/sr,score,config["low"],config["high"],config["minimum_duration"]))
+        if trigger:
+            selected.append(index)
+    second_scores={}
+    if selected:
+        second_batch=np.stack([candidates[index][1] for index in selected]).astype(np.float32)
+        second_probs=df_arena_fake_probability(
+            sess.run(None,{sess.get_inputs()[0].name:second_batch})[0])
+        second_scores=dict(zip(selected,map(float,second_probs)))
+    results=[]; details=[]
+    for index,score in enumerate(primary):
+        second=second_scores.get(index)
+        if second is None:
+            combined=float(score)
+        elif config["aggregation"]=="max":
+            combined=max(float(score),second)
+        else:
+            combined=(float(score)+second)/2.0
+        results.append(combined)
+        details.append({"primary":float(score),"second":second,
+                        "primary_start":candidates[index][2],"second_start":candidates[index][3],
+                        "used_second":second is not None})
+    return (results,details) if return_details else results
 
 def _strict_checkpoint_model(ckpt_path, device, expected_task):
     ckpt=torch.load(str(ckpt_path), map_location="cpu")
@@ -304,10 +358,12 @@ def load_fusion_weights():
             w["w_df_arena"]=float(np.clip(float(w.get("w_df_arena", 0.5)), 0.0, 1.0))
         except (TypeError, ValueError):
             w["w_df_arena"]=0.5
-        try:
-            w["w_df_component"]=float(np.clip(float(w.get("w_df_component", 0.0)), 0.0, 1.0))
-        except (TypeError, ValueError):
-            w["w_df_component"]=0.0
+        legacy=w.get("w_df_component",0.0)
+        for key in ("w_df_voice_component","w_df_music_component"):
+            try:
+                w[key]=float(np.clip(float(w.get(key,legacy)),0.0,1.0))
+            except (TypeError,ValueError):
+                w[key]=0.0
         print(f"loaded fusion {w}")
         return w
     raise FileNotFoundError("model/fusion_weights.json is mandatory; run validation calibration first")
@@ -347,15 +403,23 @@ def fuse_prediction_features(file_fake_df, voice_fake_model, music_fake_model,
                              music_present_model, voice_present_panns,
                              music_present_panns, fusion_weights):
     """Canonical score fusion shared by validation and submitted inference."""
+    values=np.nan_to_num(np.asarray([
+        file_fake_df,voice_fake_model,music_fake_model,file_voice,file_music,
+        voice_present_model,music_present_model,voice_present_panns,music_present_panns,
+    ],dtype=np.float64),nan=0.5,posinf=1.0,neginf=0.0)
+    (file_fake_df,voice_fake_model,music_fake_model,file_voice,file_music,
+     voice_present_model,music_present_model,voice_present_panns,music_present_panns)=values
     w_panns=float(fusion_weights.get("w_panns_presence",0.6))
     voice_present=w_panns*voice_present_panns + (1.0-w_panns)*voice_present_model
     music_present=w_panns*music_present_panns + (1.0-w_panns)*music_present_model
     # The generic DF_Arena score is the robust fake signal for this external
     # domain.  The small in-domain heads remain a secondary cue rather than
     # being allowed to overturn it on unseen generators.
-    w_component=fusion_weights.get("w_df_component",0.0)
-    voice_fake=w_component*file_fake_df+(1.0-w_component)*voice_fake_model
-    music_fake=w_component*file_fake_df+(1.0-w_component)*music_fake_model
+    legacy=fusion_weights.get("w_df_component",0.0)
+    w_voice_component=fusion_weights.get("w_df_voice_component",legacy)
+    w_music_component=fusion_weights.get("w_df_music_component",legacy)
+    voice_fake=w_voice_component*file_fake_df+(1.0-w_voice_component)*voice_fake_model
+    music_fake=w_music_component*file_fake_df+(1.0-w_music_component)*music_fake_model
     wv=fusion_weights.get("w_voice_file",0.5)
     wm=fusion_weights.get("w_music_file",0.3)
     wo=fusion_weights.get("w_prob_or",0.2)
@@ -380,7 +444,8 @@ def _combine_predictions(file_fake_df, v_probs, m_probs, panns_out, fusion_weigh
 
 
 def infer_wave_features_batch(voice_model, music_model, df_sess, panns_model,
-                              waves, device, use_demucs=False):
+                              waves, device, use_demucs=False, df_config=None,
+                              specialist_max_segments=None, panns_max_segments=None):
     """Canonical preprocessing/model/aggregation path used by val and submit."""
     separator=get_separator(device=device, use_demucs=use_demucs)
     separator_type="htdemucs" if getattr(separator,"use_demucs",False) else "identity"
@@ -389,18 +454,44 @@ def infer_wave_features_batch(voice_model, music_model, df_sess, panns_model,
     segment_groups_v=[]; segment_groups_m=[]; segment_groups_o=[]
     for wave in waves:
         vocals,music=separator.separate(wave,sr=TARGET_SR)
-        segment_groups_v.append(select_aux_segments(vocals,sr=TARGET_SR,seg_sec=SEG_SEC))
-        segment_groups_m.append(select_aux_segments(music,sr=TARGET_SR,seg_sec=SEG_SEC))
-        segment_groups_o.append(select_aux_segments(wave,sr=TARGET_SR,seg_sec=SEG_SEC))
-    df_probs=df_arena_predict_batch(df_sess,waves,sr=TARGET_SR,seg_sec=DF_SEG_SEC)
+        segment_groups_v.append(limit_aux_segments(
+            select_aux_segments(vocals,sr=TARGET_SR,seg_sec=SEG_SEC),specialist_max_segments))
+        segment_groups_m.append(limit_aux_segments(
+            select_aux_segments(music,sr=TARGET_SR,seg_sec=SEG_SEC),specialist_max_segments))
+        segment_groups_o.append(limit_aux_segments(
+            select_aux_segments(wave,sr=TARGET_SR,seg_sec=SEG_SEC),panns_max_segments))
     v_out,v_bounds=_run_torch_segments(voice_model,segment_groups_v,device,use_amp=True)
     m_out,m_bounds=_run_torch_segments(music_model,segment_groups_m,device,use_amp=True)
     p_out,p_bounds=_run_torch_segments(panns_model,segment_groups_o,device,use_amp=False,outputs_are_logits=False)
+    gate_threshold=(df_config or {}).get("gate_voice_presence_threshold")
+    if gate_threshold is None:
+        df_indices=list(range(len(waves)))
+    else:
+        df_indices=[]
+        for row,(start,end) in enumerate(v_bounds):
+            if float(np.mean(v_out["voice_present"][start:end])) >= float(gate_threshold):
+                df_indices.append(row)
+    df_probs=[0.5]*len(waves)
+    df_details=[{"primary":0.5,"second":None,"primary_start":None,
+                 "second_start":None,"used_second":False} for _ in waves]
+    if df_indices:
+        selected_probs,selected_details=df_arena_predict_batch(
+            df_sess,[waves[index] for index in df_indices],sr=TARGET_SR,seg_sec=DF_SEG_SEC,
+            adaptive_config=df_config,return_details=True)
+        for index,probability,detail in zip(df_indices,selected_probs,selected_details):
+            df_probs[index]=probability
+            df_details[index]=detail
+    df_used=set(df_indices)
     features=[]
     for row in range(len(waves)):
         va,vb=v_bounds[row]; ma,mb=m_bounds[row]; pa,pb=p_bounds[row]
         features.append({
             "df":float(df_probs[row]),
+            "df_primary":float(df_details[row]["primary"]),
+            "df_second":float(df_details[row]["second"]) if df_details[row]["second"] is not None else np.nan,
+            "df_has_second":bool(df_details[row]["second"] is not None),
+            "df_used":row in df_used,
+            "duration_sec":float(len(waves[row])/TARGET_SR),
             "vf":aggregate_predictions(v_out["voice_fake"][va:vb],"topk_mean",2),
             "mf":aggregate_predictions(m_out["music_fake"][ma:mb],"topk_mean",2),
             "vfile":aggregate_predictions(v_out["file_fake"][va:vb],"topk_mean",2),
@@ -414,10 +505,15 @@ def infer_wave_features_batch(voice_model, music_model, df_sess, panns_model,
 
 
 def fuse_feature_record(feature, fusion_weights):
+    row_weights=fusion_weights
+    if not feature.get("df_used",True):
+        row_weights=dict(fusion_weights)
+        row_weights["w_df_voice_component"]=0.0
+        row_weights["w_df_music_component"]=0.0
     return fuse_prediction_features(
         feature["df"],feature["vf"],feature["mf"],feature["vfile"],feature["mfile"],
         feature["vp_model"],feature["mp_model"],feature["vp_panns"],feature["mp_panns"],
-        fusion_weights)
+        row_weights)
 
 def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_weights, audio_paths, device, use_demucs=False):
     """Inference for a small group of files with batched GPU model calls."""
@@ -438,8 +534,20 @@ def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_wei
         records.append((index,audio_path,wave))
     if not records:
         return results
+    df_config={
+        "enabled":bool(fusion_weights.get("adaptive_df_enabled",True)),
+        "low":float(fusion_weights.get("adaptive_df_low",0.25)),
+        "high":float(fusion_weights.get("adaptive_df_high",0.75)),
+        "aggregation":str(fusion_weights.get("adaptive_df_aggregation","mean")),
+    }
+    if fusion_weights.get("df_gate_policy") == "voice_presence":
+        df_config["gate_voice_presence_threshold"]=float(
+            fusion_weights.get("df_gate_voice_presence_threshold",0.8))
     features=infer_wave_features_batch(
-        voice_model,music_model,df_sess,panns_model,[r[2] for r in records],device,use_demucs)
+        voice_model,music_model,df_sess,panns_model,[r[2] for r in records],device,use_demucs,
+        df_config=df_config,
+        specialist_max_segments=int(fusion_weights.get("specialist_max_segments",3)),
+        panns_max_segments=int(fusion_weights.get("panns_max_segments",3)))
     for (index,audio_path,_),feature in zip(records,features):
         results[index]=[audio_path.stem]+fuse_feature_record(feature,fusion_weights)
     return results

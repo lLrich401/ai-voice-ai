@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 Real training CLI for DACON 236749 - voice/music separate detectors, leakage-safe, HTDemucs stems, VAL-A/B/C/D, fusion optimization.
 No synthetic fallback in final path.
@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, WeightedRandomSampler
 from torch.cuda.amp import GradScaler, autocast
 from .metrics import compute_dacon_metrics
 from .dataset import scan_real_datasets, build_val_sets, AudioDataset
@@ -30,6 +30,22 @@ def get_model(task, backbone="aasist", base_channels=32, device="cpu"):
 
 
 HEADS = ("file_fake", "voice_fake", "music_fake", "voice_present", "music_present")
+
+
+def specialist_sample_weights(frame, task):
+    """Per-row weights targeting 40% component-only, 40% mixed, 20% other."""
+    mixed = frame["path"].astype(str).str.startswith("MIX::").to_numpy()
+    present = frame[f"{task}_present"].to_numpy(dtype=bool)
+    component_only = present & ~mixed
+    other = ~(mixed | component_only)
+    weights = np.zeros(len(frame), dtype=np.float64)
+    for mask, fraction in ((component_only, 0.40), (mixed, 0.40), (other, 0.20)):
+        count = int(mask.sum())
+        if count:
+            weights[mask] = fraction / count
+    if weights.sum() <= 0:
+        weights[:] = 1.0 / max(1, len(weights))
+    return weights / weights.sum()
 
 
 def masked_multitask_loss(logit_t, labels, task="multitask"):
@@ -110,7 +126,7 @@ def validate_multisegment(model, df, device, use_demucs=False, task="multitask",
     """Validate with multi-segment aggregation identical to script.py inference. Batched for speed."""
     model.eval()
     from .preprocess import extract_segments, aggregate_predictions, load_audio
-    from .dataset import apply_codec_sim, apply_telephone_sim
+    from .dataset import load_manifest_row_wave
     if batch_size is None:
         batch_size = 4 if str(device)=="cpu" else 16
     separator=None
@@ -139,27 +155,13 @@ def validate_multisegment(model, df, device, use_demucs=False, task="multitask",
     for idx in range(len(df)):
         row=df.iloc[idx]
         path_str=str(row["path"])
-        if path_str.startswith("MIX::"):
-            continue
         try:
-            wave,_ = load_audio(path_str, target_sr=sr)
+            wave = load_manifest_row_wave(
+                row, sr=sr, is_training=False, use_demucs=use_demucs,
+                task=task, separator=separator)
         except Exception as e:
             print(f"load fail {path_str}: {e}")
             continue
-        augment = str(row.get("augment","none")).lower() if "augment" in row else "none"
-        if augment=="codec_mp3" or augment=="codec":
-            wave=apply_codec_sim(wave, sr=sr)
-        elif augment=="telephone" or augment=="tel":
-            wave=apply_telephone_sim(wave, sr=sr)
-        if use_demucs and separator is not None:
-            try:
-                vocals, music = separator.separate(wave, sr=sr)
-                if task=="voice":
-                    wave=vocals
-                elif task=="music":
-                    wave=music
-            except Exception as e:
-                raise RuntimeError(f"HTDemucs separation failed {path_str}: {e}")
         segs = extract_segments(wave, sr=sr, seg_sec=seg_sec, strategy="uniform5")
         file_labels.append(np.array([row.get(k,0) for k in ["file_fake","voice_fake","music_fake","voice_present","music_present"]], dtype=np.float32))
         file_seg_counts.append(len(segs))
@@ -200,190 +202,6 @@ def validate_multisegment(model, df, device, use_demucs=False, task="multitask",
     y_pred={k: all_p[:,i] for i,k in enumerate(["file_fake","voice_fake","music_fake","voice_present","music_present"])}
     return compute_dacon_metrics(y_true, y_pred)
 
-def optimize_fusion_weights(voice_model, music_model, val_loader, device, out_path="model/fusion_weights.json"):
-    """
-    Validation-based fusion weight optimization for FILE_FAKE.
-    Uses actual PANNs (on ORIGINAL waveform) + detector predictions for presence, not ground truth.
-    Requirement 6: PANNs runs on original, voice detector on vocals, music on music.
-    """
-    voice_model.eval(); music_model.eval()
-    all_true=[]; voice_file=[]; music_file=[]; voice_fake=[]; music_fake=[]; voice_present_pred=[]; music_present_pred=[]
-    panns_model=None
-    try:
-        from .models.panns import PANNsPresenceWrapper
-        import pathlib as pl
-        if (pl.Path("model/panns/Cnn14_mAP=0.431.pth").exists() or (pl.Path(__file__).parent.parent / "model" / "panns" / "Cnn14_mAP=0.431.pth").exists()):
-            panns_model=PANNsPresenceWrapper(use_pretrained=True)
-            panns_model.to(device).eval()
-            print("PANNs loaded for fusion presence (on ORIGINAL waveform)")
-    except Exception as e:
-        print(f"PANNs not loaded for fusion: {e}")
-        panns_model=None
-    # For fusion we need to run voice detector on vocals, music on music, PANNs on original
-    # val_loader currently provides original wave (if use_demucs=False). We need separate loaders for vocals/music
-    # Try to infer dataset from val_loader
-    try:
-        df = getattr(val_loader.dataset, 'df', None)
-        is_val_dataset = df is not None
-    except:
-        df=None
-        is_val_dataset=False
-    # If we have df, we will create stem loaders for voice/music and original for PANNs
-    if df is not None:
-        from torch.utils.data import DataLoader
-        from .dataset import AudioDataset
-        # Determine use_demucs flag from original loader (should be False for original, but we need stems)
-        # Create voice/music datasets with use_demucs if needed, but for PANNs we use original
-        # Check if voice/music models were trained with use_demucs
-        voice_use_demucs = getattr(voice_model, 'use_demucs_flag', False) if hasattr(voice_model, 'use_demucs_flag') else False
-        music_use_demucs = getattr(music_model, 'use_demucs_flag', False) if hasattr(music_model, 'use_demucs_flag') else False
-        # For now, assume models expect stem if they were trained with use_demucs, but we will run them on appropriate stem
-        # Create loaders
-        from .preprocess import extract_segments
-        # We will process file by file to ensure correct stem/PANNs separation
-        with torch.inference_mode():
-            for idx in range(len(df)):
-                row=df.iloc[idx]
-                path_str=str(row["path"])
-                if path_str.startswith("MIX::"):
-                    continue
-                from .preprocess import load_audio
-                from .dataset import apply_codec_sim, apply_telephone_sim
-                wave,_ = load_audio(path_str, target_sr=16000)
-                augment = str(row.get("augment","none")).lower() if "augment" in row else "none"
-                if augment=="codec_mp3":
-                    wave=apply_codec_sim(wave, sr=16000)
-                elif augment=="telephone":
-                    wave=apply_telephone_sim(wave, sr=16000)
-                # Get separator if needed
-                # For voice/music detectors, we need vocals/music stems
-                # If models were trained with demucs, we should separate; else use original
-                # Try to infer from dataset use_demucs: if voice_model was trained with demucs, we separate
-                # For now, we will check loader.dataset.use_demucs as proxy for training flag
-                use_demucs_flag = getattr(val_loader.dataset, 'use_demucs', False)
-                if use_demucs_flag:
-                    from .models.demucs_wrapper import get_separator
-                    sep=get_separator(device=str(device), use_demucs=True)
-                    if getattr(sep,'use_demucs',False):
-                        vocals, music = sep.separate(wave, sr=16000)
-                    else:
-                        vocals, music = wave, wave
-                else:
-                    # No demucs, use original for all (unified)
-                    vocals, music = wave, wave
-                    # For training without demucs, task-specific still uses original; so voice/music detectors run on original
-                    # That's consistent with unified mode
-                # Now run models on appropriate stems
-                # Voice model on vocals
-                wav_v = torch.from_numpy(vocals).float().unsqueeze(0).to(device)  # [1,T] but need 4s segments? Use multi-segment like script
-                # For fusion validation, we should do multi-segment aggregation same as validate_multisegment
-                from .preprocess import extract_segments, aggregate_predictions
-                segs_v = extract_segments(vocals, sr=16000, seg_sec=4.0, strategy="uniform5")
-                segs_m = extract_segments(music, sr=16000, seg_sec=4.0, strategy="uniform5")
-                segs_o = extract_segments(wave, sr=16000, seg_sec=4.0, strategy="uniform5")
-                batch_v = torch.from_numpy(np.stack(segs_v)).float().to(device)
-                batch_m = torch.from_numpy(np.stack(segs_m)).float().to(device)
-                batch_o = torch.from_numpy(np.stack(segs_o)).float().to(device)
-                v_logits = voice_model(batch_v)
-                m_logits = music_model(batch_m)
-                # Aggregate per file
-                v_file_seg = torch.sigmoid(v_logits["file_fake"]).cpu().numpy()
-                m_file_seg = torch.sigmoid(m_logits["file_fake"]).cpu().numpy()
-                v_fake_seg = torch.sigmoid(v_logits["voice_fake"]).cpu().numpy()
-                m_fake_seg = torch.sigmoid(m_logits["music_fake"]).cpu().numpy()
-                v_present_seg = torch.sigmoid(v_logits["voice_present"]).cpu().numpy()
-                m_present_seg = torch.sigmoid(m_logits["music_present"]).cpu().numpy()
-                # Use topk_mean for fake/file, mean for present
-                v_file = aggregate_predictions(v_file_seg, method="topk_mean", top_k=2)
-                m_file = aggregate_predictions(m_file_seg, method="topk_mean", top_k=2)
-                v_fake = aggregate_predictions(v_fake_seg, method="topk_mean", top_k=2)
-                m_fake = aggregate_predictions(m_fake_seg, method="topk_mean", top_k=2)
-                v_present = float(np.mean(v_present_seg))
-                m_present = float(np.mean(m_present_seg))
-                # PANNs on ORIGINAL
-                if panns_model is not None:
-                    try:
-                        p_out = panns_model(batch_o)
-                        p_v = float(torch.mean(p_out["voice_present"]).item())
-                        p_m = float(torch.mean(p_out["music_present"]).item())
-                        v_present = 0.6*p_v + 0.4*v_present
-                        m_present = 0.6*p_m + 0.4*m_present
-                    except Exception as e:
-                        pass
-                all_true.append(np.array([row.get(k,0) for k in ["file_fake","voice_fake","music_fake","voice_present","music_present"]], dtype=np.float32))
-                voice_file.append(v_file); music_file.append(m_file)
-                voice_fake.append(v_fake); music_fake.append(m_fake)
-                voice_present_pred.append(v_present); music_present_pred.append(m_present)
-        if len(all_true)==0:
-            raise RuntimeError("No samples for fusion optimization")
-        all_true=np.stack(all_true)
-        voice_file=np.array(voice_file); music_file=np.array(music_file)
-        voice_fake=np.array(voice_fake); music_fake=np.array(music_fake)
-        voice_present_pred=np.array(voice_present_pred); music_present_pred=np.array(music_present_pred)
-    else:
-        # Fallback old path: single crop on original wave (not stem) – but we still ensure PANNs on original
-        with torch.inference_mode():
-            for wav, labels, _ in val_loader:
-                wav=wav.to(device)
-                v_logits=voice_model(wav)
-                m_logits=music_model(wav)
-                v_file=torch.sigmoid(v_logits["file_fake"]).cpu().numpy()
-                m_file=torch.sigmoid(m_logits["file_fake"]).cpu().numpy()
-                v_fake=torch.sigmoid(v_logits["voice_fake"]).cpu().numpy()
-                m_fake=torch.sigmoid(m_logits["music_fake"]).cpu().numpy()
-                v_present=torch.sigmoid(v_logits["voice_present"]).cpu().numpy()
-                m_present=torch.sigmoid(m_logits["music_present"]).cpu().numpy()
-                if panns_model is not None:
-                    try:
-                        p_out=panns_model(wav)
-                        p_v = p_out["voice_present"].cpu().numpy()
-                        p_m = p_out["music_present"].cpu().numpy()
-                        v_present = 0.6*p_v + 0.4*v_present
-                        m_present = 0.6*p_m + 0.4*m_present
-                    except:
-                        pass
-                all_true.append(labels.numpy())
-                voice_file.append(v_file); music_file.append(m_file)
-                voice_fake.append(v_fake); music_fake.append(m_fake)
-                voice_present_pred.append(v_present); music_present_pred.append(m_present)
-        # all_true etc already stacked in df branch, concatenated in fallback branch
-        pass
-    # Common handling: ensure arrays are 1D
-    if isinstance(all_true, list):
-        all_true=np.concatenate(all_true)
-        voice_file=np.concatenate(voice_file); music_file=np.concatenate(music_file)
-        voice_fake=np.concatenate(voice_fake); music_fake=np.concatenate(music_fake)
-        voice_present_pred=np.concatenate(voice_present_pred); music_present_pred=np.concatenate(music_present_pred)
-    # Now all_true is [N,5] or [N,5] stacked
-    file_true=all_true[:,0] if all_true.ndim==2 else all_true
-    best_score=-1; best_w=None; best_metrics=None
-    # grid search
-    for w_v in [0.3,0.5,0.7]:
-        for w_m in [0.3,0.5,0.7]:
-            for w_or in [0.0,0.2,0.4]:
-                s=w_v+w_m+w_or
-                wv=w_v/s; wm=w_m/s; wo=w_or/s
-                prob_or=1-(1-voice_fake)*(1-music_fake)
-                fused=wv*voice_file + wm*music_file + wo*prob_or
-                fused=np.clip(fused,0.01,0.99)
-                # Use actual predicted presence, not ground truth (fix leakage)
-                y_pred={"file_fake":fused, "voice_fake":voice_fake, "music_fake":music_fake,
-                        "voice_present":voice_present_pred, "music_present":music_present_pred}
-                y_true={"file_fake":file_true, "voice_fake":all_true[:,1], "music_fake":all_true[:,2],
-                        "voice_present":all_true[:,3], "music_present":all_true[:,4]}
-                metrics=compute_dacon_metrics(y_true, y_pred)
-                # Also compute FILE_FAKE EER only for alternative optimization
-                if metrics["score"]>best_score:
-                    best_score=metrics["score"]; best_w=(wv,wm,wo); best_metrics=metrics
-    if best_w is None:
-        best_w=(0.5,0.3,0.2); best_score=0
-    weights={"w_voice_file":float(best_w[0]), "w_music_file":float(best_w[1]), "w_prob_or":float(best_w[2]), "val_score":float(best_score)}
-    pathlib.Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path,"w") as f:
-        json.dump(weights,f,indent=2)
-    print(f"Fusion weights optimized {weights}")
-    return weights
-
 def main():
     parser=argparse.ArgumentParser(description="Real training for voice/music detectors")
     parser.add_argument("--data_root", default="data/raw", help="real data root")
@@ -393,14 +211,13 @@ def main():
     parser.add_argument("--backbone", choices=["aasist","spec_cnn","fusion"], default="aasist")
     parser.add_argument("--use_demucs", action="store_true", help="use HTDemucs vocals/music stems")
     parser.add_argument("--batch_size", type=int, default=16)
-    parser.add_argument("--epochs", type=int, default=20)
+    parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seg_sec", type=float, default=4.0)
     parser.add_argument("--base_channels", type=int, default=32)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--save_path", default=None)
     parser.add_argument("--val_sets", nargs="+", default=["val_a","val_b","val_c","val_d"], help="which val sets to evaluate")
-    parser.add_argument("--optimize_fusion", action="store_true")
     parser.add_argument("--seed", type=int, default=20260830)
     args=parser.parse_args()
 
@@ -470,7 +287,13 @@ def main():
     # Datasets
     train_ds=AudioDataset(train_df, sr=16000, seg_sec=args.seg_sec, is_training=True, use_demucs=args.use_demucs, task=args.task, device=str(device))
     val_a_ds=AudioDataset(val_a, sr=16000, seg_sec=args.seg_sec, is_training=False, use_demucs=args.use_demucs, task=args.task, device=str(device))
-    train_loader=DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, num_workers=0, pin_memory=False)
+    sampler = None
+    if args.task in ("voice", "music"):
+        sample_weights = specialist_sample_weights(train_df, args.task)
+        sampler = WeightedRandomSampler(torch.as_tensor(sample_weights, dtype=torch.double),
+                                        num_samples=len(train_df), replacement=True)
+    train_loader=DataLoader(train_ds, batch_size=args.batch_size, shuffle=sampler is None,
+                            sampler=sampler, num_workers=0, pin_memory=False)
     # Use smaller batch for validation on CPU for speed (AASIST batch 4 is fastest)
     val_batch = min(args.batch_size, 4) if str(device)=="cpu" else args.batch_size
     val_a_loader=DataLoader(val_a_ds, batch_size=val_batch, shuffle=False, num_workers=0)
@@ -489,6 +312,7 @@ def main():
     scaler=GradScaler(enabled=(device.type=="cuda"))
     best_score=-1
     best_path=None
+    training_history=[]
     if args.save_path is None:
         args.save_path=f"model/{args.task}_{args.backbone}.pt" if args.task!="multitask" else "model/best.pt"
     pathlib.Path(args.save_path).parent.mkdir(parents=True, exist_ok=True)
@@ -505,6 +329,9 @@ def main():
             m=validate(model, loader, device)
             epoch_metrics[name] = m
             print(f"  {name} score {m['score']:.4f} file {m['file_eer']:.3f} voice {m['voice_eer']:.3f} music {m['music_eer']:.3f}")
+        for split_name, split_metrics in epoch_metrics.items():
+            training_history.append({"task":args.task,"epoch":epoch+1,"split":split_name,
+                                     "train_loss":loss,**split_metrics})
         scheduler.step()
         selection_score = checkpoint_selection_score(epoch_metrics, task=args.task)
         print(f"  checkpoint composite {selection_score:.4f} ({args.task} responsibility + worst split + unseen VAL-B)")
@@ -541,12 +368,10 @@ def main():
                 m=validate(model, loader, device)
                 print(f"Final {name} {m}")
 
-    # Fusion optimization if requested and task is multitask with both voice/music models available
-    if args.optimize_fusion and args.task=="multitask":
-        # Need both voice and music models - for demo we use same model
-        # In real stage, this is called after both voice and music detectors trained separately
-        print("Fusion optimization requested but need separate voice/music models - skipping, run scripts/run_all_stages.py for joint optimization")
-
+    history_path=pathlib.Path("experiments")/f"{args.task}_training_curve.csv"
+    history_path.parent.mkdir(parents=True,exist_ok=True)
+    pd.DataFrame(training_history).to_csv(history_path,index=False)
+    print(f"Training curve saved {history_path} ({len(training_history)} rows)")
     print(f"Training done {args.task} best_score {best_score:.4f} saved {best_path}")
 
 if __name__=="__main__":

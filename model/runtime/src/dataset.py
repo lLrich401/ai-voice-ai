@@ -1,8 +1,8 @@
-﻿"""
+"""
 Real dataset pipeline for DACON 236749 - speaker/source/generator leakage-safe, VAL-A/B/C/D, HTDemucs stems.
 No synthetic fallback in final training path (synthetic only for emergency testing, not used in run_all_stages).
 """
-import pathlib, random, os, hashlib
+import pathlib, random, os, hashlib, re
 import numpy as np
 import pandas as pd
 import torch
@@ -148,6 +148,8 @@ def scan_real_datasets(data_root="data/raw", manifest_path="data/manifest.csv"):
                     for c in ["file_fake","voice_fake","music_fake","voice_present","music_present"]:
                         if c in df_existing.columns:
                             df_existing[c] = df_existing[c].astype(int)
+                    df_existing = ensure_split_group_id(df_existing)
+                    df_existing.to_csv(mp, index=False)
                     return df_existing
                 else:
                     missing = (~mask).sum()
@@ -223,13 +225,45 @@ def scan_real_datasets(data_root="data/raw", manifest_path="data/manifest.csv"):
 
 
 MIX_MODES = ("simultaneous", "voice_then_music", "music_then_voice", "partial_overlap", "crossfade")
-MIX_SNRS_DB = (-10.0, -5.0, 0.0, 5.0, 10.0)
+MIX_SNRS_DB = (-15.0, -10.0, -5.0, 0.0, 5.0, 10.0, 15.0)
+MIX_OVERLAP_FRACTIONS = (0.10, 0.25, 0.50, 0.75)
+MIX_GAPS_SEC = (0.0, 0.1, 0.5, 1.0)
+MIX_CROSSFADE_SEC = (0.05, 0.10, 0.25, 0.50)
+MIX_GAINS_DB = (-6.0, -3.0, 0.0, 3.0)
 
 
 def mixed_labels(voice_fake, music_fake):
     """Return official [file, voice, music, voice_present, music_present] labels."""
     vf, mf = int(voice_fake), int(music_fake)
     return [int(vf or mf), vf, mf, 1, 1]
+
+
+def derive_split_group_id(row):
+    """Stable original-identity group used by every train/validation split."""
+    source = str(row.get("source", row.get("dataset", ""))).lower()
+    original_id = str(row.get("original_id", pathlib.Path(str(row.get("path", ""))).stem))
+    speaker_id = str(row.get("speaker_id", "unknown"))
+    wavefake_match = re.search(r"LJ\d+-\d+", original_id, flags=re.IGNORECASE)
+    if "wavefake" in source or wavefake_match:
+        identity = wavefake_match.group(0).upper() if wavefake_match else original_id
+        return f"wavefake::{identity}"
+    if "libri" in source:
+        return f"libri::{speaker_id}"
+    if "asvspoof" in source:
+        return f"asvspoof::{speaker_id}"
+    if "gtzan" in source or "fma" in source:
+        return f"gtzan::{original_id}"
+    if "fake_music" in source or "fakemusic" in source:
+        # Generated pairs use the trailing source/prompt index, independent of generator.
+        identity = re.sub(r"(?i)(musicgen|audioldm2)", "generator", original_id)
+        return f"generated_music::{identity}"
+    return f"{source or 'unknown'}::{original_id}"
+
+
+def ensure_split_group_id(df):
+    result = df.copy()
+    result["split_group_id"] = result.apply(derive_split_group_id, axis=1)
+    return result
 
 
 def _row_source_ids(row):
@@ -240,7 +274,7 @@ def _row_source_ids(row):
         if value and value.lower() != "nan":
             ids.add(value)
     if not ids:
-        value = str(row.get("original_id", ""))
+        value = str(row.get("split_group_id", row.get("original_id", "")))
         if value and value.lower() != "nan":
             ids.add(value)
     return ids
@@ -253,9 +287,24 @@ def assert_no_base_source_overlap(left, right, names=("left", "right")):
     assert not overlap, f"{names[0]}/{names[1]} base-source overlap: {len(overlap)} {sorted(overlap)[:3]}"
 
 
+def assert_disjoint_split_groups(splits):
+    """Assert pairwise disjoint original identities across major split families."""
+    names = list(splits)
+    groups = {
+        name: set(ensure_split_group_id(frame)["split_group_id"].astype(str))
+        for name, frame in splits.items()
+    }
+    for i, left in enumerate(names):
+        for right in names[i + 1:]:
+            overlap = groups[left] & groups[right]
+            assert not overlap, f"{left}/{right} split_group_id overlap: {sorted(overlap)[:3]}"
+    return {name: len(value) for name, value in groups.items()}
+
+
 def add_split_internal_mixes(split_df, mixes_per_class=40, random_state=42):
     """Add balanced RR/RF/FR/FF mixes using only recordings already in one split."""
     base = split_df[~split_df["path"].astype(str).str.startswith("MIX::")].copy().reset_index(drop=True)
+    base = ensure_split_group_id(base)
     rng = np.random.default_rng(random_state)
     pools = {}
     for component, present_col, fake_col in (
@@ -278,7 +327,13 @@ def add_split_internal_mixes(split_df, mixes_per_class=40, random_state=42):
                 mode = MIX_MODES[(i + 2 * vf + mf) % len(MIX_MODES)]
                 snr = MIX_SNRS_DB[(i + vf + 2 * mf) % len(MIX_SNRS_DB)]
                 labels = mixed_labels(vf, mf)
-                v_id, m_id = str(v["original_id"]), str(m["original_id"])
+                v_original, m_original = str(v["original_id"]), str(m["original_id"])
+                v_id, m_id = str(v["split_group_id"]), str(m["split_group_id"])
+                overlap_fraction = MIX_OVERLAP_FRACTIONS[(i + vf + mf) % len(MIX_OVERLAP_FRACTIONS)]
+                gap_sec = MIX_GAPS_SEC[(i + 2 * vf + mf) % len(MIX_GAPS_SEC)]
+                crossfade_sec = MIX_CROSSFADE_SEC[(i + vf + 2 * mf) % len(MIX_CROSSFADE_SEC)]
+                voice_gain_db = MIX_GAINS_DB[(i + vf) % len(MIX_GAINS_DB)]
+                music_gain_db = MIX_GAINS_DB[(i + mf + 1) % len(MIX_GAINS_DB)]
                 rows.append({
                     "path": f"MIX::{v['path']}|{m['path']}",
                     "file_fake": labels[0], "voice_fake": labels[1], "music_fake": labels[2],
@@ -286,23 +341,28 @@ def add_split_internal_mixes(split_df, mixes_per_class=40, random_state=42):
                     "speaker_id": f"mix::{v['speaker_id']}::{m['speaker_id']}",
                     "generator": f"mix::{v['generator']}::{m['generator']}",
                     "source": "split_internal_mix", "dataset": "mix", "hf_id": "generated_after_split",
-                    "original_id": f"mix::{v_id}::{m_id}::{vf}{mf}::{i}",
+                    "original_id": f"mix::{v_original}::{m_original}::{vf}{mf}::{i}",
                     "base_voice_id": v_id, "base_music_id": m_id,
-                    "mix_mode": mode, "mix_snr_db": snr, "mix_crossfade_sec": 0.25,
+                    "split_group_id": f"mix::{v['split_group_id']}::{m['split_group_id']}",
+                    "mix_mode": mode, "mix_snr_db": snr,
+                    "mix_overlap_fraction": overlap_fraction, "mix_gap_sec": gap_sec,
+                    "mix_crossfade_sec": crossfade_sec,
+                    "mix_voice_gain_db": voice_gain_db, "mix_music_gain_db": music_gain_db,
                 })
-    originals = base.copy()
+    originals = ensure_split_group_id(base)
     originals["base_voice_id"] = originals.apply(
-        lambda r: str(r["original_id"]) if int(r["voice_present"]) else "", axis=1)
+        lambda r: str(r["split_group_id"]) if int(r["voice_present"]) else "", axis=1)
     originals["base_music_id"] = originals.apply(
-        lambda r: str(r["original_id"]) if int(r["music_present"]) else "", axis=1)
+        lambda r: str(r["split_group_id"]) if int(r["music_present"]) else "", axis=1)
     return pd.concat([originals, pd.DataFrame(rows)], ignore_index=True, sort=False)
 
 
 def render_mixed_wave(voice_wave, music_wave, mode="simultaneous", snr_db=0.0,
-                      crossfade_sec=0.25, sr=TARGET_SR):
+                      crossfade_sec=0.25, sr=TARGET_SR, overlap_fraction=0.5,
+                      gap_sec=0.0, voice_gain_db=0.0, music_gain_db=0.0):
     """Render simultaneous/sequential/overlap mixtures deterministically."""
-    voice = np.asarray(voice_wave, dtype=np.float32)
-    music = np.asarray(music_wave, dtype=np.float32)
+    voice = np.asarray(voice_wave, dtype=np.float32) * (10.0 ** (float(voice_gain_db) / 20.0))
+    music = np.asarray(music_wave, dtype=np.float32) * (10.0 ** (float(music_gain_db) / 20.0))
     v_power = float(np.mean(voice ** 2)) + 1e-9
     m_power = float(np.mean(music ** 2)) + 1e-9
     music = music * np.sqrt(v_power / (10.0 ** (float(snr_db) / 10.0) * m_power))
@@ -316,11 +376,13 @@ def render_mixed_wave(voice_wave, music_wave, mode="simultaneous", snr_db=0.0,
     if mode == "simultaneous":
         out = overlap_at(voice, music, 0)
     elif mode == "voice_then_music":
-        out = np.concatenate([voice, music])
+        out = np.concatenate([voice, np.zeros(max(0, int(round(gap_sec * sr))), np.float32), music])
     elif mode == "music_then_voice":
-        out = np.concatenate([music, voice])
+        out = np.concatenate([music, np.zeros(max(0, int(round(gap_sec * sr))), np.float32), voice])
     elif mode == "partial_overlap":
-        out = overlap_at(voice, music, max(1, len(voice) // 2))
+        overlap_fraction = float(np.clip(overlap_fraction, 0.0, 1.0))
+        overlap_samples = int(round(min(len(voice), len(music)) * overlap_fraction))
+        out = overlap_at(voice, music, max(0, len(voice) - overlap_samples))
     elif mode == "crossfade":
         fade = min(max(1, int(round(crossfade_sec * sr))), len(voice), len(music))
         out = np.concatenate([voice[:-fade], voice[-fade:] * np.linspace(1, 0, fade, dtype=np.float32)
@@ -331,6 +393,37 @@ def render_mixed_wave(voice_wave, music_wave, mode="simultaneous", snr_db=0.0,
     if peak > 0.999:
         out = out * (0.999 / peak)
     return out.astype(np.float32)
+
+
+def load_manifest_row_wave(row, sr=TARGET_SR, is_training=False, use_demucs=False,
+                           task="multitask", separator=None):
+    """Canonical manifest-row audio path shared by train, validation and calibration."""
+    path_str = str(row["path"])
+    if path_str.startswith("MIX::"):
+        voice_path, music_path = path_str.split("MIX::", 1)[1].split("|", 1)
+        voice, _ = load_audio(voice_path, target_sr=sr)
+        music, _ = load_audio(music_path, target_sr=sr)
+        snr = float(row.get("mix_snr_db", 0.0))
+        if is_training:
+            snr += random.uniform(-2.0, 2.0)
+        wave = render_mixed_wave(
+            voice, music, str(row.get("mix_mode", "simultaneous")), snr,
+            float(row.get("mix_crossfade_sec", 0.25)), sr,
+            float(row.get("mix_overlap_fraction", 0.5)), float(row.get("mix_gap_sec", 0.0)),
+            float(row.get("mix_voice_gain_db", 0.0)), float(row.get("mix_music_gain_db", 0.0)))
+    else:
+        wave, _ = load_audio(path_str, target_sr=sr)
+    if use_demucs and task in ("voice", "music"):
+        if separator is None or not getattr(separator, "use_demucs", False):
+            raise RuntimeError(f"HTDemucs unavailable for task={task}")
+        vocals, accompaniment = separator.separate(wave, sr=sr)
+        wave = vocals if task == "voice" else accompaniment
+    augment = str(row.get("augment", "none")).lower()
+    if augment in ("codec_mp3", "codec"):
+        wave = apply_codec_sim(wave, sr=sr)
+    elif augment in ("telephone", "tel"):
+        wave = apply_telephone_sim(wave, sr=sr)
+    return np.asarray(wave, dtype=np.float32)
 
 def leakage_safe_split(df, test_size=0.2, random_state=42):
     """
@@ -369,273 +462,128 @@ def _get_utterance_group(row):
     # For GTZAN etc, use original_id as is
     return oid
 
+def _metric_ready(frame):
+    return (
+        len(frame) > 0
+        and frame["file_fake"].nunique() == 2
+        and frame.loc[frame["voice_present"] == 1, "voice_fake"].nunique() == 2
+        and frame.loc[frame["music_present"] == 1, "music_fake"].nunique() == 2
+    )
+
+
+def _group_partition(frame, fractions, seed):
+    """Partition complete split groups according to fractions, deterministically."""
+    groups = frame[["split_group_id"]].drop_duplicates().sample(frac=1, random_state=seed)
+    names = list(fractions)
+    total = float(sum(fractions.values()))
+    cumulative = np.cumsum([fractions[name] / total for name in names])
+    assignment = {}
+    count = len(groups)
+    for index, group in enumerate(groups["split_group_id"]):
+        position = (index + 0.5) / max(1, count)
+        assignment[group] = names[int(np.searchsorted(cumulative, position, side="right"))]
+    return {name: frame[frame["split_group_id"].map(assignment) == name].copy() for name in names}
+
+
 def build_val_sets(df, out_dir="data/splits", random_state=42):
-    """
-    Build VAL-A/B/C/D from real data with explicit holdout and leakage-safe guarantees:
-    VAL-A normal: leakage-safe split on speaker_id, seen generators
-    VAL-B unseen generator: explicit voice fake (WF7) + music fake (AudioLDM2) held-out, original_id utterance separated, positive/negative asserted
-    VAL-C codec: VAL-A with mp3/lowpass
-    VAL-D telephone: VAL-A with bandpass+8k
-    """
-    # Explicit holdout: voice fake generator and music fake generator
-    voice_fake_gens = sorted(df[df["voice_fake"]==1]["generator"].unique().tolist())
-    music_fake_gens = sorted(df[df["music_fake"]==1]["generator"].unique().tolist())
-    print(f"voice_fake generators: {voice_fake_gens}")
-    print(f"music_fake generators: {music_fake_gens}")
-    holdout_voice = None
-    holdout_music = None
-    # Prefer WF7 for voice, AudioLDM2 for music if present
-    if "WF7" in voice_fake_gens:
-        holdout_voice = "WF7"
-    elif len(voice_fake_gens)>0:
-        holdout_voice = voice_fake_gens[-1]
-    if "AudioLDM2" in music_fake_gens:
-        holdout_music = "AudioLDM2"
-    elif "MusicGen" in music_fake_gens:
-        # hold out MusicGen if AudioLDM2 not present
-        holdout_music = "MusicGen"
-    elif len(music_fake_gens)>0:
-        holdout_music = music_fake_gens[-1]
-    unseen_gens = []
-    if holdout_voice:
-        unseen_gens.append(holdout_voice)
-    if holdout_music:
-        unseen_gens.append(holdout_music)
-    # If still empty (no fake music), fallback to at least one generator
-    if len(unseen_gens)==0:
-        generators = sorted(df["generator"].unique())
-        unseen_gens = [generators[-1]]
-        print(f"No voice/music fake found, fallback holdout {unseen_gens}")
-    print(f"Explicit holdout generators voice={holdout_voice} music={holdout_music} => unseen {unseen_gens}")
-
-    # Separate unseen_df (fake holdout) and seen_df
-    unseen_df = df[df["generator"].isin(unseen_gens)].copy().reset_index(drop=True)
-    seen_df = df[~df["generator"].isin(unseen_gens)].copy().reset_index(drop=True)
-    print(f"Generators total {len(df['generator'].unique())} unseen {unseen_gens} seen {len(seen_df)} unseen_df {len(unseen_df)}")
-
-    # Original_id / utterance separation: ensure no original utterance in train appears in VAL-B with different generator
-    # For WaveFake, same LJ utterance may have multiple WF versions; all versions of that LJ must be together
-    # Collect unseen utterance groups
-    unseen_utterances = set(unseen_df.apply(_get_utterance_group, axis=1).tolist()) if len(unseen_df)>0 else set()
-    # Also collect original_id directly for strict check
-    unseen_original_ids = set(unseen_df["original_id"].tolist()) if len(unseen_df)>0 else set()
-    print(f"Unseen utterances {len(unseen_utterances)} example {list(unseen_utterances)[:3]}")
-    # Filter seen_df to exclude any row whose utterance group is in unseen
-    if len(unseen_utterances)>0:
-        mask = seen_df.apply(lambda r: _get_utterance_group(r) in unseen_utterances, axis=1)
-        # Also check original_id exact
-        mask2 = seen_df["original_id"].isin(unseen_original_ids)
-        mask = mask | mask2
-        removed = mask.sum()
-        if removed>0:
-            print(f"Removing {removed} rows from seen_df to prevent original_id leakage to VAL-B (same LJ utterance)")
-            seen_df = seen_df[~mask].reset_index(drop=True)
-
-    # Leakage-safe split seen_df into train and val_a on speaker_id
-    train_df, val_a = leakage_safe_split(seen_df, test_size=0.2, random_state=random_state)
-
-    # Additional check: ensure train and val_a have no speaker_id overlap (already via leakage_safe_split)
-    # Build VAL-B: unseen fake + real negatives to ensure positive/negative both present
-    if len(unseen_df)>0:
-        # Need to add real samples to VAL-B to have both classes
-        # Real negatives: sample from df where file_fake==0 and not in train/val_a utterance groups
-        train_utterances = set(train_df.apply(_get_utterance_group, axis=1).tolist()) if len(train_df)>0 else set()
-        train_original_ids = set(train_df["original_id"].tolist())
-        val_a_utterances = set(val_a.apply(_get_utterance_group, axis=1).tolist()) if len(val_a)>0 else set()
-        # Pool for real negatives: all real not in train (val_a overlap allowed for real, but train/val_b must be 0)
-        real_pool = df[(df["file_fake"]==0) & (~df["original_id"].isin(train_original_ids))]
-        # Also exclude unseen utterances already
-        real_pool = real_pool[~real_pool.apply(lambda r: _get_utterance_group(r) in unseen_utterances, axis=1)]
-        # Sample real to balance: aim for 1:1 ratio with fake, at least 20% real
-        n_fake = len(unseen_df)
-        n_real_needed = max(min(n_fake, len(real_pool)), 20)  # at least 20 real
-        # If music fake holdout, need both voice and music real? Sample diverse
-        # Take 50% voice real, 50% music real if available
-        voice_real_pool = real_pool[real_pool["voice_present"]==1]
-        music_real_pool = real_pool[real_pool["music_present"]==1]
-        # Sample
-        import random as _rnd
-        _rnd.seed(random_state)
-        val_b_real = []
-        if len(voice_real_pool)>0 and len(music_real_pool)>0:
-            n_voice = min(len(voice_real_pool), n_real_needed//2 + n_real_needed%2)
-            n_music = min(len(music_real_pool), n_real_needed//2)
-            # Adjust if not enough
-            if n_voice + n_music < n_real_needed and len(real_pool) >= n_real_needed:
-                extra = real_pool.sample(n_real_needed - n_voice - n_music, random_state=random_state)
-                val_b_real = pd.concat([voice_real_pool.sample(n_voice, random_state=random_state), music_real_pool.sample(n_music, random_state=random_state), extra])
-            else:
-                val_b_real = pd.concat([voice_real_pool.sample(n_voice, random_state=random_state), music_real_pool.sample(n_music, random_state=random_state)])
-        elif len(real_pool)>0:
-            val_b_real = real_pool.sample(min(n_real_needed, len(real_pool)), random_state=random_state)
-        else:
-            val_b_real = pd.DataFrame(columns=df.columns)
-        if len(val_b_real)>0:
-            val_b = pd.concat([unseen_df, val_b_real], ignore_index=True)
-            # Shuffle
-            val_b = val_b.sample(frac=1, random_state=random_state).reset_index(drop=True)
-        else:
-            val_b = unseen_df
-        # Ensure val_b size not huge: cap at 2*val_a
-        if len(val_b) > len(val_a)*2 and len(val_a)>0:
-            val_b = val_b.sample(len(val_a)*2, random_state=random_state).reset_index(drop=True)
-        print(f"VAL-B constructed: unseen fake {n_fake} + real {len(val_b)-n_fake} = {len(val_b)} (generators {unseen_gens})")
-    else:
-        val_b = pd.DataFrame(columns=df.columns)
-        print("Warning: no unseen generators found, VAL-B will be empty (need more datasets)")
-
-    # Assert positive/negative sufficient for each val set
-    for name, d in [("VAL-A", val_a), ("VAL-B", val_b)]:
-        if len(d)==0:
-            continue
-        # file_fake
-        n_pos = (d["file_fake"]==1).sum()
-        n_neg = (d["file_fake"]==0).sum()
-        print(f"{name} file_fake pos {n_pos} neg {n_neg} ({n_pos/len(d):.2f})")
-        assert n_pos >= 10 and n_neg >= 10, f"{name} file_fake insufficient pos {n_pos} neg {n_neg}"
-        # voice_fake
-        n_pos_v = (d["voice_fake"]==1).sum()
-        n_neg_v = (d["voice_fake"]==0).sum()
-        print(f"{name} voice_fake pos {n_pos_v} neg {n_neg_v}")
-        # music_fake
-        n_pos_m = (d["music_fake"]==1).sum()
-        n_neg_m = (d["music_fake"]==0).sum()
-        print(f"{name} music_fake pos {n_pos_m} neg {n_neg_m}")
-        # For VAL-B, we require at least one of voice or music fake to have positives; but ideally both
-        # Assert at least one fake type has positives
-        assert n_pos_v >= 5 or n_pos_m >= 5, f"{name} no fake positives"
-        # Also assert voice_present/music_present both have pos/neg? But for now check file_fake
-        # Train/VAL-B original_id overlap already handled, assert it
-    # Verify train/VAL-B original_id overlap ==0
-    if len(train_df)>0 and len(val_b)>0:
-        # Check both original_id and utterance group
-        overlap_ids = set(train_df["original_id"]) & set(val_b["original_id"])
-        print(f"train/VAL-B original_id overlap {len(overlap_ids)}")
-        assert len(overlap_ids)==0, f"train/VAL-B original_id overlap {len(overlap_ids)} {list(overlap_ids)[:3]}"
-        overlap_utt = set(train_df.apply(_get_utterance_group, axis=1)) & set(val_b.apply(_get_utterance_group, axis=1))
-        print(f"train/VAL-B utterance group overlap {len(overlap_utt)}")
-        assert len(overlap_utt)==0, f"train/VAL-B utterance overlap {len(overlap_utt)} {list(overlap_utt)[:3]}"
-        # Also speaker overlap
-        overlap_speaker = set(train_df["speaker_id"]) & set(val_b["speaker_id"])
-        print(f"train/VAL-B speaker_id overlap {len(overlap_speaker)}")
-        # For strict, we allow some speaker overlap if not voice? But ideally 0; warn if >0
-        if len(overlap_speaker)>0:
-            print(f"Warning: train/VAL-B speaker overlap {len(overlap_speaker)}")
-
-    # VAL-C codec: copy val_a with codec flag
-    val_c = val_a.copy()
-    val_c["augment"] = "codec_mp3"
-    # VAL-D telephone
-    val_d = val_a.copy()
-    val_d["augment"] = "telephone"
-    # Add augment column to train/val_a/val_b as none
-    for d in [train_df, val_a, val_b]:
-        if "augment" not in d.columns:
-            d["augment"] = "none"
-        else:
-            d["augment"] = d["augment"].fillna("none")
-    # VAL-C/D also need asserts for class balance (they are same as VAL-A, so ok)
-    for name, d in [("VAL-C", val_c), ("VAL-D", val_d)]:
-        if len(d)>0:
-            n_pos = (d["file_fake"]==1).sum()
-            n_neg = (d["file_fake"]==0).sum()
-            print(f"{name} file_fake pos {n_pos} neg {n_neg}")
-            assert n_pos >= 10 and n_neg >= 10, f"{name} insufficient"
-
-    # Save
-    pathlib.Path(out_dir).mkdir(parents=True, exist_ok=True)
-    train_df.to_csv(pathlib.Path(out_dir)/"train.csv", index=False)
-    val_a.to_csv(pathlib.Path(out_dir)/"val_a.csv", index=False)
-    val_b.to_csv(pathlib.Path(out_dir)/"val_b.csv", index=False)
-    val_c.to_csv(pathlib.Path(out_dir)/"val_c.csv", index=False)
-    val_d.to_csv(pathlib.Path(out_dir)/"val_d.csv", index=False)
-    print(f"Saved splits: train {len(train_df)} val_a {len(val_a)} val_b {len(val_b)} val_c {len(val_c)} val_d {len(val_d)} to {out_dir}")
-    # Print class distributions
-    for name, d in [("train", train_df), ("VAL-A", val_a), ("VAL-B", val_b), ("VAL-C", val_c), ("VAL-D", val_d)]:
-        if len(d)>0:
-            print(f"{name} {len(d)} file_fake {(d['file_fake']==1).sum()}/{(d['file_fake']==0).sum()} voice_fake {(d['voice_fake']==1).sum()}/{(d['voice_fake']==0).sum()} music_fake {(d['music_fake']==1).sum()}/{(d['music_fake']==0).sum()}")
-    return {"train":train_df, "val_a":val_a, "val_b":val_b, "val_c":val_c, "val_d":val_d}
-
-
-# This definition intentionally supersedes the legacy implementation above.  It
-# keeps every original recording in exactly one split, and only then creates
-# mixtures inside that split.
-def build_val_sets(df, out_dir="data/splits", random_state=42):
+    """Create disjoint train/model-selection/calibration/final original splits."""
     originals = df[~df["path"].astype(str).str.startswith("MIX::")].copy().reset_index(drop=True)
+    originals = ensure_split_group_id(originals)
     voice_fake_gens = set(originals.loc[originals["voice_fake"] == 1, "generator"].astype(str))
     music_fake_gens = set(originals.loc[originals["music_fake"] == 1, "generator"].astype(str))
-
-    voice_preferences = ("WF7", "ASV2021", "MLAAD")
-    music_preferences = ("AudioLDM2", "MusicGen")
-    holdout_voice = next((g for g in voice_preferences if g in voice_fake_gens), None)
-    holdout_music = next((g for g in music_preferences if g in music_fake_gens), None)
+    holdout_voice = next((g for g in ("WF7", "ASV2021", "MLAAD") if g in voice_fake_gens), None)
+    holdout_music = next((g for g in ("AudioLDM2", "MusicGen") if g in music_fake_gens), None)
     if holdout_voice is None or holdout_music is None:
-        raise ValueError(
-            "Explicit unseen-generator validation requires a known voice generator "
-            f"{voice_preferences} and music generator {music_preferences}; found "
-            f"voice={sorted(voice_fake_gens)}, music={sorted(music_fake_gens)}")
+        raise ValueError(f"Missing explicit unseen generators: voice={sorted(voice_fake_gens)} music={sorted(music_fake_gens)}")
 
-    held = originals[
-        ((originals["voice_fake"] == 1) & (originals["generator"].astype(str) == holdout_voice)) |
-        ((originals["music_fake"] == 1) & (originals["generator"].astype(str) == holdout_music))
-    ].copy()
-    held_groups = set(held.apply(_get_utterance_group, axis=1))
-    remaining = originals[~originals.apply(lambda r: _get_utterance_group(r) in held_groups, axis=1)].copy()
+    held_mask = (
+        ((originals["voice_fake"] == 1) & (originals["generator"].astype(str) == holdout_voice))
+        | ((originals["music_fake"] == 1) & (originals["generator"].astype(str) == holdout_music))
+    )
+    held_groups = set(originals.loc[held_mask, "split_group_id"])
+    held = originals[originals["split_group_id"].isin(held_groups)].copy()
+    ordinary = originals[~originals["split_group_id"].isin(held_groups)].copy()
 
-    # Retry deterministic group splits until every official conditional metric
-    # has both labels.  This prevents silent NaNs or deceptively easy validation.
     chosen = None
-    for attempt in range(100):
-        train_base, validation_pool = leakage_safe_split(
-            remaining, test_size=0.30, random_state=random_state + attempt)
-        val_a_base, val_b_real = leakage_safe_split(
-            validation_pool, test_size=0.45, random_state=random_state + 1000 + attempt)
-        val_b_base = pd.concat([held, val_b_real], ignore_index=True).drop_duplicates("original_id")
-        candidates = (train_base, val_a_base, val_b_base)
-        valid = all(
-            len(d) and d["file_fake"].nunique() == 2
-            and d.loc[d["voice_present"] == 1, "voice_fake"].nunique() == 2
-            and d.loc[d["music_present"] == 1, "music_fake"].nunique() == 2
-            for d in candidates)
-        if valid:
-            chosen = candidates
+    for attempt in range(200):
+        ordinary_parts = _group_partition(
+            ordinary,
+            {"train": 0.65, "model_selection": 0.15, "fusion_calibration": 0.10, "final_holdout": 0.10},
+            random_state + attempt,
+        )
+        held_parts = _group_partition(
+            held,
+            {"model_selection": 0.50, "fusion_calibration": 0.25, "final_holdout": 0.25},
+            random_state + 1000 + attempt,
+        )
+        parts = {"train": ordinary_parts["train"]}
+        for name in ("model_selection", "fusion_calibration", "final_holdout"):
+            parts[name] = pd.concat([ordinary_parts[name], held_parts[name]], ignore_index=True)
+        if all(_metric_ready(parts[name]) for name in parts):
+            chosen = parts
             break
     if chosen is None:
-        raise RuntimeError("Could not create leakage-safe train/VAL-A/VAL-B with all official metric classes")
-    train_base, val_a_base, val_b_base = chosen
+        raise RuntimeError("Could not form four disjoint metric-complete original splits")
 
-    # The unseen fake generators must never appear in training.
-    assert not (((train_base["voice_fake"] == 1) & (train_base["generator"] == holdout_voice)).any())
-    assert not (((train_base["music_fake"] == 1) & (train_base["generator"] == holdout_music)).any())
-    assert_no_base_source_overlap(train_base, val_a_base, ("train", "VAL-A"))
-    assert_no_base_source_overlap(train_base, val_b_base, ("train", "VAL-B"))
-    assert_no_base_source_overlap(val_a_base, val_b_base, ("VAL-A", "VAL-B"))
+    assert_disjoint_split_groups(chosen)
+    assert not chosen["train"]["generator"].astype(str).isin((holdout_voice, holdout_music)).any()
+    train_base = chosen["train"]
+    model_base = chosen["model_selection"]
+    calibration_base = chosen["fusion_calibration"]
+    final_base = chosen["final_holdout"]
 
-    train_df = add_split_internal_mixes(train_base, mixes_per_class=80, random_state=random_state)
+    unseen = model_base[model_base["generator"].astype(str).isin((holdout_voice, holdout_music))]
+    seen = model_base[~model_base["generator"].astype(str).isin((holdout_voice, holdout_music))]
+    val_a_base = seen
+    # VAL-B stays within MODEL_SELECTION and includes unseen generators plus
+    # deterministic negatives/other components required by all official metrics.
+    val_b_base = pd.concat([unseen, seen.sample(min(len(seen), max(80, len(unseen))), random_state=random_state)],
+                           ignore_index=True).drop_duplicates("original_id")
+    if not _metric_ready(val_b_base):
+        val_b_base = model_base.copy()
+
+    train_df = add_split_internal_mixes(train_base, mixes_per_class=100, random_state=random_state)
     val_a = add_split_internal_mixes(val_a_base, mixes_per_class=20, random_state=random_state + 1)
     val_b = add_split_internal_mixes(val_b_base, mixes_per_class=20, random_state=random_state + 2)
-    for d in (train_df, val_a, val_b):
-        d["augment"] = "none"
     val_c, val_d = val_a.copy(), val_a.copy()
+    for split in (train_df, val_a, val_b, val_c, val_d):
+        split["augment"] = "none"
     val_c["augment"] = "codec_mp3"
     val_d["augment"] = "telephone"
 
-    assert_no_base_source_overlap(train_df, val_a, ("train", "VAL-A"))
-    assert_no_base_source_overlap(train_df, val_b, ("train", "VAL-B"))
-    for name, d in (("VAL-A", val_a), ("VAL-B", val_b), ("VAL-C", val_c), ("VAL-D", val_d)):
-        assert d["file_fake"].nunique() == 2, f"{name}: file EER needs real and fake"
-        voice = d[d["voice_present"] == 1]
-        music = d[d["music_present"] == 1]
-        assert voice["voice_fake"].nunique() == 2, f"{name}: voice EER/AUC needs both labels"
-        assert music["music_fake"].nunique() == 2, f"{name}: music EER/AUC needs both labels"
+    calibration_parts = _group_partition(
+        calibration_base, {"cal_a": 1.0, "cal_b": 1.0, "cal_c": 1.0}, random_state + 2000)
+    calibration_frames = []
+    for index, (fold, base) in enumerate(calibration_parts.items()):
+        mixed = add_split_internal_mixes(base, mixes_per_class=30, random_state=random_state + 20 + index)
+        mixed["calibration_fold"] = fold
+        mixed["augment"] = "none"
+        calibration_frames.append(mixed)
+    fusion_calibration = pd.concat(calibration_frames, ignore_index=True)
+    final_holdout = add_split_internal_mixes(final_base, mixes_per_class=40, random_state=random_state + 30)
+    final_holdout["augment"] = "none"
+
+    major_with_mixes = {
+        "train": train_df,
+        "model_selection": pd.concat([val_a, val_b], ignore_index=True),
+        "fusion_calibration": fusion_calibration,
+        "final_holdout": final_holdout,
+    }
+    for left, right in (("train", "model_selection"), ("train", "fusion_calibration"),
+                        ("train", "final_holdout"), ("model_selection", "fusion_calibration"),
+                        ("model_selection", "final_holdout"), ("fusion_calibration", "final_holdout")):
+        assert_no_base_source_overlap(major_with_mixes[left], major_with_mixes[right], (left, right))
 
     out = pathlib.Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    splits = {"train": train_df, "val_a": val_a, "val_b": val_b, "val_c": val_c, "val_d": val_d}
+    splits = {
+        "train": train_df, "val_a": val_a, "val_b": val_b, "val_c": val_c, "val_d": val_d,
+        "fusion_calibration": fusion_calibration, "final_holdout": final_holdout,
+    }
     for name, split in splits.items():
         split.to_csv(out / f"{name}.csv", index=False)
-    print(f"Explicit unseen generators: voice={holdout_voice}, music={holdout_music}")
-    print("Saved leakage-safe post-split mixes: " + ", ".join(f"{k}={len(v)}" for k, v in splits.items()))
+    print(f"Explicit unseen generators excluded from TRAIN: voice={holdout_voice}, music={holdout_music}")
+    print("Saved four-way leakage-safe splits: " + ", ".join(f"{k}={len(v)}" for k, v in splits.items()))
     return splits
 
 # Augmentations for VAL-C/D simulation (applied at dataset __getitem__ if augment column set)
@@ -717,75 +665,12 @@ class AudioDataset(Dataset):
 
     def __len__(self): return len(self.df)
 
-    def _load_and_separate(self, path_str, row):
-        # Handle MIX::voice|music
-        if path_str.startswith("MIX::"):
-            _, rest = path_str.split("MIX::",1)
-            v_path, m_path = rest.split("|",1)
-            # load both
-            v_wave,_ = load_audio(v_path, target_sr=self.sr)
-            m_wave,_ = load_audio(m_path, target_sr=self.sr)
-            snr = float(row.get("mix_snr_db", 0.0))
-            if self.is_training:
-                snr += random.uniform(-2.0, 2.0)
-            mix = render_mixed_wave(
-                v_wave, m_wave, mode=str(row.get("mix_mode", "simultaneous")),
-                snr_db=snr, crossfade_sec=float(row.get("mix_crossfade_sec", 0.25)), sr=self.sr)
-            # for HTDemucs path, we still need original mix; separation will be done after
-            # but for task-specific, we might want to return appropriate stem:
-            # For now, return mix as original; stem separation will handle
-            wave=mix
-            # also need to handle vocals/music for task: for mix, vocals stem is v_wave, music stem is m_wave approximated?
-            # For efficiency, we can consider separated stems as v_wave/m_wave directly without demucs
-            # If task is voice, return v_wave; if music, return m_wave (bypass demucs)
-            if self.task=="voice":
-                wave=v_wave.astype(np.float32)
-            elif self.task=="music":
-                wave=m_wave.astype(np.float32)
-            return wave
-        else:
-            wave,_ = load_audio(path_str, target_sr=self.sr)
-            # apply augment for VAL-C/D
-            row_augment = None
-            try:
-                # df has augment column
-                # but we need idx? We'll handle outside - apply based on self.df augment at __getitem__ caller
-                pass
-            except:
-                pass
-            return wave
-
     def __getitem__(self, idx):
         row=self.df.iloc[idx]
         path_str=str(row["path"])
-        # load
-        if path_str.startswith("MIX::"):
-            wave=self._load_and_separate(path_str, row)
-        else:
-            wave,_ = load_audio(path_str, target_sr=self.sr)
-            # HTDemucs stem separation - mandatory if use_demucs=True
-            if self.use_demucs:
-                if path_str.startswith("MIX::"):
-                    # MIX already handled in _load_and_separate, skip HTDemucs
-                    pass
-                else:
-                    if self.separator is None or getattr(self.separator, 'use_demucs', False)==False:
-                        raise RuntimeError(f"HTDemucs separator not available for task={self.task} but --use_demucs specified (separator_type={self.separator_type})")
-                    try:
-                        vocals, music = self.separator.separate(wave, sr=self.sr)
-                        if self.task=="voice":
-                            wave=vocals
-                        elif self.task=="music":
-                            wave=music
-                        # for multitask/file keep original
-                    except Exception as e:
-                        raise RuntimeError(f"HTDemucs separation failed for {path_str}: {e}")
-        # Validation channel simulations apply equally to original and mixed files.
-        augment = str(row.get("augment", "none")).lower()
-        if augment in ("codec_mp3", "codec"):
-            wave = apply_codec_sim(wave, sr=self.sr)
-        elif augment in ("telephone", "tel"):
-            wave = apply_telephone_sim(wave, sr=self.sr)
+        wave = load_manifest_row_wave(
+            row, sr=self.sr, is_training=self.is_training, use_demucs=self.use_demucs,
+            task=self.task, separator=self.separator)
 
         if self.is_training:
             # Apply the same family of channel perturbations to every source so
