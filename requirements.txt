@@ -1,16 +1,7 @@
-﻿torch>=2.0.0
-torchaudio>=2.0.0
-numpy>=1.24.0
-scipy>=1.10.0
-pandas>=2.0.0
-scikit-learn>=1.3.0
-soundfile>=0.12.0
-librosa>=0.10.0
-tqdm>=4.65.0
-transformers>=4.30.0
-onnxruntime>=1.15.0
-onnx>=1.15.0
-# Optional for full baseline (offline fallback if not installed):
-# demucs>=4.0.0  # HTDemucs – if not installed, librosa hpss is used (fast, offline)
-# torchlibrosa  # PANNs original – not required (torchaudio used)
-
+# DACON 236749 already provides torch 2.7.1+cu128, torchaudio, numpy, pandas,
+# scipy, librosa, soundfile, demucs and tqdm. Do not re-install evaluator-pinned
+# packages within the 10-minute installation limit.
+# DF_Arena is dynamic INT8 and runs entirely on the official server's 6 vCPU.
+# The CPU wheel is much smaller/faster to install than onnxruntime-gpu and
+# avoids CPU/GPU execution-provider partitioning overhead.
+onnxruntime==1.22.0

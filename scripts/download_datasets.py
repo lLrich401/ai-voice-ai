@@ -151,8 +151,16 @@ def download_hf_with_manifest(hf_id, local_dir, manifest_writer, config=None, sp
             if audio is None:
                 continue
             try:
-                base_name = str(item.get("ID") or item.get("audio_id") or item.get("audio_file_name") or item.get("id") or item.get("file") or f"{i:06d}")
-                base_name = base_name.replace("/","_").replace("\\","_").replace(".wav","").replace(".flac","")
+                raw_id = str(item.get("ID") or item.get("audio_id") or item.get("audio_file_name") or item.get("id") or item.get("file") or f"{i:06d}")
+                # For WaveFake, include real_or_fake to avoid collision of same LJ utterance with different generators
+                rf_for_name = str(item.get("real_or_fake","") or item.get("generator","") or "")
+                if hf_id == "ajaykarthick/wavefake-audio" and rf_for_name:
+                    raw_id = f"{raw_id}_{rf_for_name}"
+                # For GTZAN, ensure track uniqueness: include genre and id
+                if hf_id == "sanchit-gandhi/gtzan":
+                    genre = str(item.get("genre",""))
+                    raw_id = f"{raw_id}_genre{genre}"
+                base_name = raw_id.replace("/","_").replace("\\","_").replace(".wav","").replace(".flac","").replace(".","_")
                 # Ensure uniqueness with dataset prefix
                 base_name = f"{dataset_key}_{base_name}"
                 out_path = out_base / f"{base_name}"
@@ -180,13 +188,22 @@ def download_hf_with_manifest(hf_id, local_dir, manifest_writer, config=None, sp
                 music_present=0; music_fake=0
                 source="asvspoof2019"
             elif hf_id == "ajaykarthick/wavefake-audio":
-                rf=str(item.get("real_or_fake",""))
-                if rf.lower()=="real":
+                rf=str(item.get("real_or_fake","")).strip()
+                # WaveFake: R = bonafide/real, WF1~WF7 = fake (requirement 1)
+                if rf.upper() == "R" or rf.lower() in ["real","bonafide"]:
                     voice_present=1; voice_fake=0; file_fake=0
-                    generator="bonafide"
-                else:
+                    generator="R"  # keep original R for audit
+                elif rf.upper().startswith("WF"):
                     voice_present=1; voice_fake=1; file_fake=1
-                    generator=str(rf) if rf else "WaveFake"
+                    generator=str(rf)  # WF1~WF7
+                else:
+                    # Fallback: treat unknown as fake if contains WF, else real
+                    if "WF" in rf.upper():
+                        voice_present=1; voice_fake=1; file_fake=1
+                        generator=str(rf) if rf else "WaveFake"
+                    else:
+                        voice_present=1; voice_fake=0; file_fake=0
+                        generator=str(rf) if rf else "R"
                 speaker_id=f"wavefake_{hashlib.md5(base_name.encode()).hexdigest()[:6]}"
                 music_present=0; music_fake=0
                 source="wavefake_ajay"

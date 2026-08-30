@@ -11,10 +11,14 @@ Thumbs.db
 submit.zip
 *.onnx
 model/df_arena/*.onnx
+model/df_arena/*.ort
 model/df_arena/.cache/
 model/panns/*.pth
+.submit_audit/
 data/raw/
 output/
 experiments/results.csv
 # Keep small checkpoints (<100MB) - uncomment if you want LFS for them
 # *.pt
+submit.zip
+submit_*.zip

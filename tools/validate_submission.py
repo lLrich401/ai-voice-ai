@@ -7,6 +7,10 @@ def main(zip_path="submit.zip"):
         assert "script.py" in namelist, "script.py missing"
         assert "requirements.txt" in namelist, "requirements.txt missing"
         assert any(n.startswith("model/") for n in namelist), "model/ missing"
+        top_level={pathlib.PurePosixPath(n).parts[0] for n in namelist if n and not n.startswith("__MACOSX/")}
+        allowed={"model", "script.py", "requirements.txt"}
+        assert top_level <= allowed, f"unexpected top-level entries: {sorted(top_level - allowed)}"
+        assert any(n.startswith("model/runtime/src/") for n in namelist), "model/runtime/src package missing"
         # Requirement 11: verify mandatory models exist
         mandatory=[
             "model/df_arena/df_arena_1b_int8.onnx",
@@ -31,19 +35,19 @@ def main(zip_path="submit.zip"):
     tmp=tempfile.mkdtemp()
     with zipfile.ZipFile(zip_path) as z:
         z.extractall(tmp)
-    import pathlib
-    data_test=pathlib.Path(tmp)/"data"/"test"
+    data_root=pathlib.Path(tmp)/"data"
+    data_test=data_root/"test"
     data_test.mkdir(parents=True, exist_ok=True)
     sr=16000
     for i in range(3):
-        sf.write(str(data_test/f"t{i}.wav"), np.random.randn(sr*4)*0.1, sr)
-    # Also create sample_submission for exact mapping test
-    sample=pathlib.Path(tmp)/"sample_submission.csv"
-    # sample will be created by script's handling? Create a sample with exact IDs
+        sf.write(str(data_test/f"TEST_{i:04d}.wav"), np.random.randn(sr*4)*0.1, sr)
+    # Match the official data/sample_submission.csv placement and run script.py
+    # with no arguments, exactly as the evaluation server does.
+    sample=data_root/"sample_submission.csv"
     import pandas as pd
-    pd.DataFrame({"id":[f"t{i}" for i in range(3)], "FILE_FAKE_PROB":[0.5]*3, "VOICE_FAKE_PROB":[0.5]*3, "MUSIC_FAKE_PROB":[0.5]*3, "VOICE_PRESENT_PROB":[0.5]*3, "MUSIC_PRESENT_PROB":[0.5]*3}).to_csv(sample, index=False)
+    pd.DataFrame({"ID":[f"TEST_{i:04d}" for i in range(3)], "FILE_FAKE_PROB":[0.5]*3, "VOICE_FAKE_PROB":[0.5]*3, "MUSIC_FAKE_PROB":[0.5]*3, "VOICE_PRESENT_PROB":[0.5]*3, "MUSIC_PRESENT_PROB":[0.5]*3}).to_csv(sample, index=False)
     env=os.environ.copy(); env["HF_HUB_OFFLINE"]="1"; env["TRANSFORMERS_OFFLINE"]="1"
-    result=subprocess.run([sys.executable,"script.py", "--test_dir", str(data_test), "--output", str(pathlib.Path(tmp)/"output"/"submission.csv")], cwd=tmp, capture_output=True, text=True, timeout=120, env=env)
+    result=subprocess.run([sys.executable,"script.py"], cwd=tmp, capture_output=True, text=True, timeout=180, env=env)
     print(result.stdout)
     print(result.stderr[:2000] if result.stderr else "")
     assert result.returncode==0, f"script.py failed {result.stderr}"
@@ -56,7 +60,10 @@ def main(zip_path="submit.zip"):
     assert len(df)==3, f"expected 3 rows got {len(df)}"
     # Verify exact mapping: check IDs match sample
     sdf=pd.read_csv(sample)
+    assert list(df.columns)==list(sdf.columns), f"wrong columns: {list(df.columns)}"
     assert list(df.iloc[:,0].astype(str))==list(sdf.iloc[:,0].astype(str)), "sample ID order not respected (exact mapping)"
+    probabilities=df.iloc[:,1:].to_numpy(dtype=float)
+    assert np.isfinite(probabilities).all() and ((probabilities >= 0) & (probabilities <= 1)).all(), "probabilities must be finite values in [0, 1]"
     print("PASS")
 if __name__=="__main__":
     import argparse; p=argparse.ArgumentParser(); p.add_argument("zip_path", nargs="?", default="submit.zip"); a=p.parse_args(); main(a.zip_path)

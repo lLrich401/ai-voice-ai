@@ -1,6 +1,63 @@
 {
-  "w_voice_file": 0.5714285714285714,
-  "w_music_file": 0.2857142857142857,
-  "w_prob_or": 0.14285714285714285,
-  "val_score": 0.5
+  "w_voice_file": 0.0,
+  "w_music_file": 0.5,
+  "w_prob_or": 0.5,
+  "w_df_arena": 0.5,
+  "w_df_component": 0.25,
+  "w_panns_presence": 0.75,
+  "metric_version": "dacon236749-official-noninterpolated-v1",
+  "pipeline_version": "dacon236749-20260830-v3",
+  "voice_checkpoint_sha256": "375dea46d41fa877473acc5230aae637754a26d28db0ac99433e2973dbc50a51",
+  "music_checkpoint_sha256": "b837955f9f66578f616b815284a4f178a5e450d636abe255dff182991da68ba1",
+  "df_model_version": "pranjal-pravesh/df_arena_1b:int8-onnx-64600",
+  "df_arena_class_0_is_fake": true,
+  "df_arena_calibrated": true,
+  "calibration_selection_score": 0.8511485656355475,
+  "calibration_samples": 240,
+  "calibration_metrics_by_split": {
+    "val_a": {
+      "file_eer": 0.13278495887191538,
+      "voice_eer": 0.18219461697722567,
+      "music_eer": 0.17786561264822132,
+      "voice_auc": 0.8977272727272727,
+      "music_auc": 0.9733333333333334,
+      "ads": 0.8438089133741308,
+      "cps": 0.935530303030303,
+      "score": 0.852981052339748,
+      "total": 0.852981052339748
+    },
+    "val_b": {
+      "file_eer": 0.09890109890109888,
+      "voice_eer": 0.2950310559006211,
+      "music_eer": 0.13664596273291926,
+      "voice_auc": 0.9133522727272728,
+      "music_auc": 0.9616477272727273,
+      "ads": 0.8505494505494504,
+      "cps": 0.9375,
+      "score": 0.8592445054945054,
+      "total": 0.8592445054945054
+    },
+    "val_c": {
+      "file_eer": 0.14712918660287083,
+      "voice_eer": 0.21780303030303033,
+      "music_eer": 0.046536796536796564,
+      "voice_auc": 0.8369565217391305,
+      "music_auc": 0.9616963064295485,
+      "ads": 0.8689137616769196,
+      "cps": 0.8993264140843396,
+      "score": 0.8719550269176616,
+      "total": 0.8719550269176616
+    },
+    "val_d": {
+      "file_eer": 0.08285714285714288,
+      "voice_eer": 0.3861283643892339,
+      "music_eer": 0.18219461697722567,
+      "voice_auc": 0.8792613636363636,
+      "music_auc": 0.9616477272727273,
+      "ads": 0.8266873706004141,
+      "cps": 0.9204545454545454,
+      "score": 0.8360640880858272,
+      "total": 0.8360640880858272
+    }
+  }
 }
