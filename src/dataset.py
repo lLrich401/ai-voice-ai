@@ -276,6 +276,8 @@ MIX_GAPS_SEC = (0.0, 0.1, 0.5, 1.0)
 MIX_CROSSFADE_SEC = (0.05, 0.10, 0.25, 0.50)
 MIX_GAINS_DB = (-6.0, -3.0, 0.0, 3.0)
 PARTIAL_FAKE_RATIOS = (0.10, 0.20, 0.30, 0.50, 0.70)
+V7_PARTIAL_FAKE_RATIOS = (0.125, 0.25, 0.50, 0.75)
+V7_PARTIAL_FAKE_POSITIONS = ("start", "middle", "end")
 
 
 def mixed_labels(voice_fake, music_fake):
@@ -315,6 +317,57 @@ def render_partial_fake_wave(real_wave, fake_wave, fake_ratio=0.2,
         insert[-fade:]=insert[-fade:]*(1-ramp)+out[start+fake_len-fade:start+fake_len]*ramp
     out[start:start+fake_len]=insert
     return np.clip(out,-1.0,1.0).astype(np.float32)
+
+
+def add_partial_fake_examples(train_df, count=0, random_state=42):
+    """Create VOICE partial-fake rows from TRAIN-owned originals only.
+
+    The caller must pass one already-separated training split. Both source
+    identities are retained so cross-split audits can still reason about the
+    generated row. No validation/calibration/final row is accepted.
+    """
+    count = int(count)
+    if count <= 0:
+        return train_df.copy().reset_index(drop=True)
+    if "data_role" in train_df.columns:
+        roles = set(train_df["data_role"].astype(str).str.lower())
+        forbidden = {role for role in roles if role not in ("train", "training")}
+        if forbidden:
+            raise ValueError(f"partial-fake creation only accepts TRAIN rows, got {sorted(forbidden)}")
+    originals = train_df[~train_df["path"].astype(str).str.startswith(("MIX::", "PARTIAL::"))].copy()
+    originals = ensure_split_group_id(originals)
+    real = originals[(originals["voice_present"] == 1) & (originals["voice_fake"] == 0)].reset_index(drop=True)
+    fake = originals[(originals["voice_present"] == 1) & (originals["voice_fake"] == 1)].reset_index(drop=True)
+    if real.empty or fake.empty:
+        raise ValueError("partial-fake training requires both real and fake TRAIN voice pools")
+    rng = np.random.default_rng(random_state)
+    rows = []
+    for index in range(count):
+        real_row = real.iloc[int(rng.integers(len(real)))]
+        fake_row = fake.iloc[int(rng.integers(len(fake)))]
+        ratio = V7_PARTIAL_FAKE_RATIOS[index % len(V7_PARTIAL_FAKE_RATIOS)]
+        position = V7_PARTIAL_FAKE_POSITIONS[(index // len(V7_PARTIAL_FAKE_RATIOS)) % len(V7_PARTIAL_FAKE_POSITIONS)]
+        crossfade = (0.01, 0.02, 0.05)[index % 3]
+        labels = partial_fake_labels("voice")
+        real_group, fake_group = str(real_row["split_group_id"]), str(fake_row["split_group_id"])
+        rows.append({
+            "path": f"PARTIAL::voice::{real_row['path']}|{fake_row['path']}",
+            "file_fake": labels[0], "voice_fake": labels[1], "music_fake": labels[2],
+            "voice_present": labels[3], "music_present": labels[4],
+            "speaker_id": f"partial::{real_row['speaker_id']}::{fake_row['speaker_id']}",
+            "generator": f"partial::{fake_row['generator']}",
+            "source": "train_partial_voice", "dataset": "partial_voice",
+            "hf_id": "generated_after_train_split",
+            "original_id": f"partial::{real_row['original_id']}::{fake_row['original_id']}::{index}",
+            "base_voice_id": real_group, "base_fake_voice_id": fake_group,
+            "split_group_id": f"partial::{real_group}::{fake_group}",
+            "partial_fake_ratio": ratio, "partial_fake_position": position,
+            "partial_crossfade_sec": crossfade, "augment": "none", "data_role": "train",
+        })
+    result = train_df.copy()
+    if "data_role" not in result.columns:
+        result["data_role"] = "train"
+    return pd.concat([result, pd.DataFrame(rows)], ignore_index=True, sort=False)
 
 
 def derive_split_group_id(row):
@@ -701,8 +754,8 @@ def apply_telephone_sim(wave, sr=16000):
         enc=np.sign(x)*np.log1p(mu*np.abs(x))/np.log1p(mu)
         quantized=np.round((enc+1)*127.5)/127.5 -1
         decoded=np.sign(quantized)*(1/mu)*((1+mu)**np.abs(quantized)-1)
-        # add slight noise
-        decoded = decoded + np.random.randn(len(decoded))*1e-4
+        # Validation transforms must be byte-deterministic. Random noise here
+        # previously made VAL-D and candidate selection change between runs.
         return decoded.astype(np.float32)[:len(wave)]
     except:
         # fallback scipy resample
@@ -719,7 +772,8 @@ def apply_telephone_sim(wave, sr=16000):
             return wave
 
 class AudioDataset(Dataset):
-    def __init__(self, df, sr=16000, seg_sec=4.0, is_training=True, use_demucs=False, task="multitask", device="cpu"):
+    def __init__(self, df, sr=16000, seg_sec=4.0, is_training=True, use_demucs=False, task="multitask", device="cpu",
+                 augmentation_profile="baseline"):
         """
         task: multitask | voice | music | file
             voice: vocals stem for voice detector
@@ -734,6 +788,7 @@ class AudioDataset(Dataset):
         self.use_demucs=use_demucs
         self.task=task
         self.device=device
+        self.augmentation_profile=str(augmentation_profile)
         # Validation audio and deterministic channel simulations are expensive
         # to decode/resample repeatedly. Cache the final center crop per dataset
         # instance; training remains uncached so random crops/augmentations vary.
@@ -772,7 +827,8 @@ class AudioDataset(Dataset):
             # Apply the same family of channel perturbations to every source so
             # dataset identity is a less useful shortcut than synthesis traces.
             from .augment import AugmentationPipeline
-            wave = AugmentationPipeline(sr=self.sr, is_training=True)(wave)
+            wave = AugmentationPipeline(
+                sr=self.sr, is_training=True, profile=self.augmentation_profile)(wave)
 
         # segment
         seg_len=int(self.seg_sec*self.sr)

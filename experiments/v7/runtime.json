@@ -1,0 +1,17 @@
+{
+  "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+  "split": "val_a",
+  "samples": 64,
+  "df_fraction": 1.0,
+  "adaptive_df": false,
+  "official_server_runtime": "NOT RUN",
+  "results": {
+    "batch_8": {"seconds": 63.41711169999326, "projected_1200_minutes": 19.817847406247893},
+    "batch_16": {"seconds": 70.99132939998526, "projected_1200_minutes": 22.184790437495394},
+    "batch_24": {"seconds": 81.0272752000019, "projected_1200_minutes": 25.321023500000592},
+    "batch_32": {"seconds": 106.98516760001075, "projected_1200_minutes": 33.43286487500336}
+  },
+  "fastest_local_batch": 8,
+  "submission_default_batch": 16,
+  "note": "Same architecture as v6; this run was measured after sustained CPU calibration load. Projection is linear and is not an official DACON server measurement."
+}

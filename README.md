@@ -14,7 +14,8 @@ reports are historical and must not be quoted as current results.
 - DF-Arena 1B dynamic INT8 ONNX, 64,600 samples at 16 kHz, logits
   `[spoof, bonafide]`, class 0 = fake.
 - Voice and music SpecCNN specialists, strictly loaded with checkpoint SHA
-  validation. Voice fake segments use validation-selected `max` aggregation.
+  validation. The v7 voice checkpoint was selected on fresh VAL-A/B/C/D
+  reruns; voice segments retain `high_energy` selection and `max` aggregation.
 - Official PANNs `Cnn14_16k_mAP=0.438.pth`: 16 kHz, 512 FFT, 160 hop,
   64 mel bins, 50–8000 Hz, torchlibrosa frontend and active `bn0`.
 - PANNs presence is blended at 0.75 with specialist presence. Component fake
@@ -35,7 +36,7 @@ content, exact hash, decoded near-duplicate, speaker/source/generator and stable
   VAL-D applies telephone/narrow-band changes.
 - Calibration uses three disjoint folds and `0.7 * mean + 0.3 * worst`.
 - The v6 final holdout was evaluated once after policy selection. Its report
-  script refuses a second execution.
+  script refuses a second execution. **v7 did not run the final holdout.**
 - The manifest records license/provenance and exact content SHA. Only 500 rows
   are explicitly approved; 2,285 are `REVIEW_REQUIRED`. Current checkpoints
   retain those documented caveats. See `docs/data_sources.md`.
@@ -51,9 +52,37 @@ These are local measurements, not DACON leaderboard scores. The v6 total is
 0.00043 lower on the one-shot local holdout, while CPS and non-final
 cross-domain robustness improved. No post-holdout retuning was performed.
 
-The selected batch size is 16. VAL-A 64-file throughput projects 12.79 minutes
-for 1,200 files; the complete 463-file final run projects 14.75 minutes. Both
-are local linear projections. Official server runtime is **NOT RUN**.
+The v7 candidate was selected without touching that holdout. On fresh
+canonical 128-sample VAL-A/B/C/D reruns, mean VOICE EER improved from
+`0.171875` to `0.166667`; mean TOTAL improved from `0.906072` to `0.907062`;
+and worst-domain TOTAL improved from `0.887188` to `0.887383`. Independent
+calibration robust objective improved from `0.887414` to `0.888366`, with the
+worst calibration fold improving from `0.880479` to `0.884531`. Detailed
+per-domain results are in `experiments/v7/domain_results.json`.
+
+`AFTER v7 FINAL HOLDOUT = NOT RUN`. The v6 final-holdout row above is
+historical and must not be presented as a v7 score.
+
+The submission default remains batch 16 because the model architecture is
+unchanged and it was previously the stable L4-oriented choice. A post-training
+local 64-file run measured 19.82 minutes projected at batch 8 and 22.18 minutes
+at batch 16 after sustained CPU calibration load. These are noisy local linear
+projections, not official server timings. Official server runtime is **NOT RUN**.
+
+## v7 voice evidence
+
+- Domain FP/FN, generator, speaker, source, duration, SNR, codec, telephone,
+  mixed-music and confidence breakdowns are in
+  `experiments/v7/voice_error_analysis.json` and
+  `experiments/v7/voice_error_samples.csv`.
+- Segment selection/aggregation, architecture, channel augmentation,
+  partial-fake and TRAIN-only hard-mining ablations are under
+  `experiments/v7/`. Rejected candidates are not bundled.
+- New AASIST training and SSL comparison are explicitly **NOT RUN** because
+  CUDA and a licensed offline SSL checkpoint were unavailable.
+- Only 500 LibriSpeech rows are currently explicit `APPROVED`; that subset has
+  no fake class, so approved-only training is **NOT RUN**, not silently treated
+  as successful. See `experiments/v7/provenance_audit.json`.
 
 ## Reproduce and package
 
@@ -71,10 +100,30 @@ python scripts/benchmark_inference.py --samples 64 --split val_a --profiles sele
 python tools/validate_submission.py submit.zip
 ```
 
+## Project-created v8 data candidate
+
+An independent, third-party-media-free procedural corpus is available through
+`tools/generate_procedural_v8.py`. It uses only numeric seeds and repository
+code: no external recording, lyrics, MIDI, pretrained generator, checkpoint,
+or network service. The current deterministic build contains 930 synthetic
+voice/music/mixed WAV files (160.4 MB), with 840 training rows and 90
+content- and generator-disjoint stress rows. Its full audit is
+`experiments/v8/generated_dataset_audit.json` and passes all quality, label,
+provenance, exact-duplicate, near-duplicate, and split-isolation checks.
+
+The corpus is deliberately **not selected into v7**. Follow-up risk testing
+found an audio-only procedural-source classifier AUC of 1.0 for both voice and
+music. Selected v7 also missed every procedural music fake at threshold 0.5.
+The merge report therefore sets `training_authorized=false`; the files are
+diagnostic-only until a more natural v8.2 generator passes the fingerprint and
+VAL-A/B/C/D gates. Candidate manifests remain isolated under
+`data/splits_v8_candidate/`, never over `data/splits/`. See
+`docs/procedural_v8_dataset.md`.
+
 Do not rerun `scripts/evaluate_final_once.py`; its v6 one-shot report already
 exists. The archive top level is exactly `model/`, `script.py`, and
 `requirements.txt`. Training audio, unused checkpoints, `.ort` caches,
-`__pycache__`, the legacy 32 kHz PANNs checkpoint and the upstream sampler
+candidate checkpoints, `__pycache__`, the legacy 32 kHz PANNs checkpoint and the upstream sampler
 payload are excluded.
 
 Repository-authored code is MIT licensed. Third-party data and models retain

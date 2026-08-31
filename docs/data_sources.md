@@ -11,6 +11,7 @@ third-party artifact. Training audio is not included in `submit.zip`.
 | GTZAN mirror | https://huggingface.co/datasets/sanchit-gandhi/gtzan | The inspected mirror does not provide a sufficiently clear audio redistribution/commercial license | **Unknown; do not redistribute** | 985 byte-unique real-music tracks after repair, 10 genres |
 | MusicGen outputs | https://huggingface.co/facebook/musicgen-large | Model weights CC BY-NC 4.0; non-commercial restriction. Output rights may also depend on prompts/source material | Do not assume commercial or unrestricted redistribution | 150 fake music |
 | AudioLDM2 outputs | https://audioldm.github.io/audioldm2/ | Exact checkpoint/output license used by the historical generator run was not recorded | **Unknown; do not redistribute until verified** | 150 fake music |
+| Project procedural v8 | `tools/procedural_audio_v8.py` | Project-authored numeric synthesis with no corpus, text, MIDI, pretrained model, sample, or web input | Project-owned output; organiser eligibility remains the final authority | 930 generated fake files in a separate candidate manifest |
 
 All local audio was decoded to mono 16 kHz. Training adds common random gain,
 noise, EQ/band-limit, reverb, clipping and dynamic-range transforms regardless
@@ -38,3 +39,24 @@ group for every original file. `python scripts/enrich_manifest_provenance.py`
 rebuilds and validates those fields. Training accepts
 `--require_approved_provenance` to exclude every `REVIEW_REQUIRED` row. Current
 checkpoints predate that strict filter and retain the review caveats above.
+
+The v7 audit found `APPROVED=500`, `REVIEW_REQUIRED=2,285`, and `REJECTED=0`.
+The approved rows are all LibriSpeech real voice, so they do not contain the
+fake/component diversity needed to form metric-complete training and
+validation splits. Consequently `best_approved_only.pt` is **NOT RUN** rather
+than being produced from an invalid one-class experiment. No unresolved row is
+automatically promoted to approved status.
+
+## Project-created procedural v8 candidate
+
+`data/generated_v8/manifest.csv` describes 930 locally generated fake files
+(840 candidate-training, 90 unseen-generator stress). The 160.4 MB of WAV data
+is reproducible from seed `23674908` and intentionally ignored by Git. A second
+full regeneration produced the identical manifest SHA256
+`91ca2d0209449cca2627af0c4b2784b1f090c40f153613e14ddd8677c77493d8`.
+
+The audit found no quality failures, exact duplicates, cross-split spectral
+near-duplicates, or original/speaker/group/generator-family overlap. Generated
+audio remains outside the selected v7 model until a controlled VAL-A/B/C/D
+training comparison demonstrates a robust improvement. Full design and
+reproduction details are in `docs/procedural_v8_dataset.md`.

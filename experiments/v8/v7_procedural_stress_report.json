@@ -1,0 +1,75 @@
+{
+  "status": "MEASURED_GENERATOR_DISJOINT_POSITIVE_STRESS",
+  "selected_pipeline": "dacon236749-20260831-v7-voice-robust",
+  "final_holdout": "NOT RUN",
+  "rows": 90,
+  "runtime_seconds": 83.9939207000134,
+  "seconds_per_file": 0.9332657855557045,
+  "fake_detection": {
+    "file_fake": {
+      "count": 90,
+      "mean": 0.5515665425025573,
+      "p05": 0.4968183355514447,
+      "p50": 0.5596909987201515,
+      "p95": 0.5748934752662271,
+      "recall_at_0_5": 0.9444444444444444,
+      "false_negative_rate_at_0_5": 0.05555555555555555
+    },
+    "voice_fake": {
+      "count": 60,
+      "mean": 0.8069358532119608,
+      "p05": 0.7395769556876307,
+      "p50": 0.8115109695528261,
+      "p95": 0.8518889335891994,
+      "recall_at_0_5": 1.0,
+      "false_negative_rate_at_0_5": 0.0
+    },
+    "music_fake": {
+      "count": 60,
+      "mean": 0.0009207150029057494,
+      "p05": 1e-06,
+      "p50": 6.932438918738626e-05,
+      "p95": 0.0027864122181199447,
+      "recall_at_0_5": 0.0,
+      "false_negative_rate_at_0_5": 1.0
+    }
+  },
+  "presence": {
+    "voice": {
+      "auc": 0.8111111111111111,
+      "accuracy_at_0_5": 0.3333333333333333,
+      "present_recall_at_0_5": 0.0,
+      "absent_specificity_at_0_5": 1.0
+    },
+    "music": {
+      "auc": 0.9205555555555556,
+      "accuracy_at_0_5": 0.6666666666666666,
+      "present_recall_at_0_5": 1.0,
+      "absent_specificity_at_0_5": 0.0
+    }
+  },
+  "mean_predictions_by_kind": {
+    "music_only": {
+      "FILE_FAKE_PROB": 0.5662019719007323,
+      "VOICE_FAKE_PROB": 0.8530562779248783,
+      "MUSIC_FAKE_PROB": 0.001812177328489876,
+      "VOICE_PRESENT_PROB": 0.08351306630841766,
+      "MUSIC_PRESENT_PROB": 0.9232301717003186
+    },
+    "voice_only": {
+      "FILE_FAKE_PROB": 0.5306551951051123,
+      "VOICE_FAKE_PROB": 0.7781021326309897,
+      "MUSIC_FAKE_PROB": 0.0382849032098117,
+      "VOICE_PRESENT_PROB": 0.11522988529953485,
+      "MUSIC_PRESENT_PROB": 0.833273193736871
+    },
+    "mixed": {
+      "FILE_FAKE_PROB": 0.5578424605018275,
+      "VOICE_FAKE_PROB": 0.8357695737929316,
+      "MUSIC_FAKE_PROB": 2.9252677321622712e-05,
+      "VOICE_PRESENT_PROB": 0.0922150770861966,
+      "MUSIC_PRESENT_PROB": 0.8972971176107725
+    }
+  },
+  "interpretation": "Positive-only stress recall is not EER and cannot replace VAL-A/B/C/D."
+}

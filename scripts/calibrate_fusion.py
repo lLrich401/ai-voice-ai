@@ -314,6 +314,8 @@ def main():
     parser.add_argument("--reuse_cache", action="store_true")
     parser.add_argument("--skip_final_holdout", action="store_true")
     parser.add_argument("--baseline_ref", default="1b5553200d08dcf4f7867e7ecfc8cc93a5d62d5f")
+    parser.add_argument("--lock_df_always_on", action="store_true",
+                        help="keep DF gate OFF and adaptive second crop OFF")
     args = parser.parse_args()
     device = torch.device(args.device)
     cache_path = pathlib.Path(args.cache)
@@ -417,15 +419,22 @@ def main():
     _, selected_weights, _ = best_file_mode
     # Select the gate without second-crop effects, then select adaptive policy
     # on the gated canonical path. This keeps the two decisions identifiable.
-    weights, _, _, _ = select_df_gate(
-        cache, selected_weights, adaptive_candidates[0], maximum_objective_loss=0.01)
-    best_adaptive = None
-    for adaptive in adaptive_candidates:
+    if args.lock_df_always_on:
+        weights = dict(selected_weights)
+        weights.update({"df_gate_policy": "off", "df_gate_calibration_fraction": 1.0})
+        adaptive = adaptive_candidates[0]
         objective, metrics = robust_score(cache, weights, adaptive)
-        candidate = (objective, -int(adaptive["enabled"]), adaptive, metrics)
-        if best_adaptive is None or candidate[:2] > best_adaptive[:2]:
-            best_adaptive = candidate
-    objective, _, adaptive, metrics = best_adaptive
+    else:
+        weights, _, _, _ = select_df_gate(
+            cache, selected_weights, adaptive_candidates[0], maximum_objective_loss=0.01)
+        best_adaptive = None
+        for adaptive_candidate in adaptive_candidates:
+            candidate_objective, candidate_metrics = robust_score(cache, weights, adaptive_candidate)
+            candidate = (candidate_objective, -int(adaptive_candidate["enabled"]),
+                         adaptive_candidate, candidate_metrics)
+            if best_adaptive is None or candidate[:2] > best_adaptive[:2]:
+                best_adaptive = candidate
+        objective, _, adaptive, metrics = best_adaptive
     calibrated_adaptive = adaptive
     weights.update({
         "metric_version": "dacon236749-official-noninterpolated-v1",
@@ -445,6 +454,8 @@ def main():
         "adaptive_df_disagreement": adaptive.get("disagreement", 0.3),
         "specialist_max_segments": 3,
         "panns_max_segments": 3,
+        "voice_fake_aggregation": "max",
+        "voice_segment_policy": "high_energy",
         "calibration_robust_objective": objective,
         "calibration_samples": int(len(cache)),
         "calibration_metrics_by_fold": metrics,

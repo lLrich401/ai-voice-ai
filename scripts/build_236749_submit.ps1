@@ -44,7 +44,7 @@ Push-Location $workspace
 try {
     # Windows Compress-Archive can fail on the 1.37 GB ONNX file when it is
     # memory-mapped. libarchive's tar.exe writes the same ZIP layout reliably.
-    tar.exe --exclude='model/runtime/src/src' --exclude='model/df_arena/*.ort' --exclude='model/df_arena/.cache' --exclude='model/panns/Cnn14_mAP=0.431.pth' --exclude='model/panns/*.upstream.pth' --exclude='model/*_tmp.pt' --exclude='model/aasist_64.pt' --exclude='model/aasist_best.pt' --exclude='model/heuristic.pt' --exclude='model/music_spec_cnn.pt' --exclude='model/stageA_aasist.pt' --exclude='model/voice_aasist.pt' --exclude='model/voice_spec_cnn.pt' --exclude='*__pycache__*' --exclude='*.pyc' -a -c -f $archive model script.py requirements.txt
+    tar.exe --exclude='model/runtime/src/src' --exclude='model/candidates' --exclude='model/df_arena/*.ort' --exclude='model/df_arena/.cache' --exclude='model/panns/Cnn14_mAP=0.431.pth' --exclude='model/panns/*.upstream.pth' --exclude='model/*_tmp.pt' --exclude='model/aasist_64.pt' --exclude='model/aasist_best.pt' --exclude='model/heuristic.pt' --exclude='model/music_spec_cnn.pt' --exclude='model/stageA_aasist.pt' --exclude='model/voice_aasist.pt' --exclude='model/voice_spec_cnn.pt' --exclude='*__pycache__*' --exclude='*.pyc' -a -c -f $archive model script.py requirements.txt
     if ($LASTEXITCODE -ne 0) { throw "tar.exe failed with exit code $LASTEXITCODE" }
 }
 finally {

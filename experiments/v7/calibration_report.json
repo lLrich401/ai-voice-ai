@@ -1,0 +1,18 @@
+{
+  "status": "MEASURED_INDEPENDENT_CALIBRATION",
+  "samples": 656,
+  "final_holdout": "NOT RUN",
+  "cache": "experiments/v7/fusion_calibration_predictions.csv",
+  "before_robust_objective": 0.8874136387814853,
+  "after_robust_objective": 0.8883663603678957,
+  "before_worst_fold": 0.8804794624352504,
+  "after_worst_fold": 0.8845309602503132,
+  "after_folds": {
+    "cal_a": 0.8845309602503132,
+    "cal_b": 0.8975664628587389,
+    "cal_c": 0.8879328867172409
+  },
+  "df_policy_locked": "always-on primary crop",
+  "adaptive_df": false,
+  "final_holdout_protection": "--skip_final_holdout"
+}

@@ -1,0 +1,34 @@
+{
+  "status": "REJECT_CURRENT_V8_1_FOR_TRAINING",
+  "final_holdout": "NOT RUN",
+  "training_run": "NOT RUN: pre-training source-fingerprint gate failed",
+  "source_fingerprint": {
+    "voice_audio_only_auc": 1.0,
+    "voice_accuracy": 0.9979166666666667,
+    "music_audio_only_auc": 1.0,
+    "music_accuracy": 1.0,
+    "risk": "HIGH"
+  },
+  "balance": {
+    "procedural_row_fraction": 0.2931937172774869,
+    "voice_sampler_procedural_probability": 0.24285714285714283,
+    "music_sampler_procedural_probability": 0.248695652173913
+  },
+  "selected_v7_positive_stress": {
+    "rows": 90,
+    "file_fake_recall_at_0_5": 0.9444444444444444,
+    "voice_fake_recall_at_0_5": 1.0,
+    "music_fake_recall_at_0_5": 0.0,
+    "voice_presence_recall_at_0_5": 0.0,
+    "music_presence_recall_at_0_5": 1.0,
+    "note": "Positive-only stress recall is not EER."
+  },
+  "decision": "Keep v7 selected pipeline unchanged. Retain v8.1 only as a diagnostic stress corpus.",
+  "required_before_v8_2_adoption": [
+    "Reduce simple audio-only procedural source separability",
+    "Correct voice silence/prosody/bandwidth and presence semantics",
+    "Correct music spectral/temporal distribution and fake semantics",
+    "Limit procedural sampler exposure",
+    "Pass VAL-A/B/C/D no-regression training comparison"
+  ]
+}

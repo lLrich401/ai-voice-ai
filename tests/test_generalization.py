@@ -1,5 +1,6 @@
 import pathlib
 import hashlib
+import json
 
 import numpy as np
 import pandas as pd
@@ -148,6 +149,7 @@ def test_manifest_has_explicit_provenance_and_review_filter():
     assert len(checked) == len(frame)
     approved = filter_manifest_provenance(frame, require_approved=True)
     assert set(approved["allowed_for_competition"]) == {"YES"}
+    assert not approved["allowed_for_competition"].isin(("REVIEW_REQUIRED", "UNKNOWN", "NO")).any()
 
 
 def test_runtime_source_hashes_match_root_source():
@@ -158,3 +160,32 @@ def test_runtime_source_hashes_match_root_source():
         copied = runtime / path.relative_to(source)
         assert copied.exists(), f"runtime copy missing: {path.relative_to(source)}"
         assert hashlib.sha256(path.read_bytes()).digest() == hashlib.sha256(copied.read_bytes()).digest()
+
+
+def test_selected_v7_policy_and_checkpoint_hashes_are_locked():
+    root = pathlib.Path(__file__).resolve().parents[1]
+    weights = json.loads((root / "model/fusion_weights.json").read_text(encoding="utf-8"))
+    assert weights["pipeline_version"] == "dacon236749-20260831-v7-voice-robust"
+    assert weights["df_gate_policy"] == "off"
+    assert weights["adaptive_df_enabled"] is False
+    assert weights["voice_fake_aggregation"] == "max"
+    assert weights["voice_segment_policy"] == "high_energy"
+    assert weights["w_panns_presence"] == pytest.approx(0.75)
+    for key, relative in (
+        ("voice_checkpoint_sha256", "model/best.pt"),
+        ("music_checkpoint_sha256", "model/music_best.pt"),
+        ("panns_sha256", f"model/panns/{PANNs_CHECKPOINT_NAME}"),
+    ):
+        assert weights[key] == hashlib.sha256((root / relative).read_bytes()).hexdigest()
+
+
+def test_unseen_generators_and_speakers_do_not_enter_train():
+    root = pathlib.Path(__file__).resolve().parents[1] / "data/splits"
+    train = pd.read_csv(root / "train.csv")
+    val_b = pd.read_csv(root / "val_b.csv")
+    assert "WF7" not in set(train["generator"].astype(str))
+    assert "AudioLDM2" not in set(train["generator"].astype(str))
+    assert {"WF7", "AudioLDM2"} & set(val_b["generator"].astype(str))
+    train_groups = set(train["split_group_id"].astype(str))
+    val_b_groups = set(val_b["split_group_id"].astype(str))
+    assert not train_groups & val_b_groups

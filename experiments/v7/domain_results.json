@@ -1,0 +1,40 @@
+{
+  "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+  "final_holdout": "NOT RUN",
+  "comparison_basis": "fresh canonical rerun on the same 128-sample VAL-A/B/C/D subsets",
+  "before": {
+    "checkpoint_sha256": "3988a176a8da83f4be001bdd51eb297c6a5e95372f99d10b94e83f9db3156fa2",
+    "domains": {
+      "val_a": {"file_eer": 0.08541666666666667, "voice_eer": 0.14583333333333337, "total": 0.9266927083333334},
+      "val_b": {"file_eer": 0.1479166666666667, "voice_eer": 0.16666666666666663, "total": 0.8952083333333334},
+      "val_c": {"file_eer": 0.10208333333333333, "voice_eer": 0.16666666666666663, "total": 0.9151985677083334},
+      "val_d": {"file_eer": 0.1479166666666667, "voice_eer": 0.20833333333333337, "total": 0.8871875}
+    },
+    "mean_voice_eer": 0.171875,
+    "mean_total": 0.90607177734375,
+    "worst_total": 0.8871875
+  },
+  "after": {
+    "checkpoint_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+    "domains": {
+      "val_a": {"file_eer": 0.08541666666666667, "voice_eer": 0.14583333333333337, "music_eer": 0.02083333333333335, "ads": 0.921875, "voice_auc": 0.9632161458333334, "music_auc": 0.998046875, "cps": 0.9806315104166667, "total": 0.9277506510416667},
+      "val_b": {"file_eer": 0.1479166666666667, "voice_eer": 0.14583333333333337, "music_eer": 0.02083333333333335, "ads": 0.890625, "voice_auc": 0.9222005208333334, "music_auc": 0.9931640625, "cps": 0.9576822916666667, "total": 0.8973307291666668},
+      "val_c": {"file_eer": 0.10208333333333333, "voice_eer": 0.16666666666666663, "music_eer": 0.02083333333333335, "ads": 0.909375, "voice_auc": 0.951171875, "music_auc": 0.9957682291666666, "cps": 0.9734700520833333, "total": 0.9157845052083333},
+      "val_d": {"file_eer": 0.1479166666666667, "voice_eer": 0.20833333333333337, "music_eer": 0.02083333333333335, "ads": 0.8781249999999999, "voice_auc": 0.9443359375, "music_auc": 0.9970703125, "cps": 0.970703125, "total": 0.8873828125}
+    },
+    "mean_file_eer": 0.12083333333333335,
+    "mean_voice_eer": 0.16666666666666669,
+    "mean_music_eer": 0.02083333333333335,
+    "mean_ads": 0.9,
+    "mean_voice_auc": 0.9452311197916667,
+    "mean_music_auc": 0.9960123697916666,
+    "mean_cps": 0.9706217447916666,
+    "mean_total": 0.9070621744791666,
+    "worst_total": 0.8873828125
+  },
+  "robust_objective": {
+    "formula": "0.6 * mean(domain TOTAL) + 0.4 * min(domain TOTAL)",
+    "before": 0.89851806640625,
+    "after": 0.8991904296875
+  }
+}

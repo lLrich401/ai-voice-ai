@@ -1,0 +1,225 @@
+{
+  "status": "MEASURED_AUDIO_ONLY_DIAGNOSTIC",
+  "final_holdout": "NOT RUN",
+  "feature_scope": "decoded waveform statistics only; filenames/extensions excluded",
+  "components": [
+    {
+      "component": "voice",
+      "existing_rows": 240,
+      "procedural_rows": 240,
+      "audio_only_source_classifier_auc": 1.0,
+      "audio_only_source_classifier_accuracy": 0.9979166666666667,
+      "risk": "HIGH",
+      "folds": [
+        {
+          "fold": 0,
+          "auc": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "fold": 1,
+          "auc": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "fold": 2,
+          "auc": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "fold": 3,
+          "auc": 1.0,
+          "accuracy": 0.9895833333333334
+        },
+        {
+          "fold": 4,
+          "auc": 1.0,
+          "accuracy": 1.0
+        }
+      ],
+      "largest_distribution_shifts": {
+        "silence_fraction": {
+          "statistic": 0.9916666666666667,
+          "pvalue": 2.023417883859518e-138,
+          "existing_mean": 0.19462253430200166,
+          "procedural_mean": 0.015868168088015458
+        },
+        "abs_q10": {
+          "statistic": 0.9875,
+          "pvalue": 3.2239791616161655e-136,
+          "existing_mean": 0.0006928473213641459,
+          "procedural_mean": 0.009369176228841147
+        },
+        "log_band_7": {
+          "statistic": 0.9708333333333333,
+          "pvalue": 1.9620506889669883e-128,
+          "existing_mean": -2.52589332784662,
+          "procedural_mean": -6.907296176374083
+        },
+        "spectral_bandwidth": {
+          "statistic": 0.9125,
+          "pvalue": 4.471908434247828e-107,
+          "existing_mean": 1156.110533321509,
+          "procedural_mean": 243.22193118728555
+        },
+        "log_band_0": {
+          "statistic": 0.9125,
+          "pvalue": 4.471908434247828e-107,
+          "existing_mean": -0.07738487779475965,
+          "procedural_mean": -0.006902501624767182
+        },
+        "frame_rms_p90_p10": {
+          "statistic": 0.9083333333333333,
+          "pvalue": 9.330027142362514e-106,
+          "existing_mean": 199.29269546942615,
+          "procedural_mean": 13.81965196916885
+        },
+        "crest": {
+          "statistic": 0.8958333333333334,
+          "pvalue": 6.452831749587346e-102,
+          "existing_mean": 8.826711810016809,
+          "procedural_mean": 3.912249470449791
+        },
+        "spectral_centroid": {
+          "statistic": 0.8875,
+          "pvalue": 1.8988054907582026e-99,
+          "existing_mean": 879.4293951271515,
+          "procedural_mean": 320.7802958138583
+        },
+        "log_band_6": {
+          "statistic": 0.8708333333333333,
+          "pvalue": 1.044881869716101e-94,
+          "existing_mean": -2.385709705256908,
+          "procedural_mean": -6.189536420159561
+        },
+        "spectral_flatness": {
+          "statistic": 0.8666666666666667,
+          "pvalue": 1.4660998734454042e-93,
+          "existing_mean": 0.07891943593005434,
+          "procedural_mean": 0.0036063721255384143
+        }
+      },
+      "interpretation": "High AUC means simple acoustic statistics expose procedural source identity."
+    },
+    {
+      "component": "music",
+      "existing_rows": 103,
+      "procedural_rows": 240,
+      "audio_only_source_classifier_auc": 1.0,
+      "audio_only_source_classifier_accuracy": 1.0,
+      "risk": "HIGH",
+      "folds": [
+        {
+          "fold": 0,
+          "auc": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "fold": 1,
+          "auc": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "fold": 2,
+          "auc": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "fold": 3,
+          "auc": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "fold": 4,
+          "auc": 1.0,
+          "accuracy": 1.0
+        }
+      ],
+      "largest_distribution_shifts": {
+        "spectral_flatness": {
+          "statistic": 1.0,
+          "pvalue": 3.948596320888938e-90,
+          "existing_mean": 0.004162623948993223,
+          "procedural_mean": 0.04133718580719326
+        },
+        "frame_rms_std": {
+          "statistic": 1.0,
+          "pvalue": 3.948596320888938e-90,
+          "existing_mean": 0.00042380456361734497,
+          "procedural_mean": 0.0036765604393595636
+        },
+        "frame_rms_p90_p10": {
+          "statistic": 1.0,
+          "pvalue": 3.948596320888938e-90,
+          "existing_mean": 1.0374940013191822,
+          "procedural_mean": 2.9717770094515084
+        },
+        "log_band_2": {
+          "statistic": 1.0,
+          "pvalue": 3.948596320888938e-90,
+          "existing_mean": -3.5272003816324142,
+          "procedural_mean": -2.1822391427588324
+        },
+        "silence_fraction": {
+          "statistic": 0.9958333333333333,
+          "pvalue": 4.106540173724496e-88,
+          "existing_mean": 0.0022442672311787384,
+          "procedural_mean": 0.036454542299006916
+        },
+        "crest": {
+          "statistic": 0.9916666666666667,
+          "pvalue": 2.1559335912053608e-86,
+          "existing_mean": 2.7449402116099213,
+          "procedural_mean": 4.370184889507099
+        },
+        "log_band_3": {
+          "statistic": 0.9902912621359223,
+          "pvalue": 2.2499101836425164e-86,
+          "existing_mean": -3.5239733241147126,
+          "procedural_mean": -2.5816032085657663
+        },
+        "log_band_6": {
+          "statistic": 0.9902912621359223,
+          "pvalue": 2.2499101836425164e-86,
+          "existing_mean": -3.524948542954044,
+          "procedural_mean": -2.8450587428395986
+        },
+        "log_band_7": {
+          "statistic": 0.9875,
+          "pvalue": 7.626990195539445e-85,
+          "existing_mean": -3.508442866814135,
+          "procedural_mean": -2.83373336127918
+        },
+        "log_band_5": {
+          "statistic": 0.9861245954692557,
+          "pvalue": 8.581523870151128e-85,
+          "existing_mean": -3.523195062458587,
+          "procedural_mean": -2.8133007476282055
+        }
+      },
+      "interpretation": "High AUC means simple acoustic statistics expose procedural source identity."
+    }
+  ],
+  "balance": {
+    "base_rows": 2025,
+    "candidate_rows": 2865,
+    "base_positive_counts": {
+      "file_fake": 931,
+      "voice_fake": 728,
+      "music_fake": 303,
+      "voice_present": 1297,
+      "music_present": 1128
+    },
+    "candidate_positive_counts": {
+      "file_fake": 1771,
+      "voice_fake": 1208,
+      "music_fake": 783,
+      "voice_present": 1777,
+      "music_present": 1608
+    },
+    "voice_sampler_procedural_probability": 0.24285714285714283,
+    "music_sampler_procedural_probability": 0.248695652173913,
+    "procedural_row_fraction": 0.2931937172774869
+  },
+  "runtime_seconds": 17.430963399994653
+}

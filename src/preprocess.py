@@ -136,6 +136,15 @@ def aggregate_predictions(segment_probs, method="mean", top_k=2):
         agg = 1/(1+np.exp(-mean_logit))
     elif method == "median":
         agg = np.median(probs, axis=0)
+    elif method == "trimmed_mean":
+        ordered = np.sort(probs, axis=0)
+        selected = ordered[1:-1] if len(ordered) > 2 else ordered
+        agg = np.mean(selected, axis=0)
+    elif method.startswith("max_mean_"):
+        alpha = float(method.rsplit("_", 1)[1])
+        if not 0.0 <= alpha <= 1.0:
+            raise ValueError("max/mean alpha must be in [0,1]")
+        agg = alpha * np.max(probs, axis=0) + (1.0 - alpha) * np.mean(probs, axis=0)
     elif method == "attention":
         weights = np.abs(probs - 0.5) + 0.1
         weights = weights / np.sum(weights, axis=0, keepdims=True)

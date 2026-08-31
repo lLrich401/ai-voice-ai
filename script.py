@@ -24,7 +24,7 @@ import soundfile as sf
 TARGET_SR=16000
 SEG_SEC=4.0
 OUTPUT_EPS=1e-6
-PIPELINE_VERSION="dacon236749-20260831-v6-panns16k"
+PIPELINE_VERSION="dacon236749-20260831-v7-voice-robust"
 # DF-Arena model card: input length 64,600 at 16 kHz and logits ordered as
 # [spoof, bonafide].  FAKE therefore always maps to class index 0.
 DF_INPUT_SAMPLES=64600
@@ -112,13 +112,33 @@ def extract_segments(wave, sr=16000, seg_sec=4.0):
         segs.append(wave[start:start+seg_len])
     return segs
 
-def select_aux_segments(wave, sr=16000, seg_sec=4.0):
-    """Adaptive 1/2/3-crop policy for short/medium/long recordings."""
+def select_aux_segments(wave, sr=16000, seg_sec=4.0, policy="high_energy"):
+    """Adaptive 1/2/3-crop policy with deterministic validation candidates."""
     candidates=extract_segments(wave,sr=sr,seg_sec=seg_sec)
     energies=[float(np.mean(np.asarray(seg,dtype=np.float32)**2)) for seg in candidates]
     duration=len(wave)/float(sr)
     count=1 if duration<=8.0 else (2 if duration<=25.0 else 3)
-    selected=sorted(np.argsort(energies)[-min(count,len(candidates)):].tolist())
+    count=min(count,len(candidates))
+    if policy=="high_energy":
+        selected=sorted(np.argsort(energies)[-count:].tolist())
+    elif policy=="uniform":
+        selected=sorted(set(np.linspace(0,len(candidates)-1,count).round().astype(int).tolist()))
+    elif policy=="centered":
+        templates={1:[2],2:[1,3],3:[0,2,4]}
+        selected=[min(len(candidates)-1,index) for index in templates[count]]
+    elif policy=="energy_diverse":
+        order=np.argsort(energies)[::-1].tolist(); selected=[]
+        minimum_gap=2 if len(candidates)>=5 else 1
+        for index in order:
+            if all(abs(index-other)>=minimum_gap for other in selected):
+                selected.append(index)
+            if len(selected)==count: break
+        for index in order:
+            if len(selected)==count: break
+            if index not in selected: selected.append(index)
+        selected=sorted(selected)
+    else:
+        raise ValueError(f"unsupported auxiliary segment policy: {policy}")
     return [candidates[i] for i in selected]
 
 
@@ -145,6 +165,20 @@ def aggregate_predictions(probs, method="topk_mean", top_k=2):
         selected=np.clip(selected,OUTPUT_EPS,1.0-OUTPUT_EPS)
         value=float(np.mean(np.log(selected/(1-selected))))
         return float(1.0/(1.0+np.exp(-value)))
+    if method=="logit_mean":
+        selected=np.clip(probs,OUTPUT_EPS,1.0-OUTPUT_EPS)
+        value=float(np.mean(np.log(selected/(1-selected))))
+        return float(1.0/(1.0+np.exp(-value)))
+    if method=="median":
+        return float(np.median(probs))
+    if method=="trimmed_mean":
+        ordered=np.sort(probs)
+        selected=ordered[1:-1] if len(ordered)>2 else ordered
+        return float(np.mean(selected))
+    if method.startswith("max_mean_"):
+        alpha=float(method.rsplit("_",1)[1])
+        if not 0.0<=alpha<=1.0: raise ValueError("max/mean alpha must be in [0,1]")
+        return float(alpha*np.max(probs)+(1.0-alpha)*np.mean(probs))
     if method=="noisy_or":
         return float(1.0-np.prod(1.0-np.clip(probs,0.0,1.0)))
     return float(np.mean(probs))
@@ -158,7 +192,8 @@ def aggregate_head_predictions(probs, head, config=None):
     method=str((config or {}).get(f"{head}_aggregation",defaults[head]))
     allowed={
         "file_fake":{"topk_mean","max","mean","logit_topk_mean","noisy_or"},
-        "voice_fake":{"topk_mean","max","mean","logit_topk_mean"},
+        "voice_fake":{"topk_mean","max","mean","logit_topk_mean","logit_mean",
+                      "median","trimmed_mean","max_mean_0.25","max_mean_0.5","max_mean_0.75"},
         "music_fake":{"topk_mean","max","mean","logit_topk_mean"},
         "voice_present":{"mean","max","noisy_or"},
         "music_present":{"mean","max","noisy_or"},
@@ -546,8 +581,9 @@ def infer_wave_features_batch(voice_model, music_model, df_sess, panns_model,
     segment_groups_v=[]; segment_groups_m=[]; segment_groups_o=[]
     for wave in waves:
         vocals,music=separator.separate(wave,sr=TARGET_SR)
+        voice_policy=str((aggregation_config or {}).get("voice_segment_policy","high_energy"))
         segment_groups_v.append(limit_aux_segments(
-            select_aux_segments(vocals,sr=TARGET_SR,seg_sec=SEG_SEC),specialist_max_segments))
+            select_aux_segments(vocals,sr=TARGET_SR,seg_sec=SEG_SEC,policy=voice_policy),specialist_max_segments))
         segment_groups_m.append(limit_aux_segments(
             select_aux_segments(music,sr=TARGET_SR,seg_sec=SEG_SEC),specialist_max_segments))
         segment_groups_o.append(limit_aux_segments(

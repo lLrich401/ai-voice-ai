@@ -1,7 +1,7 @@
 {
-  "w_voice_file": 0.25,
+  "w_voice_file": 0.0,
   "w_music_file": 0.5,
-  "w_prob_or": 0.25,
+  "w_prob_or": 0.5,
   "w_df_arena": 0.25,
   "w_df_voice_component": 0.3,
   "w_df_music_component": 0.0,
@@ -10,8 +10,8 @@
   "df_gate_policy": "off",
   "df_gate_calibration_fraction": 1.0,
   "metric_version": "dacon236749-official-noninterpolated-v1",
-  "pipeline_version": "dacon236749-20260831-v6-panns16k",
-  "voice_checkpoint_sha256": "3988a176a8da83f4be001bdd51eb297c6a5e95372f99d10b94e83f9db3156fa2",
+  "pipeline_version": "dacon236749-20260831-v7-voice-robust",
+  "voice_checkpoint_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
   "music_checkpoint_sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
   "panns_sha256": "eee61e89d4ef120bfe0e900f0fb9e4814a2597bbd1f3bf8e149868a7d508bc10",
   "df_model_version": "pranjal-pravesh/df_arena_1b:int8-onnx-64600",
@@ -27,85 +27,87 @@
   "adaptive_df_disagreement": 0.3,
   "specialist_max_segments": 3,
   "panns_max_segments": 3,
-  "calibration_robust_objective": 0.8874136387814853,
+  "voice_fake_aggregation": "max",
+  "voice_segment_policy": "high_energy",
+  "calibration_robust_objective": 0.8883663603678957,
   "calibration_samples": 656,
   "calibration_metrics_by_fold": {
     "cal_a": {
       "file_eer": 0.14285714285714288,
-      "voice_eer": 0.2751467314308844,
+      "voice_eer": 0.24640760979558793,
       "music_eer": 0.0,
-      "voice_auc": 0.9226656233698488,
+      "voice_auc": 0.9002347417840375,
       "music_auc": 0.9631661442006269,
-      "ads": 0.8735420822852518,
-      "cps": 0.9429158837852378,
-      "score": 0.8804794624352504,
-      "total": 0.8804794624352504
+      "ads": 0.879289906612311,
+      "cps": 0.9317004429923321,
+      "score": 0.8845309602503132,
+      "total": 0.8845309602503132
     },
     "cal_b": {
       "file_eer": 0.12666255313314134,
       "voice_eer": 0.19683598794662074,
       "music_eer": 0.011667345000678363,
-      "voice_auc": 0.8902949382223994,
+      "voice_auc": 0.8764447987245915,
       "music_auc": 0.9864606562599555,
       "ads": 0.8938013223439016,
-      "cps": 0.9383777972411774,
-      "score": 0.8982589698336293,
-      "total": 0.8982589698336293
+      "cps": 0.9314527274922735,
+      "score": 0.8975664628587389,
+      "total": 0.8975664628587389
     },
     "cal_c": {
-      "file_eer": 0.1392543859649123,
+      "file_eer": 0.1486842105263158,
       "voice_eer": 0.20479962721342032,
       "music_eer": 0.011680988184747602,
-      "voice_auc": 0.9199447895100069,
+      "voice_auc": 0.9151138716356109,
       "music_auc": 0.9820577516119987,
-      "ads": 0.8859085851194355,
-      "cps": 0.9510012705610028,
-      "score": 0.8924178536635923,
-      "total": 0.8924178536635923
+      "ads": 0.8811936728387337,
+      "cps": 0.9485858116238048,
+      "score": 0.8879328867172409,
+      "total": 0.8879328867172409
     }
   },
   "file_fusion_mode_comparison": {
     "legacy": {
-      "robust_objective": 0.8874136387814853,
+      "robust_objective": 0.8883663603678957,
       "metrics_by_fold": {
         "cal_a": {
           "file_eer": 0.14285714285714288,
-          "voice_eer": 0.2751467314308844,
+          "voice_eer": 0.24640760979558793,
           "music_eer": 0.0,
-          "voice_auc": 0.9226656233698488,
+          "voice_auc": 0.9002347417840375,
           "music_auc": 0.9631661442006269,
-          "ads": 0.8735420822852518,
-          "cps": 0.9429158837852378,
-          "score": 0.8804794624352504,
-          "total": 0.8804794624352504
+          "ads": 0.879289906612311,
+          "cps": 0.9317004429923321,
+          "score": 0.8845309602503132,
+          "total": 0.8845309602503132
         },
         "cal_b": {
           "file_eer": 0.12666255313314134,
           "voice_eer": 0.19683598794662074,
           "music_eer": 0.011667345000678363,
-          "voice_auc": 0.8902949382223994,
+          "voice_auc": 0.8764447987245915,
           "music_auc": 0.9864606562599555,
           "ads": 0.8938013223439016,
-          "cps": 0.9383777972411774,
-          "score": 0.8982589698336293,
-          "total": 0.8982589698336293
+          "cps": 0.9314527274922735,
+          "score": 0.8975664628587389,
+          "total": 0.8975664628587389
         },
         "cal_c": {
-          "file_eer": 0.1392543859649123,
+          "file_eer": 0.1486842105263158,
           "voice_eer": 0.20479962721342032,
           "music_eer": 0.011680988184747602,
-          "voice_auc": 0.9199447895100069,
+          "voice_auc": 0.9151138716356109,
           "music_auc": 0.9820577516119987,
-          "ads": 0.8859085851194355,
-          "cps": 0.9510012705610028,
-          "score": 0.8924178536635923,
-          "total": 0.8924178536635923
+          "ads": 0.8811936728387337,
+          "cps": 0.9485858116238048,
+          "score": 0.8879328867172409,
+          "total": 0.8879328867172409
         }
       },
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -114,46 +116,46 @@
       }
     },
     "presence_weighted": {
-      "robust_objective": 0.8799423576761096,
+      "robust_objective": 0.8801322925409443,
       "metrics_by_fold": {
         "cal_a": {
           "file_eer": 0.15793650793650793,
-          "voice_eer": 0.2751467314308844,
+          "voice_eer": 0.24640760979558793,
           "music_eer": 0.0,
-          "voice_auc": 0.9226656233698488,
+          "voice_auc": 0.9002347417840375,
           "music_auc": 0.9631661442006269,
-          "ads": 0.8660023997455693,
-          "cps": 0.9429158837852378,
-          "score": 0.8736937481495362,
-          "total": 0.8736937481495362
+          "ads": 0.8717502240726285,
+          "cps": 0.9317004429923321,
+          "score": 0.8777452459645989,
+          "total": 0.8777452459645989
         },
         "cal_b": {
           "file_eer": 0.13506101741395862,
           "voice_eer": 0.19683598794662074,
           "music_eer": 0.011667345000678363,
-          "voice_auc": 0.8902949382223994,
+          "voice_auc": 0.8764447987245915,
           "music_auc": 0.9864606562599555,
           "ads": 0.8896020902034931,
-          "cps": 0.9383777972411774,
-          "score": 0.8944796609072616,
-          "total": 0.8944796609072616
+          "cps": 0.9314527274922735,
+          "score": 0.8937871539323712,
+          "total": 0.8937871539323712
         },
         "cal_c": {
-          "file_eer": 0.16754385964912277,
+          "file_eer": 0.17697368421052634,
           "voice_eer": 0.20479962721342032,
           "music_eer": 0.011680988184747602,
-          "voice_auc": 0.9199447895100069,
+          "voice_auc": 0.9151138716356109,
           "music_auc": 0.9820577516119987,
-          "ads": 0.8717638482773302,
-          "cps": 0.9510012705610028,
-          "score": 0.8796875905056974,
-          "total": 0.8796875905056974
+          "ads": 0.8670489359966285,
+          "cps": 0.9485858116238048,
+          "score": 0.8752026235593462,
+          "total": 0.8752026235593462
         }
       },
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -162,40 +164,40 @@
       }
     },
     "presence_component_or": {
-      "robust_objective": 0.8752995846935805,
+      "robust_objective": 0.879466654257659,
       "metrics_by_fold": {
         "cal_a": {
           "file_eer": 0.14285714285714288,
-          "voice_eer": 0.2751467314308844,
+          "voice_eer": 0.24640760979558793,
           "music_eer": 0.0,
-          "voice_auc": 0.9226656233698488,
+          "voice_auc": 0.9002347417840375,
           "music_auc": 0.9631661442006269,
-          "ads": 0.8735420822852518,
-          "cps": 0.9429158837852378,
-          "score": 0.8804794624352504,
-          "total": 0.8804794624352504
+          "ads": 0.879289906612311,
+          "cps": 0.9317004429923321,
+          "score": 0.8845309602503132,
+          "total": 0.8845309602503132
         },
         "cal_b": {
-          "file_eer": 0.15885095296860002,
+          "file_eer": 0.14695598519127934,
           "voice_eer": 0.19683598794662074,
           "music_eer": 0.011667345000678363,
-          "voice_auc": 0.8902949382223994,
+          "voice_auc": 0.8764447987245915,
           "music_auc": 0.9864606562599555,
-          "ads": 0.8777071224261723,
-          "cps": 0.9383777972411774,
-          "score": 0.8837741899076729,
-          "total": 0.8837741899076729
+          "ads": 0.8836546063148327,
+          "cps": 0.9314527274922735,
+          "score": 0.8884344184325769,
+          "total": 0.8884344184325769
         },
         "cal_c": {
-          "file_eer": 0.1905701754385965,
+          "file_eer": 0.181140350877193,
           "voice_eer": 0.20479962721342032,
           "music_eer": 0.011680988184747602,
-          "voice_auc": 0.9199447895100069,
+          "voice_auc": 0.9151138716356109,
           "music_auc": 0.9820577516119987,
-          "ads": 0.8602506903825935,
-          "cps": 0.9510012705610028,
-          "score": 0.8693257484004344,
-          "total": 0.8693257484004344
+          "ads": 0.8649656026632953,
+          "cps": 0.9485858116238048,
+          "score": 0.8733276235593463,
+          "total": 0.8733276235593463
         }
       },
       "weights": {
@@ -214,11 +216,11 @@
     {
       "pass": 1,
       "coordinate": "detector",
-      "objective": 0.8874136387814853,
+      "objective": 0.8883663603678957,
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -229,11 +231,11 @@
     {
       "pass": 1,
       "coordinate": "w_df_arena",
-      "objective": 0.8874136387814853,
+      "objective": 0.8883663603678957,
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -244,11 +246,11 @@
     {
       "pass": 1,
       "coordinate": "w_df_voice_component",
-      "objective": 0.8874136387814853,
+      "objective": 0.8883663603678957,
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -259,11 +261,11 @@
     {
       "pass": 1,
       "coordinate": "w_df_music_component",
-      "objective": 0.8874136387814853,
+      "objective": 0.8883663603678957,
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -274,11 +276,11 @@
     {
       "pass": 1,
       "coordinate": "w_panns_presence",
-      "objective": 0.8874136387814853,
+      "objective": 0.8883663603678957,
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -289,11 +291,11 @@
     {
       "pass": 2,
       "coordinate": "detector",
-      "objective": 0.8874136387814853,
+      "objective": 0.8883663603678957,
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -304,11 +306,11 @@
     {
       "pass": 2,
       "coordinate": "w_df_arena",
-      "objective": 0.8874136387814853,
+      "objective": 0.8883663603678957,
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -319,11 +321,11 @@
     {
       "pass": 2,
       "coordinate": "w_df_voice_component",
-      "objective": 0.8874136387814853,
+      "objective": 0.8883663603678957,
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -334,11 +336,11 @@
     {
       "pass": 2,
       "coordinate": "w_df_music_component",
-      "objective": 0.8874136387814853,
+      "objective": 0.8883663603678957,
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -349,11 +351,11 @@
     {
       "pass": 2,
       "coordinate": "w_panns_presence",
-      "objective": 0.8874136387814853,
+      "objective": 0.8883663603678957,
       "weights": {
-        "w_voice_file": 0.25,
+        "w_voice_file": 0.0,
         "w_music_file": 0.5,
-        "w_prob_or": 0.25,
+        "w_prob_or": 0.5,
         "w_df_arena": 0.25,
         "w_df_voice_component": 0.3,
         "w_df_music_component": 0.0,
@@ -363,7 +365,7 @@
     }
   ],
   "calibration_cache_metadata": {
-    "voice_checkpoint_sha256": "3988a176a8da83f4be001bdd51eb297c6a5e95372f99d10b94e83f9db3156fa2",
+    "voice_checkpoint_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
     "music_checkpoint_sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
     "df_model_sha256": "a3b5746088fa57529d1291cca40c05077997ccf33574074f3c6e28712e96420b",
     "df_model_version": "pranjal-pravesh/df_arena_1b:int8-onnx-64600",
@@ -371,50 +373,9 @@
     "split_csv_sha256": {
       "fusion_calibration.csv": "0748fb5d545f3b79842109094c931a31b98ed203d2b817bece7f1490039864a4"
     },
-    "pipeline_version": "dacon236749-20260831-v6-panns16k",
+    "pipeline_version": "dacon236749-20260831-v7-voice-robust",
     "calibration_script_version": "robust-folds-df-gate-panns16k-v4",
     "feature_extractor_version": "canonical-inference-panns16k-voice-max-v4",
     "baseline_ref": "1b5553200d08dcf4f7867e7ecfc8cc93a5d62d5f"
-  },
-  "voice_fake_aggregation": "max",
-  "policy_selection": {
-    "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
-    "selected": "full_primary_df_gate_off",
-    "adaptive_rejected_reason": "VAL-C codec TOTAL regressed by 0.00375",
-    "current_domain_robust": 0.8982716471354166,
-    "selected_domain_robust": 0.8995841471354166,
-    "adaptive_domain_robust": 0.9022091471354166,
-    "per_domain": {
-      "val_a": {
-        "current": 0.9154752604166667,
-        "full_primary": 0.9192252604166667,
-        "full_adaptive": 0.9192252604166667,
-        "full_primary_delta": 0.003750000000000031
-      },
-      "val_b": {
-        "current": 0.8942708333333333,
-        "full_primary": 0.8980208333333334,
-        "full_adaptive": 0.8989583333333334,
-        "full_primary_delta": 0.003750000000000031
-      },
-      "val_c": {
-        "current": 0.9151985677083334,
-        "full_primary": 0.9151985677083334,
-        "full_adaptive": 0.9114485677083334,
-        "full_primary_delta": 0.0
-      },
-      "val_d": {
-        "current": 0.8871712239583334,
-        "full_primary": 0.8871712239583334,
-        "full_adaptive": 0.8937337239583334,
-        "full_primary_delta": 0.0
-      }
-    },
-    "report": "experiments/validation_domain_gate_report.json",
-    "voice_aggregation": {
-      "selected": "max",
-      "report": "experiments/voice_aggregation_report.json",
-      "reason": "lower raw VOICE EER on VAL-A/B/C/D and no fused TOTAL regression"
-    }
   }
 }

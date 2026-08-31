@@ -1,5 +1,6 @@
 .aider*
 __pycache__/
+model/candidates/
 *.pyc
 *.pyo
 .venv/
@@ -17,6 +18,7 @@ model/panns/*.pth
 model/*_tmp.pt
 .submit_audit/
 data/raw/
+data/generated_v8/audio/
 output/
 experiments/results.csv
 # Keep small checkpoints (<100MB) - uncomment if you want LFS for them

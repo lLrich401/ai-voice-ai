@@ -1,0 +1,13 @@
+{
+  "generator_version": "procedural-v8.1",
+  "seed": 23674908,
+  "rows": 930,
+  "train_rows": 840,
+  "validation_rows": 90,
+  "voice_only": 390,
+  "music_only": 390,
+  "mixed": 150,
+  "external_assets_used": false,
+  "manifest": "data/generated_v8/manifest.csv",
+  "audio_root": "data/generated_v8/audio"
+}

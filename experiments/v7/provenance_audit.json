@@ -1,0 +1,163 @@
+{
+  "status": "MEASURED_MANIFEST_AUDIT",
+  "rows": 2785,
+  "provenance_status": {
+    "REVIEW_REQUIRED": 2285,
+    "APPROVED": 500
+  },
+  "by_dataset": [
+    {
+      "dataset_name": "asvspoof2019",
+      "provenance_status": "REVIEW_REQUIRED",
+      "samples": 500
+    },
+    {
+      "dataset_name": "fake_music_generated",
+      "provenance_status": "REVIEW_REQUIRED",
+      "samples": 300
+    },
+    {
+      "dataset_name": "gtzan_real",
+      "provenance_status": "REVIEW_REQUIRED",
+      "samples": 985
+    },
+    {
+      "dataset_name": "librispeech_dev",
+      "provenance_status": "APPROVED",
+      "samples": 500
+    },
+    {
+      "dataset_name": "wavefake_ajay",
+      "provenance_status": "REVIEW_REQUIRED",
+      "samples": 500
+    }
+  ],
+  "voice_diversity": [
+    {
+      "dataset_name": "asvspoof2019",
+      "generator": "A01",
+      "voice_fake": 1,
+      "samples": 191,
+      "unique_originals": 191,
+      "unique_speakers": 20,
+      "unique_split_groups": 20
+    },
+    {
+      "dataset_name": "asvspoof2019",
+      "generator": "A02",
+      "voice_fake": 1,
+      "samples": 181,
+      "unique_originals": 181,
+      "unique_speakers": 20,
+      "unique_split_groups": 20
+    },
+    {
+      "dataset_name": "asvspoof2019",
+      "generator": "A03",
+      "voice_fake": 1,
+      "samples": 7,
+      "unique_originals": 7,
+      "unique_speakers": 2,
+      "unique_split_groups": 2
+    },
+    {
+      "dataset_name": "asvspoof2019",
+      "generator": "bonafide",
+      "voice_fake": 0,
+      "samples": 121,
+      "unique_originals": 121,
+      "unique_speakers": 20,
+      "unique_split_groups": 20
+    },
+    {
+      "dataset_name": "librispeech_dev",
+      "generator": "LibriSpeech",
+      "voice_fake": 0,
+      "samples": 500,
+      "unique_originals": 500,
+      "unique_speakers": 40,
+      "unique_split_groups": 40
+    },
+    {
+      "dataset_name": "wavefake_ajay",
+      "generator": "R",
+      "voice_fake": 0,
+      "samples": 62,
+      "unique_originals": 62,
+      "unique_speakers": 62,
+      "unique_split_groups": 62
+    },
+    {
+      "dataset_name": "wavefake_ajay",
+      "generator": "WF1",
+      "voice_fake": 1,
+      "samples": 52,
+      "unique_originals": 52,
+      "unique_speakers": 52,
+      "unique_split_groups": 52
+    },
+    {
+      "dataset_name": "wavefake_ajay",
+      "generator": "WF2",
+      "voice_fake": 1,
+      "samples": 64,
+      "unique_originals": 64,
+      "unique_speakers": 64,
+      "unique_split_groups": 64
+    },
+    {
+      "dataset_name": "wavefake_ajay",
+      "generator": "WF3",
+      "voice_fake": 1,
+      "samples": 73,
+      "unique_originals": 73,
+      "unique_speakers": 73,
+      "unique_split_groups": 73
+    },
+    {
+      "dataset_name": "wavefake_ajay",
+      "generator": "WF4",
+      "voice_fake": 1,
+      "samples": 59,
+      "unique_originals": 59,
+      "unique_speakers": 59,
+      "unique_split_groups": 59
+    },
+    {
+      "dataset_name": "wavefake_ajay",
+      "generator": "WF5",
+      "voice_fake": 1,
+      "samples": 57,
+      "unique_originals": 57,
+      "unique_speakers": 57,
+      "unique_split_groups": 57
+    },
+    {
+      "dataset_name": "wavefake_ajay",
+      "generator": "WF6",
+      "voice_fake": 1,
+      "samples": 66,
+      "unique_originals": 66,
+      "unique_speakers": 66,
+      "unique_split_groups": 66
+    },
+    {
+      "dataset_name": "wavefake_ajay",
+      "generator": "WF7",
+      "voice_fake": 1,
+      "samples": 67,
+      "unique_originals": 67,
+      "unique_speakers": 67,
+      "unique_split_groups": 67
+    }
+  ],
+  "approved_only_training": {
+    "status": "NOT RUN",
+    "reason": "approved subset has no fake voice/music class and cannot form metric-complete leakage-safe splits",
+    "rows": 500,
+    "voice_fake_labels": [
+      0
+    ]
+  },
+  "policy": "REVIEW_REQUIRED is never promoted automatically; human rule/license review is required"
+}

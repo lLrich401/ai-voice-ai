@@ -1,0 +1,38 @@
+{
+  "status": "SELECTED_FROM_NON_FINAL_VALIDATION_AND_INDEPENDENT_CALIBRATION",
+  "pipeline_version": "dacon236749-20260831-v7-voice-robust",
+  "final_holdout": "NOT RUN",
+  "voice_checkpoint_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+  "voice_architecture": "SpecCNN",
+  "voice_segment_policy": "high_energy",
+  "voice_fake_aggregation": "max",
+  "df_gate_policy": "off",
+  "adaptive_df": false,
+  "panns_16k_immutable": true,
+  "w_panns_presence": 0.75,
+  "fusion": {
+    "w_voice_file": 0.0,
+    "w_music_file": 0.5,
+    "w_prob_or": 0.5,
+    "w_df_arena": 0.25,
+    "w_df_voice_component": 0.3,
+    "w_df_music_component": 0.0,
+    "file_fusion_mode": "legacy"
+  },
+  "calibration_robust_objective": 0.8883663603678957,
+  "calibration_folds": {
+    "cal_a": 0.8845309602503132,
+    "cal_b": 0.8975664628587389,
+    "cal_c": 0.8879328867172409
+  },
+  "decision": "Adopted because fresh VAL-A/B/C/D had lower mean VOICE EER, no domain VOICE regression, higher TOTAL in every domain, and calibration worst-fold improved.",
+  "rejected": {
+    "retained_legacy_spec_cnn": "VAL-C and VAL-D regression",
+    "v7_channel_augmentation": "not all-domain TOTAL safe in controlled comparison",
+    "v7_partial_fake": "no strict robust VOICE improvement",
+    "v7_hard_mining": "not all-domain TOTAL safe in controlled comparison",
+    "segment_policy_change": "no strict VOICE EER improvement",
+    "new_aasist_training": "NOT RUN: CUDA unavailable",
+    "ssl_backbone": "NOT RUN: no licensed offline checkpoint bundled"
+  }
+}

@@ -109,6 +109,57 @@ def mulaw_encode_decode(wave, mu=255, p=1.0):
     decoded = np.sign(quantized) * (1/mu) * ((1+mu)**np.abs(quantized) -1)
     return decoded.astype(np.float32)
 
+def alaw_encode_decode(wave, a=87.6, p=1.0):
+    """Approximate 8-bit G.711 A-law companding without external codecs."""
+    if random.random() > p:
+        return wave
+    x = np.clip(np.asarray(wave, dtype=np.float32), -1.0, 1.0)
+    magnitude = np.abs(x)
+    denominator = 1.0 + np.log(a)
+    compressed = np.where(
+        magnitude < (1.0 / a),
+        a * magnitude / denominator,
+        (1.0 + np.log(a * np.maximum(magnitude, 1e-12))) / denominator,
+    )
+    encoded = np.sign(x) * compressed
+    quantized = np.round((encoded + 1.0) * 127.5) / 127.5 - 1.0
+    qmag = np.abs(quantized)
+    expanded = np.where(
+        qmag < (1.0 / denominator),
+        qmag * denominator / a,
+        np.exp(qmag * denominator - 1.0) / a,
+    )
+    return (np.sign(quantized) * expanded).astype(np.float32)
+
+def resample_roundtrip(wave, sr=16000, target_rates=(8000, 11025, 12000), p=0.25):
+    """Simulate unknown capture rates while returning the canonical sample rate."""
+    if random.random() > p:
+        return wave
+    target = int(random.choice(target_rates))
+    try:
+        from scipy.signal import resample_poly
+        import math as _math
+        down_gcd = _math.gcd(sr, target)
+        low = resample_poly(wave, target // down_gcd, sr // down_gcd)
+        up_gcd = _math.gcd(target, sr)
+        restored = resample_poly(low, sr // up_gcd, target // up_gcd)
+        if len(restored) < len(wave):
+            restored = np.pad(restored, (0, len(wave) - len(restored)))
+        return np.asarray(restored[:len(wave)], dtype=np.float32)
+    except Exception:
+        return wave
+
+def short_dropout(wave, sr=16000, max_duration_sec=0.04, p=0.1):
+    """Packet-loss-like short attenuation; intentionally moderate."""
+    if random.random() > p or len(wave) == 0:
+        return wave
+    maximum = max(1, min(len(wave), int(round(max_duration_sec * sr))))
+    length = random.randint(1, maximum)
+    start = random.randint(0, max(0, len(wave) - length))
+    result = np.asarray(wave, dtype=np.float32).copy()
+    result[start:start + length] *= random.uniform(0.0, 0.15)
+    return result
+
 def reverb_aug(wave, sr=16000, p=0.2):
     if random.random() > p:
         return wave
@@ -135,9 +186,10 @@ def dynamic_range_compression(wave, p=0.2):
     return (np.sign(wave) * (np.abs(wave)**alpha)).astype(np.float32)
 
 class AugmentationPipeline:
-    def __init__(self, sr=16000, is_training=True):
+    def __init__(self, sr=16000, is_training=True, profile="baseline"):
         self.sr = sr
         self.is_training = is_training
+        self.profile = str(profile)
     def __call__(self, wave):
         if not self.is_training:
             return wave
@@ -148,5 +200,22 @@ class AugmentationPipeline:
         wave = reverb_aug(wave, self.sr, p=0.15)
         wave = clipping_aug(wave, p=0.05)
         wave = dynamic_range_compression(wave, p=0.1)
+        if self.profile == "voice_channel_v7":
+            # Exactly one primary channel family is selected so the synthesis
+            # trace is not destroyed by a stack of unrealistically strong
+            # transformations. Remaining perturbations are deliberately mild.
+            channel = random.choice(("clean", "telephone", "mulaw", "alaw", "low_bitrate"))
+            if channel == "telephone":
+                wave = telephone_simulation(wave, self.sr, p=1.0)
+            elif channel == "mulaw":
+                wave = mulaw_encode_decode(wave, p=1.0)
+            elif channel == "alaw":
+                wave = alaw_encode_decode(wave, p=1.0)
+            elif channel == "low_bitrate":
+                wave = low_pass_filter(wave, self.sr, random.uniform(2800, 5200))
+            wave = resample_roundtrip(wave, self.sr, p=0.35)
+            wave = short_dropout(wave, self.sr, p=0.08)
+        elif self.profile != "baseline":
+            raise ValueError(f"Unknown augmentation profile: {self.profile}")
         wave = np.clip(wave, -1.0, 1.0)
         return wave.astype(np.float32)

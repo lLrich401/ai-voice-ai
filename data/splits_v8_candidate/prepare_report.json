@@ -1,0 +1,15 @@
+{
+  "status": "PREPARED_NOT_TRAINED",
+  "base_train_rows": 2025,
+  "generated_train_rows": 840,
+  "candidate_train_rows": 2865,
+  "unseen_fake_stress_rows": 90,
+  "selected_v7_splits_modified": false,
+  "training_authorized": false,
+  "adoption_status": "REJECT_CURRENT_DATASET_HIGH_SOURCE_FINGERPRINT",
+  "high_risk_components": [
+    "voice",
+    "music"
+  ],
+  "warning": "stress_unseen_fake contains only synthetic positives; report recall/FNR, not EER."
+}

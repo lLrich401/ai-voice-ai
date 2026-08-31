@@ -24,6 +24,32 @@ def test_task_specific_aggregation_and_df_gate_paths():
     assert script.select_df_indices(outputs,bounds,0.5)==[1]
 
 
+def test_voice_aggregation_consistency_and_max_mean_blends():
+    values = np.array([0.1, 0.4, 0.9])
+    assert script.aggregate_predictions(values, "mean") == pytest.approx(values.mean())
+    assert script.aggregate_predictions(values, "median") == pytest.approx(0.4)
+    assert script.aggregate_predictions(values, "trimmed_mean") == pytest.approx(0.4)
+    for alpha in (0.25, 0.5, 0.75):
+        assert script.aggregate_predictions(values, f"max_mean_{alpha}") == pytest.approx(
+            alpha * values.max() + (1.0 - alpha) * values.mean())
+
+
+def test_auxiliary_segment_policies_are_deterministic_and_bounded():
+    wave = np.concatenate([
+        np.full(8 * 16000, 0.01, np.float32),
+        np.full(8 * 16000, 0.5, np.float32),
+        np.full(24 * 16000, 0.1, np.float32),
+    ])
+    for policy in ("high_energy", "uniform", "centered", "energy_diverse"):
+        first = script.select_aux_segments(wave, policy=policy)
+        second = script.select_aux_segments(wave, policy=policy)
+        assert 1 <= len(first) <= 3
+        for left, right in zip(first, second):
+            np.testing.assert_array_equal(left, right)
+    with pytest.raises(ValueError, match="unsupported auxiliary segment policy"):
+        script.select_aux_segments(wave, policy="unknown")
+
+
 def test_segment_and_feature_fusion_are_identical_and_not_presence_gated():
     v = np.array([[0.4, 0.7, 0.2, 0.1, 0.3], [0.6, 0.9, 0.2, 0.2, 0.3]])
     m = np.array([[0.3, 0.2, 0.6, 0.4, 0.8], [0.5, 0.2, 0.8, 0.4, 0.9]])

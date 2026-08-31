@@ -1,0 +1,94 @@
+{
+  "status": "PASS",
+  "rows": 930,
+  "train_rows": 840,
+  "validation_rows": 90,
+  "audio_bytes": 160418360,
+  "external_assets_used": false,
+  "provenance_statement": "Waveforms are derived only from numeric seeds and project source code.",
+  "class_counts": {
+    "file_fake": 930,
+    "voice_fake": 540,
+    "music_fake": 540,
+    "voice_present": 540,
+    "music_present": 540
+  },
+  "generator_counts": {
+    "proc_mix_additive_formant+additive_band": 15,
+    "proc_mix_additive_formant+fm_percussive": 14,
+    "proc_mix_additive_formant+subtractive_sequence": 14,
+    "proc_mix_codec_phase+additive_band": 9,
+    "proc_mix_codec_phase+fm_percussive": 13,
+    "proc_mix_codec_phase+subtractive_sequence": 13,
+    "proc_mix_phase_locked_unseen+spectral_block_unseen": 30,
+    "proc_mix_pulse_lpc+additive_band": 11,
+    "proc_mix_pulse_lpc+fm_percussive": 16,
+    "proc_mix_pulse_lpc+subtractive_sequence": 15,
+    "proc_music_additive_band": 120,
+    "proc_music_fm_percussive": 120,
+    "proc_music_spectral_block_unseen": 30,
+    "proc_music_subtractive_sequence": 120,
+    "proc_voice_additive_formant": 120,
+    "proc_voice_codec_phase": 120,
+    "proc_voice_phase_locked_unseen": 30,
+    "proc_voice_pulse_lpc": 120
+  },
+  "split_isolation": {
+    "original_id": {
+      "overlap_count": 0,
+      "examples": []
+    },
+    "split_group_id": {
+      "overlap_count": 0,
+      "examples": []
+    },
+    "near_duplicate_group": {
+      "overlap_count": 0,
+      "examples": []
+    },
+    "speaker_id": {
+      "overlap_count": 0,
+      "examples": []
+    },
+    "base_voice_id": {
+      "overlap_count": 0,
+      "examples": []
+    },
+    "base_music_id": {
+      "overlap_count": 0,
+      "examples": []
+    }
+  },
+  "generator_family_overlap": [],
+  "exact_duplicate_groups": [],
+  "near_duplicate_threshold": 0.9995,
+  "cross_split_near_duplicates": [],
+  "audio_stats": {
+    "duration_sec": {
+      "min": 3.412,
+      "mean": 5.38902688172043,
+      "max": 7.18
+    },
+    "peak": {
+      "min": 0.67755126953125,
+      "mean": 0.8174112299437164,
+      "max": 0.929931640625
+    },
+    "rms": {
+      "min": 0.09721293601587944,
+      "mean": 0.21953377304698304,
+      "max": 0.5385388617589376
+    },
+    "dc_offset": {
+      "min": -0.00030962692487653475,
+      "mean": -6.400252958025819e-05,
+      "max": 0.00012393615365053327
+    },
+    "clipping_fraction": {
+      "min": 0.0,
+      "mean": 0.0,
+      "max": 0.0
+    }
+  },
+  "failures": []
+}

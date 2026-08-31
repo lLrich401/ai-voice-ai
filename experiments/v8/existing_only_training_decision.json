@@ -1,0 +1,41 @@
+{
+  "status": "TRAINED_AND_REJECTED",
+  "final_holdout": "NOT RUN",
+  "training_data": {
+    "split": "data/splits/train.csv",
+    "rows": 2025,
+    "explicit_provenance_filter": false,
+    "procedural_v8_rows": 0
+  },
+  "configuration": {
+    "task": "voice",
+    "architecture": "SpecCNN",
+    "epochs": 1,
+    "seed": 20260902,
+    "augmentation_profile": "baseline",
+    "device": "cpu"
+  },
+  "candidate": {
+    "path": "model/candidates/existing_only_seed20260902.pt",
+    "sha256": "a07372be41b23526b5c238075810c387d6dfe307c03ef5d2767699dbdff916f8"
+  },
+  "comparison": {
+    "current": {
+      "mean_voice_eer": 0.16666666666666669,
+      "worst_voice_eer": 0.20833333333333337,
+      "mean_total": 0.9070865885416667,
+      "worst_total": 0.8873990885416667
+    },
+    "candidate": {
+      "mean_voice_eer": 0.17708333333333334,
+      "worst_voice_eer": 0.20833333333333337,
+      "mean_total": 0.9052848307291667,
+      "worst_total": 0.886845703125
+    },
+    "val_b_voice_eer_before": 0.14583333333333337,
+    "val_b_voice_eer_after": 0.1875
+  },
+  "decision": "REJECT",
+  "reason": "VAL-B unseen-generator VOICE EER regressed and both mean and worst TOTAL decreased.",
+  "selected_model_changed": false
+}

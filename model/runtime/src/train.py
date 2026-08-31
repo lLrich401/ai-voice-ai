@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader, WeightedRandomSampler
 from torch.cuda.amp import GradScaler, autocast
 from .metrics import compute_dacon_metrics
 from .dataset import (
-    AudioDataset, build_val_sets, filter_manifest_provenance,
+    AudioDataset, add_partial_fake_examples, build_val_sets, filter_manifest_provenance,
     scan_real_datasets,
 )
 
@@ -54,6 +54,35 @@ def specialist_sample_weights(frame, task):
     if weights.sum() <= 0:
         weights[:] = 1.0 / max(1, len(weights))
     return weights / weights.sum()
+
+
+def apply_hard_example_weights(frame, base_weights, score_frame, task="voice", strength=2.0):
+    """Upweight TRAIN false-positive/false-negative candidates without leakage."""
+    scores = score_frame.copy()
+    if "data_role" not in scores.columns:
+        raise ValueError("hard-mining scores must include data_role=train")
+    roles = set(scores["data_role"].astype(str).str.lower())
+    if roles - {"train", "training"}:
+        raise ValueError(f"hard-mining scores contain non-TRAIN roles: {sorted(roles)}")
+    required = {"path", f"{task}_fake_score"}
+    missing = required - set(scores.columns)
+    if missing:
+        raise ValueError(f"hard-mining score columns missing: {sorted(missing)}")
+    if scores["path"].astype(str).duplicated().any():
+        raise ValueError("hard-mining scores contain duplicate paths")
+    mapping = scores.set_index(scores["path"].astype(str))[f"{task}_fake_score"].astype(float)
+    unknown = set(mapping.index) - set(frame["path"].astype(str))
+    if unknown:
+        raise ValueError(f"hard-mining scores contain {len(unknown)} rows outside TRAIN")
+    aligned = frame["path"].astype(str).map(mapping)
+    generated = frame["path"].astype(str).str.startswith("PARTIAL::")
+    if aligned[~generated].isna().any():
+        raise ValueError("hard-mining scores must cover every non-generated TRAIN row")
+    label = frame[f"{task}_fake"].to_numpy(dtype=float)
+    probability = np.clip(aligned.fillna(pd.Series(label, index=frame.index)).to_numpy(dtype=float), 0.0, 1.0)
+    hardness = np.where(label > 0.5, 1.0 - probability, probability)
+    result = np.asarray(base_weights, dtype=np.float64) * (1.0 + float(strength) * hardness)
+    return result / result.sum()
 
 
 def masked_multitask_loss(logit_t, labels, task="multitask"):
@@ -231,6 +260,14 @@ def main():
     parser.add_argument("--seed", type=int, default=20260830)
     parser.add_argument("--aux_eval_interval", type=int, default=2,
                         help="evaluate VAL-B/C/D every N epochs; VAL-A remains every epoch")
+    parser.add_argument("--augmentation_profile", choices=("baseline", "voice_channel_v7"),
+                        default="baseline")
+    parser.add_argument("--partial_fake_count", type=int, default=0,
+                        help="TRAIN-only partial voice examples; zero keeps the v6 baseline")
+    parser.add_argument("--hard_mining_scores", default=None,
+                        help="CSV of TRAIN-only model scores used to reweight the sampler")
+    parser.add_argument("--history_path", default=None,
+                        help="experiment CSV; defaults to the historical task path")
     args=parser.parse_args()
 
     random.seed(args.seed); np.random.seed(args.seed); torch.manual_seed(args.seed)
@@ -290,6 +327,11 @@ def main():
     # For music task, filter to music_present==1
     # But to keep file_fake training balanced, we keep all
     train_df=splits["train"]
+    if args.partial_fake_count:
+        if args.task != "voice":
+            raise ValueError("partial_fake_count is currently defined for the voice task only")
+        train_df = add_partial_fake_examples(
+            train_df, count=args.partial_fake_count, random_state=args.seed)
     val_a=splits["val_a"]
     val_b=splits.get("val_b", pd.DataFrame())
     val_c=splits.get("val_c", pd.DataFrame())
@@ -303,11 +345,16 @@ def main():
         print(f"Music task: train {len(train_df)} val_a {len(val_a)}")
 
     # Datasets
-    train_ds=AudioDataset(train_df, sr=16000, seg_sec=args.seg_sec, is_training=True, use_demucs=args.use_demucs, task=args.task, device=str(device))
+    train_ds=AudioDataset(train_df, sr=16000, seg_sec=args.seg_sec, is_training=True, use_demucs=args.use_demucs, task=args.task, device=str(device),
+                          augmentation_profile=args.augmentation_profile)
     val_a_ds=AudioDataset(val_a, sr=16000, seg_sec=args.seg_sec, is_training=False, use_demucs=args.use_demucs, task=args.task, device=str(device))
     sampler = None
     if args.task in ("voice", "music"):
         sample_weights = specialist_sample_weights(train_df, args.task)
+        if args.hard_mining_scores:
+            score_table = pd.read_csv(args.hard_mining_scores)
+            sample_weights = apply_hard_example_weights(
+                train_df, sample_weights, score_table, task=args.task)
         sampler = WeightedRandomSampler(torch.as_tensor(sample_weights, dtype=torch.double),
                                         num_samples=len(train_df), replacement=True)
     train_loader=DataLoader(train_ds, batch_size=args.batch_size, shuffle=sampler is None,
@@ -364,7 +411,10 @@ def main():
                         "task": args.task, "backbone": args.backbone,
                         "model_name": type(model).__name__, "base_channels": int(args.base_channels),
                         "sample_rate": 16000, "seg_sec": float(args.seg_sec),
-                        "label_heads": list(HEADS), "use_demucs": bool(args.use_demucs)}, args.save_path)
+                        "label_heads": list(HEADS), "use_demucs": bool(args.use_demucs),
+                        "augmentation_profile": args.augmentation_profile,
+                        "partial_fake_count": int(args.partial_fake_count),
+                        "hard_mining_scores": args.hard_mining_scores}, args.save_path)
             print(f"  saved {args.save_path} composite {best_score:.4f}")
             best_path=args.save_path
             no_improve=0
@@ -391,7 +441,8 @@ def main():
                 m=validate(model, loader, device)
                 print(f"Final {name} {m}")
 
-    history_path=pathlib.Path("experiments")/f"{args.task}_training_curve.csv"
+    history_path=(pathlib.Path(args.history_path) if args.history_path else
+                  pathlib.Path("experiments")/f"{args.task}_training_curve.csv")
     history_path.parent.mkdir(parents=True,exist_ok=True)
     pd.DataFrame(training_history).to_csv(history_path,index=False)
     print(f"Training curve saved {history_path} ({len(training_history)} rows)")

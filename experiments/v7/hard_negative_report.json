@@ -1,0 +1,253 @@
+{
+  "status": "MEASURED_TRAIN_ONLY",
+  "final_holdout": "NOT USED",
+  "rows": 2025,
+  "voice_rows": 1297,
+  "split_sha256": "c9e94f0ca35e824b852deb10b80d3738b60efec4b7c44c1932ddf2f992a2b976",
+  "checkpoint_sha256": "3988a176a8da83f4be001bdd51eb297c6a5e95372f99d10b94e83f9db3156fa2",
+  "runtime_seconds": 26.819025499979034,
+  "hardest_real": [
+    {
+      "path": "data\\raw\\ajaykarthick_wavefake-audio\\wavefake_ajay_LJ028-0361_R_1.wav",
+      "source": "wavefake_ajay",
+      "generator": "R",
+      "voice_fake_score": 0.7608662247657776
+    },
+    {
+      "path": "data\\raw\\openslr_librispeech_asr\\librispeech_dev_6345-93306-0018.flac",
+      "source": "librispeech_dev",
+      "generator": "LibriSpeech",
+      "voice_fake_score": 0.7594375610351562
+    },
+    {
+      "path": "data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_6081990.flac",
+      "source": "asvspoof2019",
+      "generator": "bonafide",
+      "voice_fake_score": 0.7592591643333435
+    },
+    {
+      "path": "data\\raw\\openslr_librispeech_asr\\librispeech_dev_5694-64038-0007.flac",
+      "source": "librispeech_dev",
+      "generator": "LibriSpeech",
+      "voice_fake_score": 0.7591985464096069
+    },
+    {
+      "path": "data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_3517928.flac",
+      "source": "asvspoof2019",
+      "generator": "bonafide",
+      "voice_fake_score": 0.7582679390907288
+    },
+    {
+      "path": "data\\raw\\openslr_librispeech_asr\\librispeech_dev_8297-275154-0009.flac",
+      "source": "librispeech_dev",
+      "generator": "LibriSpeech",
+      "voice_fake_score": 0.7581165432929993
+    },
+    {
+      "path": "data\\raw\\openslr_librispeech_asr\\librispeech_dev_1988-24833-0026.flac",
+      "source": "librispeech_dev",
+      "generator": "LibriSpeech",
+      "voice_fake_score": 0.7569872140884399
+    },
+    {
+      "path": "data\\raw\\ajaykarthick_wavefake-audio\\wavefake_ajay_LJ028-0384_R_1.wav",
+      "source": "wavefake_ajay",
+      "generator": "R",
+      "voice_fake_score": 0.756830632686615
+    },
+    {
+      "path": "data\\raw\\ajaykarthick_wavefake-audio\\wavefake_ajay_LJ020-0071.wav",
+      "source": "wavefake_ajay",
+      "generator": "R",
+      "voice_fake_score": 0.7562969326972961
+    },
+    {
+      "path": "data\\raw\\openslr_librispeech_asr\\librispeech_dev_3081-166546-0008.flac",
+      "source": "librispeech_dev",
+      "generator": "LibriSpeech",
+      "voice_fake_score": 0.7558508515357971
+    },
+    {
+      "path": "data\\raw\\ajaykarthick_wavefake-audio\\wavefake_ajay_LJ017-0002.wav",
+      "source": "wavefake_ajay",
+      "generator": "R",
+      "voice_fake_score": 0.754841685295105
+    },
+    {
+      "path": "data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_7500588.flac",
+      "source": "asvspoof2019",
+      "generator": "bonafide",
+      "voice_fake_score": 0.754304051399231
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_8657027.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0120.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::bonafide::MusicGen",
+      "voice_fake_score": 0.754141628742218
+    },
+    {
+      "path": "data\\raw\\openslr_librispeech_asr\\librispeech_dev_6345-93306-0009.flac",
+      "source": "librispeech_dev",
+      "generator": "LibriSpeech",
+      "voice_fake_score": 0.7539704442024231
+    },
+    {
+      "path": "data\\raw\\openslr_librispeech_asr\\librispeech_dev_1988-148538-0008.flac",
+      "source": "librispeech_dev",
+      "generator": "LibriSpeech",
+      "voice_fake_score": 0.7537351846694946
+    },
+    {
+      "path": "data\\raw\\ajaykarthick_wavefake-audio\\wavefake_ajay_LJ019-0317_R_1.wav",
+      "source": "wavefake_ajay",
+      "generator": "R",
+      "voice_fake_score": 0.7534559369087219
+    },
+    {
+      "path": "data\\raw\\ajaykarthick_wavefake-audio\\wavefake_ajay_LJ017-0037.wav",
+      "source": "wavefake_ajay",
+      "generator": "R",
+      "voice_fake_score": 0.753068208694458
+    },
+    {
+      "path": "data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_5359998.flac",
+      "source": "asvspoof2019",
+      "generator": "bonafide",
+      "voice_fake_score": 0.7529190182685852
+    },
+    {
+      "path": "data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_5387852.flac",
+      "source": "asvspoof2019",
+      "generator": "bonafide",
+      "voice_fake_score": 0.7526878118515015
+    },
+    {
+      "path": "data\\raw\\ajaykarthick_wavefake-audio\\wavefake_ajay_LJ030-0003.wav",
+      "source": "wavefake_ajay",
+      "generator": "R",
+      "voice_fake_score": 0.7525366544723511
+    }
+  ],
+  "hardest_fake": [
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_7807766.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0076.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A01::MusicGen",
+      "voice_fake_score": 0.6564120054244995
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_2651172.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0282.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A01::MusicGen",
+      "voice_fake_score": 0.6588370203971863
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_9264723.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0136.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A01::MusicGen",
+      "voice_fake_score": 0.6590443849563599
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_2627334.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0260.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A02::MusicGen",
+      "voice_fake_score": 0.6616153717041016
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_3986222.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0280.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A01::MusicGen",
+      "voice_fake_score": 0.6618826389312744
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_6513765.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0038.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A02::MusicGen",
+      "voice_fake_score": 0.6619359254837036
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_2979645.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0206.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A02::MusicGen",
+      "voice_fake_score": 0.6635107398033142
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_1584369.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0262.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A02::MusicGen",
+      "voice_fake_score": 0.6636187434196472
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_4886583.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0138.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A01::MusicGen",
+      "voice_fake_score": 0.6639406085014343
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_3568369.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0214.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A01::MusicGen",
+      "voice_fake_score": 0.6648629903793335
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_9130247.flac|data/raw/gtzan_unique_v2/jazz.00007.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A01::GTZAN_genre_5",
+      "voice_fake_score": 0.6665233373641968
+    },
+    {
+      "path": "MIX::data\\raw\\ajaykarthick_wavefake-audio\\wavefake_ajay_LJ019-0384.wav|data\\raw\\fake_music_generated\\fake_music_MusicGen_0262.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::WF5::MusicGen",
+      "voice_fake_score": 0.666646420955658
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_1836954.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0242.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A02::MusicGen",
+      "voice_fake_score": 0.6670516133308411
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_7519722.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0120.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A02::MusicGen",
+      "voice_fake_score": 0.6694961786270142
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_3824878.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0076.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A01::MusicGen",
+      "voice_fake_score": 0.6703194975852966
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_5667211.flac|data/raw/gtzan_unique_v2/blues.00049.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A01::GTZAN_genre_0",
+      "voice_fake_score": 0.6703495979309082
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_3986222.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0102.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A01::MusicGen",
+      "voice_fake_score": 0.6706663370132446
+    },
+    {
+      "path": "MIX::data\\raw\\Bisher_ASVspoof_2019_LA\\asvspoof2019_LA_T_2367403.flac|data\\raw\\fake_music_generated\\fake_music_MusicGen_0176.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::A02::MusicGen",
+      "voice_fake_score": 0.6722193360328674
+    },
+    {
+      "path": "MIX::data\\raw\\ajaykarthick_wavefake-audio\\wavefake_ajay_LJ043-0029.wav|data/raw/gtzan_unique_v2/country.00050.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::WF2::GTZAN_genre_2",
+      "voice_fake_score": 0.6732264161109924
+    },
+    {
+      "path": "MIX::data\\raw\\ajaykarthick_wavefake-audio\\wavefake_ajay_LJ028-0392.wav|data\\raw\\fake_music_generated\\fake_music_MusicGen_0282.wav",
+      "source": "split_internal_mix",
+      "generator": "mix::WF6::MusicGen",
+      "voice_fake_score": 0.6733758449554443
+    }
+  ]
+}

@@ -1,9 +1,12 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from src.dataset import (
     AudioDataset,
+    add_partial_fake_examples,
     add_split_internal_mixes,
+    apply_telephone_sim,
     assert_disjoint_split_groups,
     assert_no_base_source_overlap,
     derive_split_group_id,
@@ -121,3 +124,33 @@ def test_four_major_split_groups_are_pairwise_disjoint():
     }
     counts = assert_disjoint_split_groups(splits)
     assert counts == {name: 1 for name in splits}
+
+
+def test_partial_fake_rows_keep_train_sources_and_official_masks():
+    base = pd.DataFrame([
+        {"path": "real.wav", "file_fake": 0, "voice_fake": 0, "music_fake": 0,
+         "voice_present": 1, "music_present": 0, "speaker_id": "r", "generator": "real",
+         "source": "voice", "dataset": "voice", "original_id": "real", "split_group_id": "real"},
+        {"path": "fake.wav", "file_fake": 1, "voice_fake": 1, "music_fake": 0,
+         "voice_present": 1, "music_present": 0, "speaker_id": "f", "generator": "fake",
+         "source": "voice", "dataset": "voice", "original_id": "fake", "split_group_id": "fake"},
+    ])
+    result = add_partial_fake_examples(base, count=4, random_state=7)
+    partial = result[result["path"].astype(str).str.startswith("PARTIAL::")]
+    assert len(partial) == 4
+    assert set(partial["partial_fake_ratio"]) == {0.125, 0.25, 0.5, 0.75}
+    expected = np.array([1, 1, 0, 1, 0])
+    assert (partial[["file_fake", "voice_fake", "music_fake", "voice_present", "music_present"]]
+            .to_numpy() == expected).all()
+    assert set(partial["data_role"]) == {"train"}
+
+
+def test_partial_fake_builder_rejects_non_train_rows():
+    frame = pd.DataFrame({"data_role": ["val_b"], "path": ["x.wav"]})
+    with pytest.raises(ValueError, match="TRAIN"):
+        add_partial_fake_examples(frame, count=1)
+
+
+def test_telephone_validation_transform_is_deterministic():
+    wave = np.sin(np.linspace(0, 100, 32000)).astype(np.float32) * 0.1
+    np.testing.assert_array_equal(apply_telephone_sim(wave), apply_telephone_sim(wave))
