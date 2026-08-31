@@ -34,12 +34,16 @@ def run_batches(models, df_session, panns, waves, device, batch_size, config,
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--samples", type=int, default=32)
-    parser.add_argument("--batch_size", type=int, default=16)
+    parser.add_argument("--batch_sizes", nargs="+", type=int, default=[8, 16, 24, 32])
+    parser.add_argument("--split", default="val_a",
+                        help="non-final split used only for runtime measurement")
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--profiles", nargs="*", default=None)
     args = parser.parse_args()
     device = torch.device(args.device)
-    frame = pd.read_csv(ROOT / "data/splits/final_holdout.csv")
+    if args.split == "final_holdout":
+        raise ValueError("runtime tuning on final_holdout is forbidden")
+    frame = pd.read_csv(ROOT / "data/splits" / f"{args.split}.csv")
     frame = frame[~frame["path"].astype(str).str.startswith("MIX::")]
     frame = frame.sample(min(args.samples, len(frame)), random_state=20260831)
     waves = [load_manifest_row_wave(row, is_training=False) for _, row in frame.iterrows()]
@@ -62,8 +66,10 @@ def main():
         "component_low": float(weights.get("adaptive_df_component_low", 0.3)),
         "component_high": float(weights.get("adaptive_df_component_high", 0.7)),
         "disagreement": float(weights.get("adaptive_df_disagreement", 0.3)),
-        "gate_voice_presence_threshold": float(weights.get("df_gate_voice_presence_threshold", 0.8)),
     }
+    if weights.get("df_gate_policy") == "voice_presence":
+        selected_config["gate_voice_presence_threshold"] = float(
+            weights.get("df_gate_voice_presence_threshold", 0.8))
     profiles = (
         ("selected_submission", selected_config, 3, 3),
         ("baseline_single_crop", {"enabled": False}, 3, 3),
@@ -82,12 +88,15 @@ def main():
     for name, config, specialist_segments, panns_segments in profiles:
         if args.profiles and name not in args.profiles:
             continue
-        elapsed, df_calls = run_batches(models, df_session, panns, waves, device, args.batch_size, config,
-                                        specialist_segments, panns_segments)
-        results[name] = {"samples": len(waves), "seconds": elapsed,
-                         "df_calls": df_calls,
-                         "seconds_per_file": elapsed / len(waves),
-                         "projected_1200_minutes": elapsed / len(waves) * 1200 / 60}
+        for batch_size in args.batch_sizes:
+            elapsed, df_calls = run_batches(
+                models, df_session, panns, waves, device, batch_size, config,
+                specialist_segments, panns_segments)
+            results[f"{name}_batch_{batch_size}"] = {
+                "split": args.split, "samples": len(waves), "seconds": elapsed,
+                "batch_size": batch_size, "df_calls": df_calls,
+                "seconds_per_file": elapsed / len(waves),
+                "projected_1200_minutes": elapsed / len(waves) * 1200 / 60}
     print(json.dumps(results, indent=2))
 
 

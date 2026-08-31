@@ -1,0 +1,374 @@
+{
+  "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+  "per_split_limit": 128,
+  "splits": {
+    "val_a": {
+      "samples": 128,
+      "source_rows": 533,
+      "split_sha256": "e17d764df6ed8df0268b5dbded9537fe4d63a19b65465f59ede3d7ac134b56bc",
+      "runtime_seconds_feature_collection": 145.98851549997926,
+      "policies": {
+        "A_current_voice_0.8": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.16666666666666663,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9427083333333334,
+            "music_auc": 0.998046875,
+            "ads": 0.909375,
+            "cps": 0.9703776041666667,
+            "score": 0.9154752604166667,
+            "total": 0.9154752604166667
+          },
+          "df_primary_fraction": 0.671875
+        },
+        "B_full_primary": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.14583333333333337,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9427083333333334,
+            "music_auc": 0.998046875,
+            "ads": 0.9135416666666667,
+            "cps": 0.9703776041666667,
+            "score": 0.9192252604166667,
+            "total": 0.9192252604166667
+          },
+          "df_primary_fraction": 1.0
+        },
+        "C_full_adaptive": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.14583333333333337,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9427083333333334,
+            "music_auc": 0.998046875,
+            "ads": 0.9135416666666667,
+            "cps": 0.9703776041666667,
+            "score": 0.9192252604166667,
+            "total": 0.9192252604166667
+          },
+          "df_primary_fraction": 1.0
+        },
+        "D_voice_0.7_adaptive": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.14583333333333337,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9427083333333334,
+            "music_auc": 0.998046875,
+            "ads": 0.9135416666666667,
+            "cps": 0.9703776041666667,
+            "score": 0.9192252604166667,
+            "total": 0.9192252604166667
+          },
+          "df_primary_fraction": 0.8359375
+        },
+        "E_any_presence_0.8_adaptive": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.14583333333333337,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9427083333333334,
+            "music_auc": 0.998046875,
+            "ads": 0.9135416666666667,
+            "cps": 0.9703776041666667,
+            "score": 0.9192252604166667,
+            "total": 0.9192252604166667
+          },
+          "df_primary_fraction": 1.0
+        },
+        "F_presence_or_uncertainty": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.14583333333333337,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9427083333333334,
+            "music_auc": 0.998046875,
+            "ads": 0.9135416666666667,
+            "cps": 0.9703776041666667,
+            "score": 0.9192252604166667,
+            "total": 0.9192252604166667
+          },
+          "df_primary_fraction": 1.0
+        }
+      }
+    },
+    "val_b": {
+      "samples": 128,
+      "source_rows": 293,
+      "split_sha256": "a78b245827a2a6bb5c8fbc435f455122f11a58064fdd7907bbb7655ba6373562",
+      "runtime_seconds_feature_collection": 148.50463489998947,
+      "policies": {
+        "A_current_voice_0.8": {
+          "metrics": {
+            "file_eer": 0.14166666666666666,
+            "voice_eer": 0.1875,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9547526041666667,
+            "music_auc": 0.9931640625,
+            "ads": 0.8854166666666666,
+            "cps": 0.9739583333333334,
+            "score": 0.8942708333333333,
+            "total": 0.8942708333333333
+          },
+          "df_primary_fraction": 0.640625
+        },
+        "B_full_primary": {
+          "metrics": {
+            "file_eer": 0.14166666666666666,
+            "voice_eer": 0.16666666666666663,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9547526041666667,
+            "music_auc": 0.9931640625,
+            "ads": 0.8895833333333334,
+            "cps": 0.9739583333333334,
+            "score": 0.8980208333333334,
+            "total": 0.8980208333333334
+          },
+          "df_primary_fraction": 1.0
+        },
+        "C_full_adaptive": {
+          "metrics": {
+            "file_eer": 0.1479166666666667,
+            "voice_eer": 0.14583333333333337,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9547526041666667,
+            "music_auc": 0.9931640625,
+            "ads": 0.890625,
+            "cps": 0.9739583333333334,
+            "score": 0.8989583333333334,
+            "total": 0.8989583333333334
+          },
+          "df_primary_fraction": 1.0
+        },
+        "D_voice_0.7_adaptive": {
+          "metrics": {
+            "file_eer": 0.14166666666666666,
+            "voice_eer": 0.16666666666666663,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9547526041666667,
+            "music_auc": 0.9931640625,
+            "ads": 0.8895833333333334,
+            "cps": 0.9739583333333334,
+            "score": 0.8980208333333334,
+            "total": 0.8980208333333334
+          },
+          "df_primary_fraction": 0.828125
+        },
+        "E_any_presence_0.8_adaptive": {
+          "metrics": {
+            "file_eer": 0.1479166666666667,
+            "voice_eer": 0.14583333333333337,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9547526041666667,
+            "music_auc": 0.9931640625,
+            "ads": 0.890625,
+            "cps": 0.9739583333333334,
+            "score": 0.8989583333333334,
+            "total": 0.8989583333333334
+          },
+          "df_primary_fraction": 1.0
+        },
+        "F_presence_or_uncertainty": {
+          "metrics": {
+            "file_eer": 0.1479166666666667,
+            "voice_eer": 0.14583333333333337,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9547526041666667,
+            "music_auc": 0.9931640625,
+            "ads": 0.890625,
+            "cps": 0.9739583333333334,
+            "score": 0.8989583333333334,
+            "total": 0.8989583333333334
+          },
+          "df_primary_fraction": 1.0
+        }
+      }
+    },
+    "val_c": {
+      "samples": 128,
+      "source_rows": 533,
+      "split_sha256": "5bae6c021e7642a8d025f1d0c92cc57a65d9e0b473d7b06f9e20f7d46951dcd4",
+      "runtime_seconds_feature_collection": 144.1212750999839,
+      "policies": {
+        "A_current_voice_0.8": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.16666666666666663,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.939453125,
+            "music_auc": 0.9957682291666666,
+            "ads": 0.909375,
+            "cps": 0.9676106770833333,
+            "score": 0.9151985677083334,
+            "total": 0.9151985677083334
+          },
+          "df_primary_fraction": 0.6640625
+        },
+        "B_full_primary": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.16666666666666663,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.939453125,
+            "music_auc": 0.9957682291666666,
+            "ads": 0.909375,
+            "cps": 0.9676106770833333,
+            "score": 0.9151985677083334,
+            "total": 0.9151985677083334
+          },
+          "df_primary_fraction": 1.0
+        },
+        "C_full_adaptive": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.1875,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.939453125,
+            "music_auc": 0.9957682291666666,
+            "ads": 0.9052083333333333,
+            "cps": 0.9676106770833333,
+            "score": 0.9114485677083334,
+            "total": 0.9114485677083334
+          },
+          "df_primary_fraction": 1.0
+        },
+        "D_voice_0.7_adaptive": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.1875,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.939453125,
+            "music_auc": 0.9957682291666666,
+            "ads": 0.9052083333333333,
+            "cps": 0.9676106770833333,
+            "score": 0.9114485677083334,
+            "total": 0.9114485677083334
+          },
+          "df_primary_fraction": 0.8046875
+        },
+        "E_any_presence_0.8_adaptive": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.1875,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.939453125,
+            "music_auc": 0.9957682291666666,
+            "ads": 0.9052083333333333,
+            "cps": 0.9676106770833333,
+            "score": 0.9114485677083334,
+            "total": 0.9114485677083334
+          },
+          "df_primary_fraction": 1.0
+        },
+        "F_presence_or_uncertainty": {
+          "metrics": {
+            "file_eer": 0.10208333333333333,
+            "voice_eer": 0.1875,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.939453125,
+            "music_auc": 0.9957682291666666,
+            "ads": 0.9052083333333333,
+            "cps": 0.9676106770833333,
+            "score": 0.9114485677083334,
+            "total": 0.9114485677083334
+          },
+          "df_primary_fraction": 1.0
+        }
+      }
+    },
+    "val_d": {
+      "samples": 128,
+      "source_rows": 533,
+      "split_sha256": "bb733da58874189b0cceb0a2a3671f45d4f812c92ec38b233d15e63901f31457",
+      "runtime_seconds_feature_collection": 147.62635350000346,
+      "policies": {
+        "A_current_voice_0.8": {
+          "metrics": {
+            "file_eer": 0.1479166666666667,
+            "voice_eer": 0.20833333333333337,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9401041666666667,
+            "music_auc": 0.9970703125,
+            "ads": 0.8781249999999999,
+            "cps": 0.9685872395833334,
+            "score": 0.8871712239583334,
+            "total": 0.8871712239583334
+          },
+          "df_primary_fraction": 0.7890625
+        },
+        "B_full_primary": {
+          "metrics": {
+            "file_eer": 0.1479166666666667,
+            "voice_eer": 0.20833333333333337,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9401041666666667,
+            "music_auc": 0.9970703125,
+            "ads": 0.8781249999999999,
+            "cps": 0.9685872395833334,
+            "score": 0.8871712239583334,
+            "total": 0.8871712239583334
+          },
+          "df_primary_fraction": 1.0
+        },
+        "C_full_adaptive": {
+          "metrics": {
+            "file_eer": 0.14166666666666666,
+            "voice_eer": 0.1875,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9401041666666667,
+            "music_auc": 0.9970703125,
+            "ads": 0.8854166666666666,
+            "cps": 0.9685872395833334,
+            "score": 0.8937337239583334,
+            "total": 0.8937337239583334
+          },
+          "df_primary_fraction": 1.0
+        },
+        "D_voice_0.7_adaptive": {
+          "metrics": {
+            "file_eer": 0.14166666666666666,
+            "voice_eer": 0.1875,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9401041666666667,
+            "music_auc": 0.9970703125,
+            "ads": 0.8854166666666666,
+            "cps": 0.9685872395833334,
+            "score": 0.8937337239583334,
+            "total": 0.8937337239583334
+          },
+          "df_primary_fraction": 0.8671875
+        },
+        "E_any_presence_0.8_adaptive": {
+          "metrics": {
+            "file_eer": 0.14166666666666666,
+            "voice_eer": 0.1875,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9401041666666667,
+            "music_auc": 0.9970703125,
+            "ads": 0.8854166666666666,
+            "cps": 0.9685872395833334,
+            "score": 0.8937337239583334,
+            "total": 0.8937337239583334
+          },
+          "df_primary_fraction": 1.0
+        },
+        "F_presence_or_uncertainty": {
+          "metrics": {
+            "file_eer": 0.14166666666666666,
+            "voice_eer": 0.1875,
+            "music_eer": 0.02083333333333335,
+            "voice_auc": 0.9401041666666667,
+            "music_auc": 0.9970703125,
+            "ads": 0.8854166666666666,
+            "cps": 0.9685872395833334,
+            "score": 0.8937337239583334,
+            "total": 0.8937337239583334
+          },
+          "df_primary_fraction": 1.0
+        }
+      }
+    }
+  }
+}

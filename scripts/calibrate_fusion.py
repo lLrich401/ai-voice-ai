@@ -20,8 +20,8 @@ from src.metrics import compute_dacon_metrics
 import script as submission
 
 HEADS = ("file_fake", "voice_fake", "music_fake", "voice_present", "music_present")
-CALIBRATION_SCRIPT_VERSION = "robust-folds-df-gate-v3"
-FEATURE_EXTRACTOR_VERSION = "canonical-inference-adaptive-df-v2"
+CALIBRATION_SCRIPT_VERSION = "robust-folds-df-gate-panns16k-v4"
+FEATURE_EXTRACTOR_VERSION = "canonical-inference-panns16k-voice-max-v4"
 
 
 def sha256(path):
@@ -36,7 +36,7 @@ def cache_metadata(split_paths):
     df_path = next((path for path in (
         ROOT / "model/df_arena/df_arena_1b_int8.ort",
         ROOT / "model/df_arena/df_arena_1b_int8.onnx") if path.exists()), None)
-    panns_path = ROOT / "model/panns/Cnn14_mAP=0.431.pth"
+    panns_path = ROOT / "model/panns/Cnn14_16k_mAP=0.438.pth"
     return {
         "voice_checkpoint_sha256": sha256(ROOT / "model/best.pt"),
         "music_checkpoint_sha256": sha256(ROOT / "model/music_best.pt"),
@@ -111,7 +111,8 @@ def load_row_wave(row):
     return load_manifest_row_wave(row, sr=16000, is_training=False, use_demucs=False)
 
 
-def collect(split_name, df, models, df_session, panns, device, batch_size, baseline_models=None):
+def collect(split_name, df, models, df_session, panns, device, batch_size,
+            baseline_models=None, df_config=None):
     voice, music = models
     records = []
     for start in range(0, len(df), batch_size):
@@ -119,7 +120,8 @@ def collect(split_name, df, models, df_session, panns, device, batch_size, basel
         waves = [load_row_wave(row) for _, row in rows.iterrows()]
         features = submission.infer_wave_features_batch(
             voice, music, df_session, panns, waves, device, use_demucs=False,
-            df_config={"enabled": True, "force_second_for_long": True})
+            df_config=(df_config if df_config is not None else
+                       {"enabled": True, "force_second_for_long": True}))
         baseline = specialist_features(baseline_models, waves, device) if baseline_models else [{} for _ in waves]
         for (_, row), feature, baseline_feature in zip(rows.iterrows(), features, baseline):
             records.append({
@@ -160,27 +162,70 @@ def adaptive_df(frame, config):
     return np.where(use, combined, primary)
 
 
+def df_execution_mask(frame, weights, prefix=""):
+    """Return the samples that execute DF using only pre-DF specialist cues."""
+    policy = str(weights.get("df_gate_policy", "off"))
+    values = lambda name: frame[f"{prefix}{name}"].to_numpy(float)
+    if policy in ("off", "none", "always", ""):
+        return np.ones(len(frame), dtype=bool)
+    voice_presence = values("vp_model")
+    music_presence = values("mp_model")
+    if policy == "voice_presence":
+        return voice_presence >= float(weights.get("df_gate_voice_presence_threshold", 0.8))
+    any_presence = np.maximum(voice_presence, music_presence)
+    if policy == "any_presence":
+        return any_presence >= float(weights.get("df_gate_presence_threshold", 0.8))
+    low = float(weights.get("df_gate_uncertainty_low", 0.2))
+    high = float(weights.get("df_gate_uncertainty_high", 0.8))
+    specialist_probability = (
+        0.5 * values("vfile") + 0.5 * values("mfile"))
+    uncertain = (specialist_probability > low) & (specialist_probability < high)
+    if policy == "specialist_uncertainty":
+        return uncertain
+    if policy == "presence_or_uncertainty":
+        threshold = float(weights.get("df_gate_presence_threshold", 0.8))
+        return (any_presence >= threshold) | uncertain
+    raise ValueError(f"unsupported df_gate_policy={policy}")
+
+
 def score_frame(frame, weights, adaptive, prefix=""):
+    """Vectorized equivalent of the canonical scalar fusion function."""
     df_scores = adaptive_df(frame, adaptive)
-    def value(row, name):
-        return getattr(row, f"{prefix}{name}")
-    predicted = []
-    gate_threshold = (float(weights.get("df_gate_voice_presence_threshold", 0.8))
-                      if weights.get("df_gate_policy") == "voice_presence" else None)
-    for df_score, row in zip(df_scores, frame.itertuples()):
-        row_weights = weights
-        if gate_threshold is not None and value(row, "vp_model") < gate_threshold:
-            # Match submitted inference exactly: skipped DF is neutral and must
-            # not leak into either component score through its calibrated blend.
-            df_score = 0.5
-            row_weights = dict(weights)
-            row_weights["w_df_voice_component"] = 0.0
-            row_weights["w_df_music_component"] = 0.0
-        predicted.append(submission.fuse_prediction_features(
-            df_score, value(row,"vf"), value(row,"mf"), value(row,"vfile"), value(row,"mfile"),
-            value(row,"vp_model"), value(row,"mp_model"),
-            row.vp_panns, row.mp_panns, row_weights))
-    predicted = np.asarray(predicted)
+    def values(name):
+        return frame[f"{prefix}{name}"].to_numpy(float)
+    execute_df = df_execution_mask(frame, weights, prefix)
+    df_scores = np.where(execute_df, df_scores, 0.5)
+    legacy = float(weights.get("w_df_component", 0.0))
+    voice_component = np.where(execute_df, float(weights.get("w_df_voice_component", legacy)), 0.0)
+    music_component = np.where(execute_df, float(weights.get("w_df_music_component", legacy)), 0.0)
+    voice_fake = voice_component * df_scores + (1.0 - voice_component) * values("vf")
+    music_fake = music_component * df_scores + (1.0 - music_component) * values("mf")
+    panns_weight = float(weights.get("w_panns_presence", 0.6))
+    voice_present = panns_weight * frame["vp_panns"].to_numpy(float) + (1 - panns_weight) * values("vp_model")
+    music_present = panns_weight * frame["mp_panns"].to_numpy(float) + (1 - panns_weight) * values("mp_model")
+    probability_or = 1.0 - (1.0 - voice_fake) * (1.0 - music_fake)
+    mode = str(weights.get("file_fusion_mode", "legacy"))
+    wv = float(weights.get("w_voice_file", 0.5))
+    wm = float(weights.get("w_music_file", 0.3))
+    wo = float(weights.get("w_prob_or", 0.2))
+    if mode == "legacy":
+        detector_fused = wv * values("vfile") + wm * values("mfile") + wo * probability_or
+    else:
+        voice_risk = voice_present * voice_fake
+        music_risk = music_present * music_fake
+        component_or = 1.0 - (1.0 - voice_risk) * (1.0 - music_risk)
+        if mode == "presence_component_or":
+            detector_fused = component_or
+        elif mode == "presence_weighted":
+            detector_fused = (wv * voice_present * values("vfile")
+                              + wm * music_present * values("mfile")
+                              + wo * component_or)
+        else:
+            raise ValueError(f"unsupported file_fusion_mode={mode}")
+    w_df = float(weights.get("w_df_arena", 0.5))
+    file_fake = w_df * df_scores + (1.0 - w_df) * detector_fused
+    predicted = np.column_stack((file_fake, voice_fake, music_fake, voice_present, music_present))
+    predicted = np.clip(predicted, submission.OUTPUT_EPS, 1.0 - submission.OUTPUT_EPS)
     y_true = {head: frame[f"y_{head}"].to_numpy() for head in HEADS}
     y_pred = {head: predicted[:, index] for index, head in enumerate(HEADS)}
     return compute_dacon_metrics(y_true, y_pred)
@@ -308,27 +353,44 @@ def main():
         "trigger_mode": "any_uncertain_disagreement",
         "component_low": 0.3, "component_high": 0.7, "disagreement": 0.3,
     })
-    best = None
-    for wv, wm, wo in detector_weights:
-        for wdf in (0.0, 0.25, 0.5, 0.75, 1.0):
-            for voice_component in (0.0, 0.05, 0.10, 0.20, 0.30):
-                for music_component in (0.0, 0.025, 0.05, 0.10, 0.20):
-                    for panns_weight in (0.0, 0.25, 0.5, 0.75, 1.0):
-                        weights = {"w_voice_file": wv, "w_music_file": wm, "w_prob_or": wo,
-                                   "w_df_arena": wdf,
-                                   "w_df_voice_component": voice_component,
-                                   "w_df_music_component": music_component,
-                                   "w_panns_presence": panns_weight}
-                        # Select fusion weights without adaptive crops first. This
-                        # prevents multiplying an already broad grid by crop
-                        # hyperparameters and materially reduces calibration overfit.
-                        adaptive = adaptive_candidates[0]
-                        objective, metrics = robust_score(cache, weights, adaptive)
-                        complexity = voice_component + music_component + abs(wdf - 0.5)
-                        candidate = (objective, -complexity, dict(weights), adaptive, metrics)
-                        if best is None or candidate[:2] > best[:2]:
-                            best = candidate
-    _, _, selected_weights, _, _ = best
+    # A five-dimensional Cartesian grid both overfits 656 calibration rows and
+    # repeats EER/AUC computation thousands of times. Coordinate search keeps
+    # the same conservative candidate values while changing one decision at a
+    # time. Two fixed passes are enough for convergence on this small grid.
+    selected_weights = {
+        "w_voice_file": 0.25, "w_music_file": 0.5, "w_prob_or": 0.25,
+        "w_df_arena": 0.25, "w_df_voice_component": 0.3,
+        "w_df_music_component": 0.0, "w_panns_presence": 0.75,
+        "file_fusion_mode": "legacy",
+    }
+    coordinate_groups = (
+        ("detector", detector_weights),
+        ("w_df_arena", (0.0, 0.25, 0.5, 0.75, 1.0)),
+        ("w_df_voice_component", (0.0, 0.05, 0.10, 0.20, 0.30)),
+        ("w_df_music_component", (0.0, 0.025, 0.05, 0.10, 0.20)),
+        ("w_panns_presence", (0.0, 0.25, 0.5, 0.75, 1.0)),
+    )
+    coordinate_trace = []
+    for pass_index in range(2):
+        for name, candidates in coordinate_groups:
+            best_coordinate = None
+            for value in candidates:
+                trial = dict(selected_weights)
+                if name == "detector":
+                    trial.update(dict(zip(
+                        ("w_voice_file", "w_music_file", "w_prob_or"), value)))
+                    complexity = 0.0
+                else:
+                    trial[name] = value
+                    complexity = float(value) if "component" in name else 0.0
+                objective, metrics = robust_score(cache, trial, adaptive_candidates[0])
+                candidate = (objective, -complexity, trial, metrics)
+                if best_coordinate is None or candidate[:2] > best_coordinate[:2]:
+                    best_coordinate = candidate
+            objective, _, selected_weights, metrics = best_coordinate
+            coordinate_trace.append({"pass": pass_index + 1, "coordinate": name,
+                                     "objective": objective,
+                                     "weights": dict(selected_weights)})
     # FILE-only fusion candidates. Component and presence calibration remains
     # fixed so this comparison cannot improve conditional EER by side effect.
     file_mode_results = {}
@@ -370,6 +432,7 @@ def main():
         "pipeline_version": submission.PIPELINE_VERSION,
         "voice_checkpoint_sha256": expected_metadata["voice_checkpoint_sha256"],
         "music_checkpoint_sha256": expected_metadata["music_checkpoint_sha256"],
+        "panns_sha256": expected_metadata["panns_sha256"],
         "df_model_version": expected_metadata["df_model_version"],
         "df_arena_class_0_is_fake": True,
         "adaptive_df_enabled": adaptive["enabled"],
@@ -386,6 +449,7 @@ def main():
         "calibration_samples": int(len(cache)),
         "calibration_metrics_by_fold": metrics,
         "file_fusion_mode_comparison": file_mode_results,
+        "coordinate_search_trace": coordinate_trace,
         "calibration_cache_metadata": expected_metadata,
     })
     out = ROOT / "model/fusion_weights.json"

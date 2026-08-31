@@ -1,0 +1,96 @@
+{
+  "status": "MEASURED_LOCAL_VALIDATION",
+  "frontend": {
+    "sample_rate": 16000,
+    "window_size": 512,
+    "hop_size": 160,
+    "mel_bins": 64,
+    "fmin": 50,
+    "fmax": 8000
+  },
+  "max_segments": 3,
+  "splits": {
+    "val_a": {
+      "samples": 533,
+      "runtime_seconds": 38.68067319999682,
+      "seconds_per_file": 0.07257161951218916,
+      "corrected_16k": {
+        "voice_auc": 0.9670220600006404,
+        "music_auc": 0.9001636892162673,
+        "cps": 0.9335928746084539
+      }
+    },
+    "val_b": {
+      "samples": 293,
+      "runtime_seconds": 19.1101636000094,
+      "seconds_per_file": 0.0652224013652198,
+      "corrected_16k": {
+        "voice_auc": 0.9692232055063913,
+        "music_auc": 0.6973056994818654,
+        "cps": 0.8332644524941284
+      }
+    },
+    "val_c": {
+      "samples": 533,
+      "runtime_seconds": 40.288156399998115,
+      "seconds_per_file": 0.07558753545965875,
+      "corrected_16k": {
+        "voice_auc": 0.9668139467870522,
+        "music_auc": 0.9720599441198882,
+        "cps": 0.9694369454534701
+      }
+    },
+    "val_d": {
+      "samples": 533,
+      "runtime_seconds": 49.86550889999489,
+      "seconds_per_file": 0.09355630187616303,
+      "corrected_16k": {
+        "voice_auc": 0.9619793167483108,
+        "music_auc": 0.9406203256850957,
+        "cps": 0.9512998212167032
+      }
+    },
+    "fusion_calibration": {
+      "samples": 656,
+      "runtime_seconds": 53.279120199993486,
+      "seconds_per_file": 0.08121817103657543,
+      "corrected_16k": {
+        "voice_auc": 0.8945186491935484,
+        "music_auc": 0.843283371040724,
+        "cps": 0.8689010101171362
+      },
+      "legacy_mismatched": {
+        "voice_auc": 0.8305443548387097,
+        "music_auc": 0.10931136877828054,
+        "cps": 0.4699278618084951
+      },
+      "corrected_blend_grid": {
+        "0.0": {
+          "voice_auc": 0.8584425403225806,
+          "music_auc": 0.9772483031674207,
+          "cps": 0.9178454217450007
+        },
+        "0.25": {
+          "voice_auc": 0.893132560483871,
+          "music_auc": 0.9781815610859728,
+          "cps": 0.935657060784922
+        },
+        "0.5": {
+          "voice_auc": 0.9069430443548387,
+          "music_auc": 0.9791572398190046,
+          "cps": 0.9430501420869217
+        },
+        "0.75": {
+          "voice_auc": 0.9075478830645161,
+          "music_auc": 0.9800197963800905,
+          "cps": 0.9437838397223033
+        },
+        "1.0": {
+          "voice_auc": 0.8945186491935484,
+          "music_auc": 0.843283371040724,
+          "cps": 0.8689010101171362
+        }
+      }
+    }
+  }
+}

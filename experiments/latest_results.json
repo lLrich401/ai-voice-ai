@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "status": "MEASURED_LOCAL_UNLESS_MARKED",
+  "timestamp": "2026-08-31T14:18:35.7300858+09:00",
+  "base_git_commit": "507efd3fb6b90da4bcd7afb4b00b3fee3a1ea959",
+  "implementation_git_commit": "PENDING_FIRST_COMMIT",
+  "pipeline_version": "dacon236749-20260831-v6-panns16k",
+  "checkpoints": {
+    "voice_sha256": "3988a176a8da83f4be001bdd51eb297c6a5e95372f99d10b94e83f9db3156fa2",
+    "music_sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+    "df_sha256": "a3b5746088fa57529d1291cca40c05077997ccf33574074f3c6e28712e96420b",
+    "panns_packaged_sha256": "eee61e89d4ef120bfe0e900f0fb9e4814a2597bbd1f3bf8e149868a7d508bc10",
+    "panns_upstream_md5": "362fc5ff18f1d6ad2f6d464b45893f2c"
+  },
+  "splits": {
+    "fusion_calibration_sha256": "0748fb5d545f3b79842109094c931a31b98ed203d2b817bece7f1490039864a4",
+    "final_holdout_sha256": "233c542b9773c7fe5cd82a67414e3192c9c2b066baea6ab7e9a80d8607a81a9e",
+    "sizes": {"train": 2025, "val_a": 533, "val_b": 293, "fusion_calibration": 656, "final_holdout": 463}
+  },
+  "reported_public_submission": {
+    "status": "USER_REPORTED_DACON_PUBLIC",
+    "total": 0.6461396931,
+    "ads": 0.6276746032,
+    "cps": 0.8123255026
+  },
+  "before_local_final_holdout": {
+    "status": "MEASURED_PREVIOUS_V5_ONE_SHOT",
+    "file_eer": 0.11010101010101012,
+    "voice_eer": 0.15163063851055852,
+    "music_eer": 0.015863050393437127,
+    "ads": 0.909864452129352,
+    "voice_auc": 0.9046594982078854,
+    "music_auc": 0.9863897763578275,
+    "cps": 0.9455246372828565,
+    "total": 0.9134304706447024,
+    "df_fraction": 0.6219512195121951,
+    "projected_runtime_1200_minutes": 12.6441
+  },
+  "after_local_final_holdout": {
+    "status": "MEASURED_ONE_SHOT_FINAL_LOCAL_HOLDOUT",
+    "file_eer": 0.11010101010101012,
+    "voice_eer": 0.16454246324295052,
+    "music_eer": 0.015863050393437127,
+    "ads": 0.9072820871828737,
+    "voice_auc": 0.9414294750158129,
+    "music_auc": 0.9874973375931843,
+    "cps": 0.9644634063044986,
+    "total": 0.9130002190950363,
+    "df_fraction": 1.0,
+    "measured_runtime_463_seconds": 341.4997652999882,
+    "projected_runtime_1200_minutes": 14.751609725513348
+  },
+  "panns_ab_calibration": {
+    "legacy_mismatched_cps": 0.4699278618084951,
+    "corrected_16k_cps": 0.8689010101171362,
+    "corrected_blend_0_75_cps": 0.9437838397223033,
+    "corrected_runtime_seconds_per_file": 0.08125280350608724
+  },
+  "fusion": {
+    "voice_file": 0.25,
+    "music_file": 0.5,
+    "probability_or": 0.25,
+    "df_arena": 0.25,
+    "df_voice_component": 0.3,
+    "df_music_component": 0.0,
+    "panns_presence": 0.75,
+    "voice_fake_aggregation": "max",
+    "df_gate_policy": "off",
+    "adaptive_df": false
+  },
+  "calibration": {
+    "robust_objective": 0.8874136387814853,
+    "fold_totals": {"cal_a": 0.8804794624352504, "cal_b": 0.8982589698336293, "cal_c": 0.8924178536635923},
+    "worst_fold": {"name": "cal_a", "total": 0.8804794624352504}
+  },
+  "validation_128_balanced_each": {
+    "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+    "val_a_total": 0.9267252604166667,
+    "val_b_unseen_generator_total": 0.8980208333333334,
+    "val_c_codec_total": 0.9151985677083334,
+    "val_d_telephone_total": 0.8871712239583334,
+    "worst_domain": "val_d_telephone"
+  },
+  "leakage_audit": {"files": 2785, "exact_cross_family": 0, "near_cross_family": 0, "status": "PASS"},
+  "runtime_benchmark": {
+    "status": "MEASURED_VAL_A_64_FILES",
+    "selected_batch_size": 16,
+    "seconds": 40.93488630000502,
+    "projected_runtime_1200_minutes": 12.792151968751568,
+    "official_server_runtime": "NOT_RUN"
+  },
+  "submission": {
+    "size_bytes": 935623738,
+    "sha256": "34c5c4e1c0b9e0385308d6b4604d7dfe930bfe2c21a2c47400d4a9363c92a024",
+    "top_level": ["model", "script.py", "requirements.txt"],
+    "archive_validation": "PASS",
+    "offline_smoke_test": "PASS"
+  },
+  "tests": {"pytest": "38 passed", "seconds": 7.51},
+  "not_run": [
+    "new AASIST training: no CUDA controlled experiment",
+    "partial-fake checkpoint retraining: infrastructure only",
+    "source-disjoint music holdout: only one real source and two fake generators",
+    "official DACON evaluator runtime",
+    "new DACON leaderboard submission"
+  ]
+}

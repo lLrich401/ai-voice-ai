@@ -24,7 +24,7 @@ import soundfile as sf
 TARGET_SR=16000
 SEG_SEC=4.0
 OUTPUT_EPS=1e-6
-PIPELINE_VERSION="dacon236749-20260831-v5"
+PIPELINE_VERSION="dacon236749-20260831-v6-panns16k"
 # DF-Arena model card: input length 64,600 at 16 kHz and logits ordered as
 # [spoof, bonafide].  FAKE therefore always maps to class index 0.
 DF_INPUT_SAMPLES=64600
@@ -36,7 +36,11 @@ DF_ARENA_FAKE_INDEX=0
 import onnxruntime as ort
 from src.models.aasist import AASISTMultitask
 from src.models.beats_backbone import MusicMultitask
-from src.models.panns import PANNsPresenceWrapper
+from src.models.panns import (
+    PANNs_CHECKPOINT_NAME,
+    PANNs_CHECKPOINT_SHA256,
+    PANNsPresenceWrapper,
+)
 from src.models.demucs_wrapper import get_separator
 
 def verify_mandatory_models():
@@ -46,8 +50,8 @@ def verify_mandatory_models():
         ("DF_Arena_ORT", pathlib.Path("model/df_arena/df_arena_1b_int8.ort")),
         ("DF_Arena", pathlib.Path("model/df_arena/df_arena_1b_int8.onnx")),
         ("DF_Arena_alt", pathlib.Path(__file__).parent / "model" / "df_arena" / "df_arena_1b_int8.onnx"),
-        ("PANNs", pathlib.Path("model/panns/Cnn14_mAP=0.431.pth")),
-        ("PANNs_alt", pathlib.Path(__file__).parent / "model" / "panns" / "Cnn14_mAP=0.431.pth"),
+        ("PANNs", pathlib.Path("model/panns") / PANNs_CHECKPOINT_NAME),
+        ("PANNs_alt", pathlib.Path(__file__).parent / "model" / "panns" / PANNs_CHECKPOINT_NAME),
         ("Voice_checkpoint", pathlib.Path("model/best.pt")),
         ("Music_checkpoint", pathlib.Path("model/music_best.pt")),
         ("Fusion_weights", pathlib.Path("model/fusion_weights.json")),
@@ -61,7 +65,7 @@ def verify_mandatory_models():
     if not df_exists:
         missing.append("model/df_arena/df_arena_1b_int8.onnx (1.37GB DF_Arena_1B)")
     if not panns_exists:
-        missing.append("model/panns/Cnn14_mAP=0.431.pth (PANNs CNN14)")
+        missing.append(f"model/panns/{PANNs_CHECKPOINT_NAME} (official 16 kHz PANNs CNN14)")
     if not voice_exists:
         missing.append("model/best.pt (voice detector checkpoint)")
     if not music_exists:
@@ -373,11 +377,12 @@ def load_music_model(device):
     return _strict_checkpoint_model(ckpt_path, device, "music")
 
 def load_panns(device):
-    cands=[pathlib.Path("model/panns/Cnn14_mAP=0.431.pth"), pathlib.Path(__file__).parent / "model" / "panns" / "Cnn14_mAP=0.431.pth"]
+    cands=[pathlib.Path("model/panns")/PANNs_CHECKPOINT_NAME,
+           pathlib.Path(__file__).parent/"model"/"panns"/PANNs_CHECKPOINT_NAME]
     ckpt_path=next((p for p in cands if p.exists()), None)
     if ckpt_path is None or not ckpt_path.exists():
-        raise FileNotFoundError("PANNs checkpoint not found: model/panns/Cnn14_mAP=0.431.pth (download from https://github.com/qiuqiangkong/audioset_tagging_cnn)")
-    model=PANNsPresenceWrapper(use_pretrained=True)
+        raise FileNotFoundError(f"PANNs checkpoint not found: model/panns/{PANNs_CHECKPOINT_NAME}")
+    model=PANNsPresenceWrapper(use_pretrained=True,checkpoint_path=ckpt_path)
     if not model.pretrained_loaded:
         raise RuntimeError("PANNs failed to load pretrained weights")
     model.to(device).eval()
@@ -395,6 +400,7 @@ def load_fusion_weights():
             "pipeline_version":PIPELINE_VERSION,
             "voice_checkpoint_sha256":_sha256_file(pathlib.Path("model/best.pt")),
             "music_checkpoint_sha256":_sha256_file(pathlib.Path("model/music_best.pt")),
+            "panns_sha256":PANNs_CHECKPOINT_SHA256,
         }
         stale={key:(w.get(key),value) for key,value in expected.items() if w.get(key)!=value}
         if stale:
@@ -425,7 +431,13 @@ def load_fusion_weights():
                 w[key]=float(np.clip(float(w.get(key,legacy)),0.0,1.0))
             except (TypeError,ValueError):
                 w[key]=0.0
-        print(f"loaded fusion {w}")
+        print(
+            "loaded fusion "
+            f"pipeline={w.get('pipeline_version')} "
+            f"df_gate={w.get('df_gate_policy', 'off')} "
+            f"adaptive={bool(w.get('adaptive_df_enabled', False))} "
+            f"voice_aggregation={w.get('voice_fake_aggregation', 'topk_mean')}"
+        )
         return w
     raise FileNotFoundError("model/fusion_weights.json is mandatory; run validation calibration first")
 
@@ -524,9 +536,10 @@ def _combine_predictions(file_fake_df, v_probs, m_probs, panns_out, fusion_weigh
 def infer_wave_features_batch(voice_model, music_model, df_sess, panns_model,
                               waves, device, use_demucs=False, df_config=None,
                               specialist_max_segments=None, panns_max_segments=None,
-                              aggregation_config=None):
+                              aggregation_config=None, separator=None):
     """Canonical preprocessing/model/aggregation path used by val and submit."""
-    separator=get_separator(device=device, use_demucs=use_demucs)
+    if separator is None:
+        separator=get_separator(device=device, use_demucs=use_demucs)
     separator_type="htdemucs" if getattr(separator,"use_demucs",False) else "identity"
     if use_demucs and separator_type!="htdemucs":
         raise RuntimeError(f"HTDemucs requested but unavailable (separator_type={separator_type})")
@@ -633,7 +646,7 @@ def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_wei
         df_config=df_config,
         specialist_max_segments=int(fusion_weights.get("specialist_max_segments",3)),
         panns_max_segments=int(fusion_weights.get("panns_max_segments",3)),
-        aggregation_config=fusion_weights)
+        aggregation_config=fusion_weights, separator=separator)
     for (index,audio_path,_),feature in zip(records,features):
         results[index]=[audio_path.stem]+fuse_feature_record(feature,fusion_weights)
     return results

@@ -31,7 +31,7 @@ DATASETS = {
     "wavefake_ajay": {
         "hf_id": "ajaykarthick/wavefake-audio",
         "split": "train",
-        "license": "MIT",
+        "license": "CC BY-SA 4.0 upstream; verify source-specific terms",
         "url": "https://huggingface.co/datasets/ajaykarthick/wavefake-audio",
         "category": "Fake Voice",
         "samples": "Real + Fake (WF1 etc)",
@@ -40,7 +40,7 @@ DATASETS = {
     "gtzan_real": {
         "hf_id": "sanchit-gandhi/gtzan",
         "split": "train",
-        "license": "CC BY-SA",
+        "license": "Unclear in inspected mirror; review required",
         "url": "https://huggingface.co/datasets/sanchit-gandhi/gtzan",
         "category": "Real Music",
         "samples": "1000 tracks GTZAN (10 genres, 30s each)",
@@ -213,13 +213,7 @@ def download_hf_with_manifest(hf_id, local_dir, manifest_writer, config=None, sp
                     voice_present=1; voice_fake=1; file_fake=1
                     generator=str(rf)  # WF1~WF7
                 else:
-                    # Fallback: treat unknown as fake if contains WF, else real
-                    if "WF" in rf.upper():
-                        voice_present=1; voice_fake=1; file_fake=1
-                        generator=str(rf) if rf else "WaveFake"
-                    else:
-                        voice_present=1; voice_fake=0; file_fake=0
-                        generator=str(rf) if rf else "R"
+                    raise ValueError(f"Unknown WaveFake metadata label: {rf!r}")
                 speaker_id=f"wavefake_{hashlib.md5(base_name.encode()).hexdigest()[:6]}"
                 music_present=0; music_fake=0
                 source="wavefake_ajay"

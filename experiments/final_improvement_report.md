@@ -1,67 +1,92 @@
-# DACON 236749 final improvement report
+# DACON 236749 v6 measured report
 
-Generated: 2026-08-31. All values below are measured results unless explicitly marked as a projection or NOT RUN.
+Generated 2026-08-31. `latest_results.json` is authoritative. Every value is a
+local measurement unless marked user-reported, projected, or NOT RUN.
 
-## Starting point
+## 1. Problems found and changes made
 
-- User-reported public submission: TOTAL 0.6461396931, ADS 0.6276746032, CPS 0.8123255026, runtime 15m 50s.
-- The old local holdout was invalid for music comparison: 500 GTZAN manifest rows represented only 10 unique file hashes and leaked across split families.
+- The 32 kHz `Cnn14_mAP=0.431.pth` was fed a custom 16 kHz 1024/320 frontend;
+  torchaudio dB conversion differed from upstream and `bn0` was skipped.
+- Replaced it with official 16 kHz CNN14 (512/160/64 mel/50–8000 Hz), exact
+  torchlibrosa flow and strict 84/84 state loading. The packaged state dict
+  removes only the upstream training sampler.
+- Calibration PANNs CPS changed from 0.46993 (mismatched) to 0.86890 standalone;
+  0.75 specialist blending measured 0.94378.
+- Rejected the old voice-presence 0.8 DF gate. Gate OFF + one primary crop
+  improved balanced VAL-A/B by 0.00375 and tied VAL-C/D.
+- Rejected adaptive second crop despite a higher four-domain mean because
+  codec VAL-C regressed by 0.00375.
+- Voice `max` segment aggregation lowered raw VOICE EER on all four validation
+  domains and caused no fused TOTAL regression; it replaced `topk_mean`.
+- Vectorized fusion scoring and replaced the 5-D Cartesian calibration grid
+  with two-pass coordinate search, reducing a stalled minutes-long search to
+  about nine seconds and reducing calibration freedom.
+- Removed duplicate separator construction, fixed runtime benchmark gate
+  emulation, prohibited final-holdout runtime tuning, and kept batch size 16.
+- Added manifest-level provenance, exact content SHA, explicit review status,
+  opt-in approved-only training, and fail-closed path-label inference.
 
-## Data and leakage repair
+## 2. Data, validation and leakage
 
-- Recovered the official cached GTZAN parquet snapshot: 999 source rows.
-- Removed 14 exact source duplicates, leaving 985 unique file hashes.
-- Grouped 13 decoded near-duplicate pairs (26 rows) using a label-free spectro-temporal fingerprint plus waveform correlation >= 0.999.
-- Regenerated every split by original-content group.
-- Cross-family audit after regeneration: 2,785 files checked, 0 exact and 0 near duplicates (`PASS`).
-- Final split sizes: train 2,025; VAL-A 533; VAL-B 293; fusion calibration 656; final holdout 463.
+- No new training audio was downloaded and no DACON test audio was used.
+- 2,785 originals; exact cross-family duplicates 0; decoded near duplicates 0.
+- Independent train/model-selection/calibration/final families remain intact.
+- Music source-disjoint experiment remains NOT RUN: one real source and two
+  fake generators are insufficient. The very low local MUSIC EER is therefore
+  not treated as proof of private generalization.
+- 2,285 provenance rows require license review; only LibriSpeech's 500 rows are
+  explicitly marked approved. Current checkpoints were not retrained under the
+  strict approved-only filter.
 
-## Selected models and calibration
+## 3. Before / after
 
-- Voice SpecCNN: early-stopped after epoch 6; epoch 1 checkpoint retained by the four-condition composite objective.
-- Music SpecCNN: epoch 10 selected; composite 0.9937.
-- Music multi-segment validation EER: VAL-A 0.000, VAL-B 0.000, codec VAL-C 0.000, telephone VAL-D 0.000.
-- Fusion used three disjoint calibration folds only. Robust calibration objective: 0.8877316689.
-- Selected FILE weights: voice 0.25, music 0.50, probability-OR 0.25, DF-Arena 0.25.
-- DF component weights: voice 0.30, music 0.00. Voice-presence gate threshold: 0.80.
-- Calibration DF gate fraction: 0.6219512195.
-- Selected adaptive policy: primary uncertainty 0.20-0.80, max aggregation, minimum duration 12s.
+| metric | BEFORE v5 | AFTER v6 |
+|---|---:|---:|
+| FILE EER | 0.110101 | 0.110101 |
+| VOICE EER | 0.151631 | 0.164542 |
+| MUSIC EER | 0.015863 | 0.015863 |
+| ADS | 0.909864 | 0.907282 |
+| VOICE AUC | 0.904659 | 0.941429 |
+| MUSIC AUC | 0.986390 | 0.987497 |
+| CPS | 0.945525 | 0.964463 |
+| TOTAL | 0.913430 | 0.913000 |
+| projected local runtime / 1,200 | 12.64 min | 12.79–14.75 min |
+| DF primary fraction | 0.621951 | 1.000000 |
 
-## Untouched final holdout
+The final candidate was locked before the v6 one-shot holdout. Its TOTAL is
+0.00043 lower there, but reverting would tune on the final holdout and violate
+the selection protocol. Non-final domain robustness was the selection target.
 
-| Variant | FILE EER | VOICE EER | MUSIC EER | ADS | CPS | TOTAL |
-|---|---:|---:|---:|---:|---:|---:|
-| Existing Git baseline on repaired split | 0.17278 | 0.19351 | 0.14379 | 0.83177 | 0.93792 | 0.84238 |
-| Retrained specialists | 0.15979 | 0.16454 | 0.03173 | 0.87768 | 0.94552 | 0.88446 |
-| Calibrated FILE/DF weights | 0.11010 | 0.16454 | 0.01586 | 0.90728 | 0.94552 | 0.91111 |
-| Adaptive DF crop | 0.11010 | 0.15809 | 0.01586 | 0.90857 | 0.94552 | 0.91227 |
-| Selected submission | 0.11010 | 0.15163 | 0.01586 | 0.90986 | 0.94552 | 0.91343 |
+## 4. Calibration and domain results
 
-The selected submission improves the repaired-split baseline TOTAL by 0.07105. These local values are not a guarantee of the private leaderboard score.
+Final gate-off calibration robust objective: 0.887414. Fold totals: CAL-A
+0.880479, CAL-B 0.898259, CAL-C 0.892418; worst fold CAL-A.
 
-## Runtime
+Balanced 128-row non-final measurements with final voice aggregation:
 
-Measured on 32 real files, CPU, batch size 16, after model warm-up:
+| condition | TOTAL |
+|---|---:|
+| VAL-A | 0.926725 |
+| VAL-B unseen generator | 0.898021 |
+| VAL-C codec | 0.915199 |
+| VAL-D telephone | 0.887171 |
 
-| Profile | DF calls | Seconds | Projected 1,200-file time |
-|---|---:|---:|---:|
-| Selected submission | 24 | 20.2306 | 12.6441 min |
-| Gate, no adaptive crop | 19 | 16.0774 | 10.0483 min |
-| No DF-Arena | 0 | 1.7828 | 1.1143 min |
+## 5. Runtime and submission
 
-The earlier accuracy profile projected 20.2638 minutes locally; the selected submission projection is 37.6% lower. The new official evaluator runtime is **NOT RUN**; the 12.64-minute value is a local linear projection, not an official measurement.
+- Batch 8/16/24/32 projected 14.18/12.79/13.82/14.45 minutes from VAL-A;
+  batch 16 retained.
+- Complete v6 holdout: 463 files in 341.50 seconds, linear projection 14.75 min.
+- Official DACON runtime: NOT RUN.
+- `submit.zip`: 935,623,738 bytes; top level exactly `model/`, `script.py`,
+  `requirements.txt`.
+- Archive validator and offline three-file end-to-end smoke test: PASS.
+- `pytest`: 38 passed.
 
-## Rejected or unavailable experiments
+## 6. Not changed
 
-- FILE OOF logistic meta-fusion: rejected. Bootstrap win probability 0.545 and improvement p05 -0.00690 failed the adoption rule.
-- Lower DF gates: rejected when they reduced the worst calibration fold.
-- Source-level music domain holdout: NOT RUN because only one real-music source and two fake generators were legally available.
-- AASIST three-seed GPU comparison and music multi-seed training: NOT RUN because this machine has no CUDA. Reproducible runners and status files are included.
-- Partial-fake training: infrastructure and tests added, but no checkpoint was claimed without a completed controlled retraining run.
-
-## Verification and artifact
-
-- `python -m pytest -q`: 37 passed.
-- `python tools/validate_submission.py submit.zip`: PASS, including a three-file end-to-end inference smoke test.
-- `submit.zip`: 928,328,170 bytes.
-- Package contains `script.py`, requirements, two selected SpecCNN checkpoints, DF-Arena INT8 ONNX, PANNs, calibrated weights, and a byte-identical runtime source copy.
+- No new AASIST or partial-fake checkpoint was claimed because controlled GPU
+  retraining was not completed.
+- No meta-fusion was adopted; prior OOF bootstrap evidence remained weak.
+- No private/public leaderboard feedback was used for hyperparameter search.
+- Component outputs remain ungated by presence, and output post-processing is
+  limited to finite probability clipping.

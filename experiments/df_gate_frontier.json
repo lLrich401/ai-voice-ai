@@ -1,0 +1,1107 @@
+{
+  "status": "MEASURED_CALIBRATION_ONLY",
+  "samples": 656,
+  "best_objective": 0.895575437689021,
+  "all_df_primary": {
+    "policy": "all_df",
+    "adaptive": false,
+    "robust_objective": 0.8874136387814853,
+    "df_primary_fraction": 1.0,
+    "df_second_fraction": 0.0,
+    "df_crop_fraction": 1.0,
+    "metrics_by_fold": {
+      "cal_a": {
+        "file_eer": 0.14285714285714288,
+        "voice_eer": 0.2751467314308844,
+        "music_eer": 0.0,
+        "voice_auc": 0.9226656233698488,
+        "music_auc": 0.9631661442006269,
+        "ads": 0.8735420822852518,
+        "cps": 0.9429158837852378,
+        "score": 0.8804794624352504,
+        "total": 0.8804794624352504
+      },
+      "cal_b": {
+        "file_eer": 0.12666255313314134,
+        "voice_eer": 0.19683598794662074,
+        "music_eer": 0.011667345000678363,
+        "voice_auc": 0.8902949382223994,
+        "music_auc": 0.9864606562599555,
+        "ads": 0.8938013223439016,
+        "cps": 0.9383777972411774,
+        "score": 0.8982589698336293,
+        "total": 0.8982589698336293
+      },
+      "cal_c": {
+        "file_eer": 0.1392543859649123,
+        "voice_eer": 0.20479962721342032,
+        "music_eer": 0.011680988184747602,
+        "voice_auc": 0.9199447895100069,
+        "music_auc": 0.9820577516119987,
+        "ads": 0.8859085851194355,
+        "cps": 0.9510012705610028,
+        "score": 0.8924178536635923,
+        "total": 0.8924178536635923
+      }
+    },
+    "configuration": {
+      "df_gate_policy": "off"
+    }
+  },
+  "all_df_adaptive": {
+    "policy": "all_df",
+    "adaptive": true,
+    "robust_objective": 0.8922623770700678,
+    "df_primary_fraction": 1.0,
+    "df_second_fraction": 0.24085365853658536,
+    "df_crop_fraction": 1.2408536585365852,
+    "metrics_by_fold": {
+      "cal_a": {
+        "file_eer": 0.14285714285714288,
+        "voice_eer": 0.26077717061323624,
+        "music_eer": 0.0,
+        "voice_auc": 0.9226656233698488,
+        "music_auc": 0.9631661442006269,
+        "ads": 0.8764159944487813,
+        "cps": 0.9429158837852378,
+        "score": 0.8830659833824269,
+        "total": 0.8830659833824269
+      },
+      "cal_b": {
+        "file_eer": 0.12666255313314134,
+        "voice_eer": 0.16072965992251398,
+        "music_eer": 0.011667345000678363,
+        "voice_auc": 0.8902949382223994,
+        "music_auc": 0.9864606562599555,
+        "ads": 0.901022587948723,
+        "cps": 0.9383777972411774,
+        "score": 0.9047581088779685,
+        "total": 0.9047581088779685
+      },
+      "cal_c": {
+        "file_eer": 0.1256578947368421,
+        "voice_eer": 0.19229574401988192,
+        "music_eer": 0.011680988184747602,
+        "voice_auc": 0.9199447895100069,
+        "music_auc": 0.9820577516119987,
+        "ads": 0.8952076073721782,
+        "cps": 0.9510012705610028,
+        "score": 0.9007869736910606,
+        "total": 0.9007869736910606
+      }
+    },
+    "configuration": {
+      "df_gate_policy": "off"
+    }
+  },
+  "current_gate": {
+    "policy": "current_voice_0.8",
+    "adaptive": true,
+    "robust_objective": 0.8906989286565388,
+    "df_primary_fraction": 0.6219512195121951,
+    "df_second_fraction": 0.10823170731707317,
+    "df_crop_fraction": 0.7301829268292683,
+    "metrics_by_fold": {
+      "cal_a": {
+        "file_eer": 0.14285714285714288,
+        "voice_eer": 0.24640760979558793,
+        "music_eer": 0.0,
+        "voice_auc": 0.9226656233698488,
+        "music_auc": 0.9631661442006269,
+        "ads": 0.879289906612311,
+        "cps": 0.9429158837852378,
+        "score": 0.8856525043296037,
+        "total": 0.8856525043296037
+      },
+      "cal_b": {
+        "file_eer": 0.12666255313314134,
+        "voice_eer": 0.16072965992251398,
+        "music_eer": 0.011667345000678363,
+        "voice_auc": 0.8902949382223994,
+        "music_auc": 0.9864606562599555,
+        "ads": 0.901022587948723,
+        "cps": 0.9383777972411774,
+        "score": 0.9047581088779685,
+        "total": 0.9047581088779685
+      },
+      "cal_c": {
+        "file_eer": 0.1486842105263158,
+        "voice_eer": 0.20479962721342032,
+        "music_eer": 0.011680988184747602,
+        "voice_auc": 0.9199447895100069,
+        "music_auc": 0.9820577516119987,
+        "ads": 0.8811936728387337,
+        "cps": 0.9510012705610028,
+        "score": 0.8881744326109606,
+        "total": 0.8881744326109606
+      }
+    },
+    "configuration": {
+      "df_gate_policy": "voice_presence",
+      "df_gate_voice_presence_threshold": 0.8
+    }
+  },
+  "top": [
+    {
+      "policy": "voice_presence_0.7",
+      "adaptive": true,
+      "robust_objective": 0.895575437689021,
+      "df_primary_fraction": 0.8567073170731707,
+      "df_second_fraction": 0.2225609756097561,
+      "df_crop_fraction": 1.079268292682927,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.13174603174603172,
+          "voice_eer": 0.24640760979558793,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8848454621678665,
+          "cps": 0.9429158837852378,
+          "score": 0.8906525043296037,
+          "total": 0.8906525043296037
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16568015497201893,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.900032488938822,
+          "cps": 0.9383777972411774,
+          "score": 0.9038670197690576,
+          "total": 0.9038670197690576
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.20479962721342032,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8927068307334707,
+          "cps": 0.9510012705610028,
+          "score": 0.8985362747162239,
+          "total": 0.8985362747162239
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "voice_presence",
+        "df_gate_voice_presence_threshold": 0.7
+      }
+    },
+    {
+      "policy": "presence_0.9_or_uncertainty_0.2_0.8",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 0.9984756097560976,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2393292682926829,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "presence_or_uncertainty",
+        "df_gate_presence_threshold": 0.9,
+        "df_gate_uncertainty_low": 0.2,
+        "df_gate_uncertainty_high": 0.8
+      }
+    },
+    {
+      "policy": "all_df",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "off"
+      }
+    },
+    {
+      "policy": "voice_presence_0.5",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "voice_presence",
+        "df_gate_voice_presence_threshold": 0.5
+      }
+    },
+    {
+      "policy": "any_presence_0.5",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "any_presence",
+        "df_gate_presence_threshold": 0.5
+      }
+    },
+    {
+      "policy": "voice_presence_0.6",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "voice_presence",
+        "df_gate_voice_presence_threshold": 0.6
+      }
+    },
+    {
+      "policy": "any_presence_0.6",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "any_presence",
+        "df_gate_presence_threshold": 0.6
+      }
+    },
+    {
+      "policy": "any_presence_0.7",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "any_presence",
+        "df_gate_presence_threshold": 0.7
+      }
+    },
+    {
+      "policy": "uncertainty_0.1_0.9",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "specialist_uncertainty",
+        "df_gate_uncertainty_low": 0.1,
+        "df_gate_uncertainty_high": 0.9
+      }
+    },
+    {
+      "policy": "presence_0.7_or_uncertainty_0.1_0.9",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "presence_or_uncertainty",
+        "df_gate_presence_threshold": 0.7,
+        "df_gate_uncertainty_low": 0.1,
+        "df_gate_uncertainty_high": 0.9
+      }
+    },
+    {
+      "policy": "presence_0.8_or_uncertainty_0.1_0.9",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "presence_or_uncertainty",
+        "df_gate_presence_threshold": 0.8,
+        "df_gate_uncertainty_low": 0.1,
+        "df_gate_uncertainty_high": 0.9
+      }
+    },
+    {
+      "policy": "presence_0.9_or_uncertainty_0.1_0.9",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "presence_or_uncertainty",
+        "df_gate_presence_threshold": 0.9,
+        "df_gate_uncertainty_low": 0.1,
+        "df_gate_uncertainty_high": 0.9
+      }
+    },
+    {
+      "policy": "presence_0.7_or_uncertainty_0.2_0.8",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "presence_or_uncertainty",
+        "df_gate_presence_threshold": 0.7,
+        "df_gate_uncertainty_low": 0.2,
+        "df_gate_uncertainty_high": 0.8
+      }
+    },
+    {
+      "policy": "presence_0.8_or_uncertainty_0.2_0.8",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "presence_or_uncertainty",
+        "df_gate_presence_threshold": 0.8,
+        "df_gate_uncertainty_low": 0.2,
+        "df_gate_uncertainty_high": 0.8
+      }
+    },
+    {
+      "policy": "presence_0.7_or_uncertainty_0.3_0.7",
+      "adaptive": true,
+      "robust_objective": 0.8922623770700678,
+      "df_primary_fraction": 1.0,
+      "df_second_fraction": 0.24085365853658536,
+      "df_crop_fraction": 1.2408536585365852,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.26077717061323624,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8764159944487813,
+          "cps": 0.9429158837852378,
+          "score": 0.8830659833824269,
+          "total": 0.8830659833824269
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.901022587948723,
+          "cps": 0.9383777972411774,
+          "score": 0.9047581088779685,
+          "total": 0.9047581088779685
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.19229574401988192,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8952076073721782,
+          "cps": 0.9510012705610028,
+          "score": 0.9007869736910606,
+          "total": 0.9007869736910606
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "presence_or_uncertainty",
+        "df_gate_presence_threshold": 0.7,
+        "df_gate_uncertainty_low": 0.3,
+        "df_gate_uncertainty_high": 0.7
+      }
+    }
+  ],
+  "frontier": [
+    {
+      "maximum_objective_loss": 0.0,
+      "policy": "voice_presence_0.7",
+      "adaptive": true,
+      "robust_objective": 0.895575437689021,
+      "df_primary_fraction": 0.8567073170731707,
+      "df_second_fraction": 0.2225609756097561,
+      "df_crop_fraction": 1.079268292682927,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.13174603174603172,
+          "voice_eer": 0.24640760979558793,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8848454621678665,
+          "cps": 0.9429158837852378,
+          "score": 0.8906525043296037,
+          "total": 0.8906525043296037
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16568015497201893,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.900032488938822,
+          "cps": 0.9383777972411774,
+          "score": 0.9038670197690576,
+          "total": 0.9038670197690576
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.20479962721342032,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8927068307334707,
+          "cps": 0.9510012705610028,
+          "score": 0.8985362747162239,
+          "total": 0.8985362747162239
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "voice_presence",
+        "df_gate_voice_presence_threshold": 0.7
+      }
+    },
+    {
+      "maximum_objective_loss": 0.001,
+      "policy": "voice_presence_0.7",
+      "adaptive": true,
+      "robust_objective": 0.895575437689021,
+      "df_primary_fraction": 0.8567073170731707,
+      "df_second_fraction": 0.2225609756097561,
+      "df_crop_fraction": 1.079268292682927,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.13174603174603172,
+          "voice_eer": 0.24640760979558793,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8848454621678665,
+          "cps": 0.9429158837852378,
+          "score": 0.8906525043296037,
+          "total": 0.8906525043296037
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16568015497201893,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.900032488938822,
+          "cps": 0.9383777972411774,
+          "score": 0.9038670197690576,
+          "total": 0.9038670197690576
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.20479962721342032,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8927068307334707,
+          "cps": 0.9510012705610028,
+          "score": 0.8985362747162239,
+          "total": 0.8985362747162239
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "voice_presence",
+        "df_gate_voice_presence_threshold": 0.7
+      }
+    },
+    {
+      "maximum_objective_loss": 0.0025,
+      "policy": "voice_presence_0.7",
+      "adaptive": true,
+      "robust_objective": 0.895575437689021,
+      "df_primary_fraction": 0.8567073170731707,
+      "df_second_fraction": 0.2225609756097561,
+      "df_crop_fraction": 1.079268292682927,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.13174603174603172,
+          "voice_eer": 0.24640760979558793,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.8848454621678665,
+          "cps": 0.9429158837852378,
+          "score": 0.8906525043296037,
+          "total": 0.8906525043296037
+        },
+        "cal_b": {
+          "file_eer": 0.12666255313314134,
+          "voice_eer": 0.16568015497201893,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.900032488938822,
+          "cps": 0.9383777972411774,
+          "score": 0.9038670197690576,
+          "total": 0.9038670197690576
+        },
+        "cal_c": {
+          "file_eer": 0.1256578947368421,
+          "voice_eer": 0.20479962721342032,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8927068307334707,
+          "cps": 0.9510012705610028,
+          "score": 0.8985362747162239,
+          "total": 0.8985362747162239
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "voice_presence",
+        "df_gate_voice_presence_threshold": 0.7
+      }
+    },
+    {
+      "maximum_objective_loss": 0.005,
+      "policy": "current_voice_0.8",
+      "adaptive": false,
+      "robust_objective": 0.8905836323115264,
+      "df_primary_fraction": 0.6219512195121951,
+      "df_second_fraction": 0.0,
+      "df_crop_fraction": 0.6219512195121951,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.24640760979558793,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.879289906612311,
+          "cps": 0.9429158837852378,
+          "score": 0.8856525043296037,
+          "total": 0.8856525043296037
+        },
+        "cal_b": {
+          "file_eer": 0.13506101741395862,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.8968233558083143,
+          "cps": 0.9383777972411774,
+          "score": 0.9009787999516007,
+          "total": 0.9009787999516007
+        },
+        "cal_c": {
+          "file_eer": 0.1486842105263158,
+          "voice_eer": 0.18654861758310032,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8848438747647978,
+          "cps": 0.9510012705610028,
+          "score": 0.8914596143444182,
+          "total": 0.8914596143444182
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "voice_presence",
+        "df_gate_voice_presence_threshold": 0.8
+      }
+    },
+    {
+      "maximum_objective_loss": 0.01,
+      "policy": "current_voice_0.8",
+      "adaptive": false,
+      "robust_objective": 0.8905836323115264,
+      "df_primary_fraction": 0.6219512195121951,
+      "df_second_fraction": 0.0,
+      "df_crop_fraction": 0.6219512195121951,
+      "metrics_by_fold": {
+        "cal_a": {
+          "file_eer": 0.14285714285714288,
+          "voice_eer": 0.24640760979558793,
+          "music_eer": 0.0,
+          "voice_auc": 0.9226656233698488,
+          "music_auc": 0.9631661442006269,
+          "ads": 0.879289906612311,
+          "cps": 0.9429158837852378,
+          "score": 0.8856525043296037,
+          "total": 0.8856525043296037
+        },
+        "cal_b": {
+          "file_eer": 0.13506101741395862,
+          "voice_eer": 0.16072965992251398,
+          "music_eer": 0.011667345000678363,
+          "voice_auc": 0.8902949382223994,
+          "music_auc": 0.9864606562599555,
+          "ads": 0.8968233558083143,
+          "cps": 0.9383777972411774,
+          "score": 0.9009787999516007,
+          "total": 0.9009787999516007
+        },
+        "cal_c": {
+          "file_eer": 0.1486842105263158,
+          "voice_eer": 0.18654861758310032,
+          "music_eer": 0.011680988184747602,
+          "voice_auc": 0.9199447895100069,
+          "music_auc": 0.9820577516119987,
+          "ads": 0.8848438747647978,
+          "cps": 0.9510012705610028,
+          "score": 0.8914596143444182,
+          "total": 0.8914596143444182
+        }
+      },
+      "configuration": {
+        "df_gate_policy": "voice_presence",
+        "df_gate_voice_presence_threshold": 0.8
+      }
+    }
+  ]
+}

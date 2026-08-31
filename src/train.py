@@ -11,7 +11,10 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from torch.cuda.amp import GradScaler, autocast
 from .metrics import compute_dacon_metrics
-from .dataset import scan_real_datasets, build_val_sets, AudioDataset
+from .dataset import (
+    AudioDataset, build_val_sets, filter_manifest_provenance,
+    scan_real_datasets,
+)
 
 def get_model(task, backbone="aasist", base_channels=32, device="cpu"):
     if backbone=="aasist":
@@ -211,6 +214,8 @@ def main():
     parser=argparse.ArgumentParser(description="Real training for voice/music detectors")
     parser.add_argument("--data_root", default="data/raw", help="real data root")
     parser.add_argument("--manifest", default="data/manifest.csv")
+    parser.add_argument("--require_approved_provenance", action="store_true",
+                        help="exclude rows whose license review is unresolved")
     parser.add_argument("--splits_dir", default="data/splits")
     parser.add_argument("--task", choices=["voice","music","multitask"], default="multitask")
     parser.add_argument("--backbone", choices=["aasist","spec_cnn","fusion"], default="aasist")
@@ -237,13 +242,18 @@ def main():
     # Scan real datasets - fail clearly if not found (requirement 12: no silent fallback)
     try:
         if not pathlib.Path(args.manifest).exists():
-            df=scan_real_datasets(args.data_root, args.manifest)
+            df=scan_real_datasets(
+                args.data_root, args.manifest,
+                require_approved_provenance=args.require_approved_provenance)
         else:
             df=pd.read_csv(args.manifest)
+            df=filter_manifest_provenance(df, args.require_approved_provenance)
             print(f"Loaded manifest {args.manifest} {len(df)} rows")
             # if manifest is old or empty, rescan
             if len(df)==0:
-                df=scan_real_datasets(args.data_root, args.manifest)
+                df=scan_real_datasets(
+                    args.data_root, args.manifest,
+                    require_approved_provenance=args.require_approved_provenance)
     except Exception as e:
         print(f"ERROR: Real data manifest failed: {e}")
         print("No synthetic fallback in final pipeline. Run: python scripts/download_datasets.py --datasets librispeech_dev wavefake fma_small fakemusiccaps --max_samples 1000")
@@ -251,7 +261,8 @@ def main():
 
     # Build splits if not exist
     splits_dir=pathlib.Path(args.splits_dir)
-    if not (splits_dir/"train.csv").exists() or not (splits_dir/"val_a.csv").exists():
+    force_rebuild = args.require_approved_provenance
+    if force_rebuild or not (splits_dir/"train.csv").exists() or not (splits_dir/"val_a.csv").exists():
         try:
             splits=build_val_sets(df, out_dir=args.splits_dir)
         except Exception as e:

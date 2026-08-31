@@ -122,7 +122,34 @@ def _extract_generator(path: pathlib.Path):
     if "fma" in p: return "FMA"
     return "unknown"
 
-def scan_real_datasets(data_root="data/raw", manifest_path="data/manifest.csv"):
+PROVENANCE_COLUMNS = (
+    "dataset_name", "source_url", "version", "license",
+    "allowed_for_competition", "redistribution_allowed",
+    "commercial_restriction", "original_id", "speaker_id", "generator",
+    "content_hash", "near_duplicate_group", "split_group_id",
+)
+
+
+def filter_manifest_provenance(frame, require_approved=False):
+    """Validate provenance and optionally retain only explicitly approved rows."""
+    missing = [column for column in PROVENANCE_COLUMNS if column not in frame.columns]
+    if missing:
+        raise RuntimeError(
+            f"Manifest is missing provenance columns {missing}; run "
+            "scripts/enrich_manifest_provenance.py")
+    if frame[list(PROVENANCE_COLUMNS)].isna().any().any():
+        raise RuntimeError("Manifest contains empty required provenance values")
+    if not require_approved:
+        return frame
+    approved = frame[frame["allowed_for_competition"].astype(str).eq("YES")].copy()
+    if approved.empty:
+        raise RuntimeError("No explicitly competition-approved training rows remain")
+    return approved.reset_index(drop=True)
+
+
+def scan_real_datasets(data_root="data/raw", manifest_path="data/manifest.csv",
+                       allow_path_label_fallback=False,
+                       require_approved_provenance=False):
     """
     Load official manifest if exists (written by scripts/download_datasets.py with HF metadata),
     otherwise scan data/raw and fallback to path inference (warning: not official).
@@ -149,10 +176,18 @@ def scan_real_datasets(data_root="data/raw", manifest_path="data/manifest.csv"):
                         if c in df_existing.columns:
                             df_existing[c] = df_existing[c].astype(int)
                     df_existing = ensure_split_group_id(df_existing)
+                    # Persist grouping for the complete manifest. Approved-only
+                    # filtering is an in-memory training view and must never
+                    # erase rows that still require legal review.
                     df_existing.to_csv(mp, index=False)
-                    return df_existing
+                    return filter_manifest_provenance(
+                        df_existing, require_approved_provenance)
                 else:
                     missing = (~mask).sum()
+                    if not allow_path_label_fallback:
+                        raise RuntimeError(
+                            f"Manifest {mp} has {missing} missing files; path-label "
+                            "fallback is disabled")
                     print(f"Manifest {mp} has {missing} missing files, rescanning and merging")
                     # Keep existing rows that exist, rescan missing?
                     df_existing = df_existing[mask].reset_index(drop=True)
@@ -160,10 +195,16 @@ def scan_real_datasets(data_root="data/raw", manifest_path="data/manifest.csv"):
                     existing_paths = set(df_existing["path"].tolist())
                 # Fall through to scan additional files, but keep official labels for existing
             else:
-                print(f"Manifest {mp} exists but no hf_id column (legacy path-inference), will rescan with official logic")
+                if not allow_path_label_fallback:
+                    raise RuntimeError(f"Manifest {mp} lacks required HF metadata")
+                print(f"Manifest {mp} exists but no hf_id column; explicit fallback enabled")
                 existing_paths = set()
                 df_existing = pd.DataFrame()
+        except RuntimeError:
+            raise
         except Exception as e:
+            if not allow_path_label_fallback:
+                raise RuntimeError(f"Failed to load mandatory manifest {mp}: {e}") from e
             print(f"Failed to load manifest {mp}: {e}, rescanning")
             existing_paths = set()
             df_existing = pd.DataFrame()
@@ -171,7 +212,11 @@ def scan_real_datasets(data_root="data/raw", manifest_path="data/manifest.csv"):
         existing_paths = set()
         df_existing = pd.DataFrame()
 
-    # Scan files for any new files not in manifest
+    if not allow_path_label_fallback:
+        raise RuntimeError(
+            "Refusing to infer labels from file paths. Create a metadata-backed "
+            "manifest or explicitly set allow_path_label_fallback=True for diagnostics.")
+    # Explicit diagnostic-only scan for files not in the manifest.
     root = pathlib.Path(data_root)
     if not root.exists():
         if len(df_existing)>0:

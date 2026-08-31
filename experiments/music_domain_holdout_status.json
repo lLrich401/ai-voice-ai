@@ -1,6 +1,6 @@
 {
   "real_sources": [
-    "gtzan_real"
+    "gtzan_real_v2"
   ],
   "fake_generators": [
     "AudioLDM2",

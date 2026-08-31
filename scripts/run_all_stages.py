@@ -26,6 +26,8 @@ def main():
                         help="0 uses the complete independent fusion calibration split")
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--use_demucs", action="store_true")
+    parser.add_argument("--require_approved_provenance", action="store_true",
+                        help="train only on rows explicitly marked YES")
     args = parser.parse_args()
 
     # Content-only grouping happens before every split build. It is idempotent
@@ -37,13 +39,18 @@ def main():
         if source.str.lower().eq("gtzan_real_v2").any():
             group_manifest(manifest, "experiments/gtzan_near_duplicate_groups.json")
     # Always regenerate: legacy pre-split MIX rows must never be reused.
-    build_val_sets(scan_real_datasets(), out_dir="data/splits", random_state=42)
+    build_val_sets(
+        scan_real_datasets(
+            require_approved_provenance=args.require_approved_provenance),
+        out_dir="data/splits", random_state=42)
     common = [
         "--epochs", str(args.epochs), "--batch_size", str(args.batch_size),
         "--device", args.device,
     ]
     if args.use_demucs:
         common.append("--use_demucs")
+    if args.require_approved_provenance:
+        common.append("--require_approved_provenance")
     run([sys.executable, "-m", "src.train", "--task", "voice", "--backbone", "spec_cnn",
          "--save_path", "model/best.pt", *common])
     run([sys.executable, "-m", "src.train", "--task", "music", "--backbone", "spec_cnn",

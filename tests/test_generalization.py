@@ -9,8 +9,13 @@ import torch
 from scripts.calibrate_fusion import validate_cache_metadata
 from scripts.analyze_file_meta import assert_calibration_only, oof_logistic_scores
 from scripts.audit_near_duplicates import spectral_fingerprint, fingerprint_similarity
-from src.dataset import assert_no_base_source_overlap
-from src.models.panns import PANNsPresenceWrapper
+from src.dataset import (
+    PROVENANCE_COLUMNS, assert_no_base_source_overlap,
+    filter_manifest_provenance,
+)
+from src.models.panns import (
+    OFFICIAL_16K_CONFIG, PANNs_CHECKPOINT_NAME, PANNsPresenceWrapper,
+)
 from src.train import specialist_sample_weights, validate_multisegment
 
 
@@ -110,15 +115,39 @@ def test_specialist_sampler_balances_sources_inside_bucket():
     assert weights[:3].sum()==pytest.approx(weights[3:].sum())
 
 
-def test_actual_panns_checkpoint_has_near_complete_coverage():
-    checkpoint = pathlib.Path(__file__).resolve().parents[1] / "model/panns/Cnn14_mAP=0.431.pth"
+def test_actual_panns_checkpoint_is_strict_and_frontend_compatible():
+    checkpoint = pathlib.Path(__file__).resolve().parents[1] / "model/panns" / PANNs_CHECKPOINT_NAME
     if not checkpoint.exists():
         pytest.skip("bundled PANNs checkpoint unavailable")
     model = PANNsPresenceWrapper(use_pretrained=True)
     assert model.pretrained_loaded
-    assert model.load_stats["key_coverage"] >= 0.98
-    assert model.load_stats["element_coverage"] >= 0.98
-    assert model.load_stats["missing_core"] == []
+    assert model.load_stats["key_coverage"] == 1.0
+    assert model.load_stats["element_coverage"] == 1.0
+    assert model.load_stats["missing_keys"] == []
+    assert model.load_stats["unexpected_keys"] == []
+    assert model.load_stats["frontend"] == {
+        "sample_rate": 16000, "window_size": 512, "hop_size": 160,
+        "mel_bins": 64, "fmin": 50, "fmax": 8000,
+    }
+    called = []
+    hook = model.panns.bn0.register_forward_hook(lambda *args: called.append(True))
+    model.eval()
+    with torch.inference_mode():
+        output = model(torch.zeros(1, OFFICIAL_16K_CONFIG.sample_rate))
+    hook.remove()
+    assert called == [True]
+    assert torch.isfinite(output["voice_present"]).all()
+    assert torch.isfinite(output["music_present"]).all()
+
+
+def test_manifest_has_explicit_provenance_and_review_filter():
+    root = pathlib.Path(__file__).resolve().parents[1]
+    frame = pd.read_csv(root / "data/manifest.csv")
+    assert set(PROVENANCE_COLUMNS) <= set(frame.columns)
+    checked = filter_manifest_provenance(frame)
+    assert len(checked) == len(frame)
+    approved = filter_manifest_provenance(frame, require_approved=True)
+    assert set(approved["allowed_for_competition"]) == {"YES"}
 
 
 def test_runtime_source_hashes_match_root_source():

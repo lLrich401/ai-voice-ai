@@ -1,0 +1,14 @@
+{
+  "voice_checkpoint_sha256": "3988a176a8da83f4be001bdd51eb297c6a5e95372f99d10b94e83f9db3156fa2",
+  "music_checkpoint_sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+  "df_model_sha256": "a3b5746088fa57529d1291cca40c05077997ccf33574074f3c6e28712e96420b",
+  "df_model_version": "pranjal-pravesh/df_arena_1b:int8-onnx-64600",
+  "panns_sha256": "eee61e89d4ef120bfe0e900f0fb9e4814a2597bbd1f3bf8e149868a7d508bc10",
+  "split_csv_sha256": {
+    "fusion_calibration.csv": "0748fb5d545f3b79842109094c931a31b98ed203d2b817bece7f1490039864a4"
+  },
+  "pipeline_version": "dacon236749-20260831-v6-panns16k",
+  "calibration_script_version": "robust-folds-df-gate-panns16k-v4",
+  "feature_extractor_version": "canonical-inference-adaptive-df-panns16k-v3",
+  "baseline_ref": "1b5553200d08dcf4f7867e7ecfc8cc93a5d62d5f"
+}

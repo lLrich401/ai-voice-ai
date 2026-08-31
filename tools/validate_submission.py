@@ -14,7 +14,7 @@ def main(zip_path="submit.zip"):
         # Requirement 11: verify mandatory models exist
         mandatory=[
             "model/df_arena/df_arena_1b_int8.onnx",
-            "model/panns/Cnn14_mAP=0.431.pth",
+            "model/panns/Cnn14_16k_mAP=0.438.pth",
             "model/best.pt",
             "model/music_best.pt",
             "model/fusion_weights.json",

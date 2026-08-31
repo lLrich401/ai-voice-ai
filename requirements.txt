@@ -1,5 +1,5 @@
 # DACON 236749 already provides torch 2.7.1+cu128, torchaudio, numpy, pandas,
-# scipy, librosa, soundfile, demucs and tqdm. Do not re-install evaluator-pinned
+# scipy, librosa, soundfile, torchlibrosa==0.1.0, demucs and tqdm. Do not re-install evaluator-pinned
 # packages within the 10-minute installation limit.
 # DF_Arena is dynamic INT8 and runs entirely on the official server's 6 vCPU.
 # The CPU wheel is much smaller/faster to install than onnxruntime-gpu and

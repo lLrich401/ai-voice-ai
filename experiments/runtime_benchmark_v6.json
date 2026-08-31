@@ -1,0 +1,15 @@
+{
+  "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+  "split": "val_a",
+  "samples": 64,
+  "df_fraction": 1.0,
+  "adaptive": false,
+  "results": {
+    "batch_8": {"seconds": 45.37595980000333, "projected_1200_minutes": 14.17998743750104},
+    "batch_16": {"seconds": 40.93488630000502, "projected_1200_minutes": 12.792151968751568},
+    "batch_24": {"seconds": 44.22179460001644, "projected_1200_minutes": 13.819310812505137},
+    "batch_32": {"seconds": 46.229293100012, "projected_1200_minutes": 14.44665409375375}
+  },
+  "selected_batch_size": 16,
+  "note": "Projection is linear from local measured throughput, not DACON server runtime."
+}

@@ -1,72 +1,81 @@
 # DACON 236749 audio deepfake detector
 
-Offline submission pipeline for DACON competition 236749. The official score is
-`0.9 * ADS + 0.1 * CPS`; ADS combines file/voice/music EER and CPS combines
-voice/music presence AUC. Component EER is evaluated only where that component
-is present. `src/metrics.py` mirrors the organizer's non-interpolated
-`roc_curve(..., drop_intermediate=False)` implementation.
+Offline, leakage-audited submission pipeline for DACON competition 236749.
+The official score is `0.9 * ADS + 0.1 * CPS`; component fake EER is measured
+only where the corresponding component exists. `src/metrics.py` implements the
+organizer's non-interpolated ROC/EER calculation.
 
-## Pipeline
+The machine-readable source of truth is
+[`experiments/latest_results.json`](experiments/latest_results.json). Older
+reports are historical and must not be quoted as current results.
 
-- DF-Arena 1B INT8 ONNX: file fake evidence, exactly 64,600 samples, logits
-  `[spoof, bonafide]` and class 0 mapped to fake.
-- Independently trained voice/music SpecCNN specialists.
-- Pretrained PANNs CNN14 AudioSet tags for continuous presence scores.
-- One fusion function is shared by calibration and single/batch inference.
-  Component fake scores are never multiplied by predicted presence.
-- Adaptive auxiliary crops: 1 for <=8 s, 2 for <=25 s, 3 for longer audio.
-  DF-Arena adds a distant second crop only for audio >=12 s whose first score
-  is in the calibrated uncertainty interval.
-- Rank-preserving output clipping only at `1e-6 .. 1-1e-6`.
+## Selected pipeline
 
-HTDemucs is optional. If `--use_demucs` is requested, absence/load failure is
-fatal; identity audio is never called a separated stem. Bundled checkpoints use
-`use_demucs=False`, so default inference matches training. PANNs always receives
-the original waveform.
+- DF-Arena 1B dynamic INT8 ONNX, 64,600 samples at 16 kHz, logits
+  `[spoof, bonafide]`, class 0 = fake.
+- Voice and music SpecCNN specialists, strictly loaded with checkpoint SHA
+  validation. Voice fake segments use validation-selected `max` aggregation.
+- Official PANNs `Cnn14_16k_mAP=0.438.pth`: 16 kHz, 512 FFT, 160 hop,
+  64 mel bins, 50–8000 Hz, torchlibrosa frontend and active `bn0`.
+- PANNs presence is blended at 0.75 with specialist presence. Component fake
+  outputs are never multiplied by presence probabilities.
+- DF gate is OFF and adaptive second crop is OFF. Every file receives one
+  primary DF crop; this dominated the old voice-only gate on measured VAL-A/B
+  and did not regress VAL-C/D.
+- `use_demucs=False` in both checkpoint training and default inference.
 
-## Data and validation
+## Data safety and validation
 
-The 2,300 originals receive a stable `split_group_id` and are split before any mixing. Each split then independently
-adds balanced RR/RF/FR/FF mixes in simultaneous, both sequential directions,
-partial-overlap and crossfade layouts at multiple SNRs. Assertions reject base
-recordings shared across train/validation.
+There are 2,785 original files grouped before augmentation by original
+content, exact hash, decoded near-duplicate, speaker/source/generator and stable
+`split_group_id`. Cross-family audit: 0 exact and 0 near duplicates.
 
-- Train 1,799; VAL-A 328; VAL-B 291; VAL-C/D 328 each; independent fusion
-  calibration 603; untouched final holdout 462.
-- WF7 and AudioLDM2 fake generators are explicitly held out for VAL-B.
-- VAL-C simulates codec/low-pass; VAL-D simulates telephone audio.
-- Loss masks voice/music fake labels when the corresponding source is absent.
-- Checkpoints use all four official validation scores, the worst split and
-  unseen-generator VAL-B, not VAL-A alone.
+- Train 2,025; VAL-A 533; VAL-B 293; fusion calibration 656; final holdout 463.
+- VAL-B holds out unseen generators; VAL-C applies codec/compression changes;
+  VAL-D applies telephone/narrow-band changes.
+- Calibration uses three disjoint folds and `0.7 * mean + 0.3 * worst`.
+- The v6 final holdout was evaluated once after policy selection. Its report
+  script refuses a second execution.
+- The manifest records license/provenance and exact content SHA. Only 500 rows
+  are explicitly approved; 2,285 are `REVIEW_REQUIRED`. Current checkpoints
+  retain those documented caveats. See `docs/data_sources.md`.
 
-## Reproduce
+## Current measured result
+
+| local final holdout | FILE EER | VOICE EER | MUSIC EER | ADS | VOICE AUC | MUSIC AUC | CPS | TOTAL |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| v5 before | 0.11010 | 0.15163 | 0.01586 | 0.90986 | 0.90466 | 0.98639 | 0.94552 | 0.91343 |
+| v6 after | 0.11010 | 0.16454 | 0.01586 | 0.90728 | 0.94143 | 0.98750 | 0.96446 | 0.91300 |
+
+These are local measurements, not DACON leaderboard scores. The v6 total is
+0.00043 lower on the one-shot local holdout, while CPS and non-final
+cross-domain robustness improved. No post-holdout retuning was performed.
+
+The selected batch size is 16. VAL-A 64-file throughput projects 12.79 minutes
+for 1,200 files; the complete 463-file final run projects 14.75 minutes. Both
+are local linear projections. Official server runtime is **NOT RUN**.
+
+## Reproduce and package
 
 ```powershell
 python -m pytest -q
-python -c "from src.dataset import scan_real_datasets,build_val_sets; build_val_sets(scan_real_datasets())"
-python -m src.train --task voice --backbone spec_cnn --epochs 10 --batch_size 64 --device cpu --save_path model/best.pt
-python -m src.train --task music --backbone spec_cnn --epochs 10 --batch_size 64 --device cpu --save_path model/music_best.pt
-python scripts/calibrate_fusion.py --per_split 0 --batch_size 16 --device cpu
-python script.py --test_dir data/test --output output/submission.csv
+python scripts/prepare_panns_16k.py  # one-time online artifact preparation
+python scripts/audit_near_duplicates.py
+python scripts/evaluate_panns_ab.py --splits fusion_calibration val_a val_b val_c val_d
+python scripts/replace_cached_panns.py
+python scripts/replace_cached_voice_aggregation.py
+python scripts/calibrate_fusion.py --cache experiments/fusion_calibration_predictions_16k_voice_max.csv --reuse_cache --skip_final_holdout
+python scripts/select_validated_policy.py
+python scripts/benchmark_inference.py --samples 64 --split val_a --profiles selected_submission
 .\scripts\build_236749_submit.ps1
 python tools/validate_submission.py submit.zip
 ```
 
-The evaluator defaults are exactly `./data/test` and
-`./output/submission.csv`. WAV, MP3, FLAC, M4A and OGG are accepted. All model
-artifacts are mandatory and checkpoints load strictly/offline.
+Do not rerun `scripts/evaluate_final_once.py`; its v6 one-shot report already
+exists. The archive top level is exactly `model/`, `script.py`, and
+`requirements.txt`. Training audio, unused checkpoints, `.ort` caches,
+`__pycache__`, the legacy 32 kHz PANNs checkpoint and the upstream sampler
+payload are excluded.
 
-## Measured status (2026-08-31)
-
-Ten CPU epochs were run per specialist. The selected checkpoints are voice
-epoch 5 and music epoch 9. Three-fold robust calibration used all 603 samples.
-The speed-selected voice-presence DF gate plus presence-aware FILE fusion has
-robust objective 0.87579 versus 0.87466 for gated legacy FILE fusion, while
-invoking DF for 64.0% of calibration files. Its one-shot final-holdout score is
-0.92910 (ADS 0.92712; local data, not a DACON leaderboard claim). On 64 local
-CPU files the same gate reduced DF calls from
-64 to 41 and projected 1,200-file runtime from 9.68 to 7.45 minutes, a 23.0%
-reduction. The official L4 benchmark and a new DACON score are **NOT RUN**.
-
-Repository-authored code is MIT licensed. Third-party data/models retain their
-upstream terms; see `docs/data_sources.md`.
+Repository-authored code is MIT licensed. Third-party data and models retain
+their upstream terms.
