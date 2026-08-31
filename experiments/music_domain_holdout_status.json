@@ -1,0 +1,15 @@
+{
+  "real_sources": [
+    "gtzan_real"
+  ],
+  "fake_generators": [
+    "AudioLDM2",
+    "MusicGen"
+  ],
+  "minimum_required": {
+    "real_sources": 2,
+    "fake_generators": 4
+  },
+  "status": "NOT RUN",
+  "reason": "insufficient independent music domains"
+}

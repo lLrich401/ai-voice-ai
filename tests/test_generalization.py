@@ -7,6 +7,8 @@ import pytest
 import torch
 
 from scripts.calibrate_fusion import validate_cache_metadata
+from scripts.analyze_file_meta import assert_calibration_only, oof_logistic_scores
+from scripts.audit_near_duplicates import spectral_fingerprint, fingerprint_similarity
 from src.dataset import assert_no_base_source_overlap
 from src.models.panns import PANNsPresenceWrapper
 from src.train import specialist_sample_weights, validate_multisegment
@@ -26,6 +28,29 @@ def test_calibration_cache_rejects_every_stale_dependency():
         stale[key] = "changed"
         with pytest.raises(RuntimeError, match="Stale calibration cache"):
             validate_cache_metadata(stale, expected)
+
+
+def test_meta_fusion_is_deterministic_and_rejects_final_holdout():
+    frame=pd.DataFrame({"calibration_fold":["a","a","b","b","c","c"],
+                        "y_file_fake":[0,1,0,1,0,1],"split":["calibration"]*6})
+    features=np.arange(18,dtype=float).reshape(6,3)
+    first=oof_logistic_scores(frame,features,C=0.1,seed=7)
+    second=oof_logistic_scores(frame,features,C=0.1,seed=7)
+    np.testing.assert_allclose(first,second)
+    frame.loc[0,"split"]="final_holdout"
+    with pytest.raises(ValueError,match="final holdout"):
+        assert_calibration_only(frame)
+
+
+def test_audio_fingerprint_is_gain_tolerant_and_distinguishes_content():
+    time=np.linspace(0,1,16000,endpoint=False)
+    first=np.sin(2*np.pi*440*time).astype(np.float32)
+    different=np.sin(2*np.pi*1700*time).astype(np.float32)
+    fp_first,_=spectral_fingerprint(first)
+    fp_gain,_=spectral_fingerprint(first*0.1)
+    fp_different,_=spectral_fingerprint(different)
+    assert fingerprint_similarity(fp_first,fp_gain)>0.999
+    assert fingerprint_similarity(fp_first,fp_different)<0.95
 
 
 def test_saved_calibration_and_final_holdout_are_independent():
@@ -75,6 +100,14 @@ def test_specialist_sampler_targets_component_mix_other_proportions():
     assert weights[:4].sum() == pytest.approx(0.4)
     assert weights[4:6].sum() == pytest.approx(0.4)
     assert weights[6:].sum() == pytest.approx(0.2)
+
+
+def test_specialist_sampler_balances_sources_inside_bucket():
+    frame=pd.DataFrame({"path":["a.wav"]*3+["b.wav"],"voice_present":[1]*4,
+                        "music_present":[0]*4,"source":["large"]*3+["small"],
+                        "generator":["real"]*4})
+    weights=specialist_sample_weights(frame,"voice")
+    assert weights[:3].sum()==pytest.approx(weights[3:].sum())
 
 
 def test_actual_panns_checkpoint_has_near_complete_coverage():

@@ -134,7 +134,41 @@ def aggregate_predictions(probs, method="topk_mean", top_k=2):
     if method=="topk_mean":
         k=min(top_k,len(probs))
         return float(np.mean(np.sort(probs)[-k:]))
+    if method=="max":
+        return float(np.max(probs))
+    if method=="logit_topk_mean":
+        k=min(top_k,len(probs)); selected=np.sort(probs)[-k:]
+        selected=np.clip(selected,OUTPUT_EPS,1.0-OUTPUT_EPS)
+        value=float(np.mean(np.log(selected/(1-selected))))
+        return float(1.0/(1.0+np.exp(-value)))
+    if method=="noisy_or":
+        return float(1.0-np.prod(1.0-np.clip(probs,0.0,1.0)))
     return float(np.mean(probs))
+
+
+def aggregate_head_predictions(probs, head, config=None):
+    """Task-specific segment aggregation with unchanged safe defaults."""
+    defaults={"file_fake":"topk_mean","voice_fake":"topk_mean",
+              "music_fake":"topk_mean","voice_present":"mean",
+              "music_present":"mean"}
+    method=str((config or {}).get(f"{head}_aggregation",defaults[head]))
+    allowed={
+        "file_fake":{"topk_mean","max","mean","logit_topk_mean","noisy_or"},
+        "voice_fake":{"topk_mean","max","mean","logit_topk_mean"},
+        "music_fake":{"topk_mean","max","mean","logit_topk_mean"},
+        "voice_present":{"mean","max","noisy_or"},
+        "music_present":{"mean","max","noisy_or"},
+    }
+    if method not in allowed[head]:
+        raise ValueError(f"unsupported aggregation {head}={method}")
+    return aggregate_predictions(probs,method,2)
+
+
+def select_df_indices(voice_outputs, voice_bounds, threshold=None):
+    if threshold is None:
+        return list(range(len(voice_bounds)))
+    return [index for index,(start,end) in enumerate(voice_bounds)
+            if float(np.mean(voice_outputs["voice_present"][start:end]))>=float(threshold)]
 
 def is_silence(wave, thresh=0.008):
     rms = float((wave**2).mean()**0.5)
@@ -209,7 +243,7 @@ def _df_arena_crop_candidates(wave, sr=16000, seg_sec=DF_SEG_SEC):
     cumulative=np.concatenate(([0.0],np.cumsum(squared)))
     energies=[cumulative[start+seg_len]-cumulative[start] for start in starts]
     best=starts[int(np.argmax(energies))]
-    minimum_distance=max(seg_len//2,2*sr)
+    minimum_distance=max(seg_len//2,3*sr)
     eligible=[(energy,start) for energy,start in zip(energies,starts)
               if abs(start-best)>=minimum_distance]
     second=max(eligible)[1] if eligible else None
@@ -222,9 +256,25 @@ def _df_arena_segments(wave, sr=16000, seg_sec=DF_SEG_SEC):
 
 
 def should_use_adaptive_df_second_crop(duration_sec, primary_fake_probability,
-                                       low=0.25, high=0.75, minimum_duration=12.0):
-    return (float(duration_sec)>=float(minimum_duration)
-            and float(low)<float(primary_fake_probability)<float(high))
+                                       low=0.25, high=0.75, minimum_duration=12.0,
+                                       voice_fake_probability=None,
+                                       music_fake_probability=None,
+                                       trigger_mode="primary", component_low=0.3,
+                                       component_high=0.7, disagreement=0.3):
+    if float(duration_sec)<float(minimum_duration):
+        return False
+    primary=float(primary_fake_probability)
+    primary_uncertain=float(low)<primary<float(high)
+    if trigger_mode=="primary":
+        return primary_uncertain
+    values=[primary]
+    component_uncertain=False
+    for value in (voice_fake_probability,music_fake_probability):
+        if value is not None:
+            value=float(value); values.append(value)
+            component_uncertain |= float(component_low)<value<float(component_high)
+    detector_disagreement=(max(values)-min(values))>=float(disagreement)
+    return primary_uncertain or component_uncertain or detector_disagreement
 
 def df_arena_predict_batch(sess, waves, sr=16000, seg_sec=DF_SEG_SEC,
                            adaptive_config=None, return_details=False):
@@ -244,9 +294,15 @@ def df_arena_predict_batch(sess, waves, sr=16000, seg_sec=DF_SEG_SEC,
     selected=[]
     for index,(wave,item,score) in enumerate(zip(waves,candidates,primary)):
         has_second=item[1] is not None
+        external_voice=config.get("external_voice_fake",[None]*len(waves))[index]
+        external_music=config.get("external_music_fake",[None]*len(waves))[index]
         trigger=config["enabled"] and has_second and (
             config.get("force_second_for_long",False)
-            or should_use_adaptive_df_second_crop(len(wave)/sr,score,config["low"],config["high"],config["minimum_duration"]))
+            or should_use_adaptive_df_second_crop(
+                len(wave)/sr,score,config["low"],config["high"],config["minimum_duration"],
+                external_voice,external_music,config.get("trigger_mode","primary"),
+                config.get("component_low",0.3),config.get("component_high",0.7),
+                config.get("disagreement",0.3)))
         if trigger:
             selected.append(index)
     second_scores={}
@@ -262,6 +318,11 @@ def df_arena_predict_batch(sess, waves, sr=16000, seg_sec=DF_SEG_SEC,
             combined=float(score)
         elif config["aggregation"]=="max":
             combined=max(float(score),second)
+        elif config["aggregation"]=="logit_mean":
+            first=float(np.clip(score,OUTPUT_EPS,1.0-OUTPUT_EPS))
+            other=float(np.clip(second,OUTPUT_EPS,1.0-OUTPUT_EPS))
+            logit=(np.log(first/(1-first))+np.log(other/(1-other)))/2.0
+            combined=float(1.0/(1.0+np.exp(-logit)))
         else:
             combined=(float(score)+second)/2.0
         results.append(combined)
@@ -462,7 +523,8 @@ def _combine_predictions(file_fake_df, v_probs, m_probs, panns_out, fusion_weigh
 
 def infer_wave_features_batch(voice_model, music_model, df_sess, panns_model,
                               waves, device, use_demucs=False, df_config=None,
-                              specialist_max_segments=None, panns_max_segments=None):
+                              specialist_max_segments=None, panns_max_segments=None,
+                              aggregation_config=None):
     """Canonical preprocessing/model/aggregation path used by val and submit."""
     separator=get_separator(device=device, use_demucs=use_demucs)
     separator_type="htdemucs" if getattr(separator,"use_demucs",False) else "identity"
@@ -481,20 +543,21 @@ def infer_wave_features_batch(voice_model, music_model, df_sess, panns_model,
     m_out,m_bounds=_run_torch_segments(music_model,segment_groups_m,device,use_amp=True)
     p_out,p_bounds=_run_torch_segments(panns_model,segment_groups_o,device,use_amp=False,outputs_are_logits=False)
     gate_threshold=(df_config or {}).get("gate_voice_presence_threshold")
-    if gate_threshold is None:
-        df_indices=list(range(len(waves)))
-    else:
-        df_indices=[]
-        for row,(start,end) in enumerate(v_bounds):
-            if float(np.mean(v_out["voice_present"][start:end])) >= float(gate_threshold):
-                df_indices.append(row)
+    df_indices=select_df_indices(v_out,v_bounds,gate_threshold)
     df_probs=[0.5]*len(waves)
     df_details=[{"primary":0.5,"second":None,"primary_start":None,
                  "second_start":None,"used_second":False} for _ in waves]
     if df_indices:
+        selected_config=dict(df_config or {})
+        selected_config["external_voice_fake"]=[
+            aggregate_predictions(v_out["voice_fake"][v_bounds[index][0]:v_bounds[index][1]],"topk_mean",2)
+            for index in df_indices]
+        selected_config["external_music_fake"]=[
+            aggregate_predictions(m_out["music_fake"][m_bounds[index][0]:m_bounds[index][1]],"topk_mean",2)
+            for index in df_indices]
         selected_probs,selected_details=df_arena_predict_batch(
             df_sess,[waves[index] for index in df_indices],sr=TARGET_SR,seg_sec=DF_SEG_SEC,
-            adaptive_config=df_config,return_details=True)
+            adaptive_config=selected_config,return_details=True)
         for index,probability,detail in zip(df_indices,selected_probs,selected_details):
             df_probs[index]=probability
             df_details[index]=detail
@@ -509,14 +572,14 @@ def infer_wave_features_batch(voice_model, music_model, df_sess, panns_model,
             "df_has_second":bool(df_details[row]["second"] is not None),
             "df_used":row in df_used,
             "duration_sec":float(len(waves[row])/TARGET_SR),
-            "vf":aggregate_predictions(v_out["voice_fake"][va:vb],"topk_mean",2),
-            "mf":aggregate_predictions(m_out["music_fake"][ma:mb],"topk_mean",2),
-            "vfile":aggregate_predictions(v_out["file_fake"][va:vb],"topk_mean",2),
-            "mfile":aggregate_predictions(m_out["file_fake"][ma:mb],"topk_mean",2),
-            "vp_model":float(np.mean(v_out["voice_present"][va:vb])),
-            "mp_model":float(np.mean(m_out["music_present"][ma:mb])),
-            "vp_panns":float(np.mean(p_out["voice_present"][pa:pb])),
-            "mp_panns":float(np.mean(p_out["music_present"][pa:pb])),
+            "vf":aggregate_head_predictions(v_out["voice_fake"][va:vb],"voice_fake",aggregation_config),
+            "mf":aggregate_head_predictions(m_out["music_fake"][ma:mb],"music_fake",aggregation_config),
+            "vfile":aggregate_head_predictions(v_out["file_fake"][va:vb],"file_fake",aggregation_config),
+            "mfile":aggregate_head_predictions(m_out["file_fake"][ma:mb],"file_fake",aggregation_config),
+            "vp_model":aggregate_head_predictions(v_out["voice_present"][va:vb],"voice_present",aggregation_config),
+            "mp_model":aggregate_head_predictions(m_out["music_present"][ma:mb],"music_present",aggregation_config),
+            "vp_panns":aggregate_head_predictions(p_out["voice_present"][pa:pb],"voice_present",aggregation_config),
+            "mp_panns":aggregate_head_predictions(p_out["music_present"][pa:pb],"music_present",aggregation_config),
         })
     return features
 
@@ -556,6 +619,11 @@ def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_wei
         "low":float(fusion_weights.get("adaptive_df_low",0.25)),
         "high":float(fusion_weights.get("adaptive_df_high",0.75)),
         "aggregation":str(fusion_weights.get("adaptive_df_aggregation","mean")),
+        "minimum_duration":float(fusion_weights.get("adaptive_df_minimum_duration",12.0)),
+        "trigger_mode":str(fusion_weights.get("adaptive_df_trigger_mode","primary")),
+        "component_low":float(fusion_weights.get("adaptive_df_component_low",0.3)),
+        "component_high":float(fusion_weights.get("adaptive_df_component_high",0.7)),
+        "disagreement":float(fusion_weights.get("adaptive_df_disagreement",0.3)),
     }
     if fusion_weights.get("df_gate_policy") == "voice_presence":
         df_config["gate_voice_presence_threshold"]=float(
@@ -564,7 +632,8 @@ def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_wei
         voice_model,music_model,df_sess,panns_model,[r[2] for r in records],device,use_demucs,
         df_config=df_config,
         specialist_max_segments=int(fusion_weights.get("specialist_max_segments",3)),
-        panns_max_segments=int(fusion_weights.get("panns_max_segments",3)))
+        panns_max_segments=int(fusion_weights.get("panns_max_segments",3)),
+        aggregation_config=fusion_weights)
     for (index,audio_path,_),feature in zip(records,features):
         results[index]=[audio_path.stem]+fuse_feature_record(feature,fusion_weights)
     return results

@@ -230,6 +230,7 @@ MIX_OVERLAP_FRACTIONS = (0.10, 0.25, 0.50, 0.75)
 MIX_GAPS_SEC = (0.0, 0.1, 0.5, 1.0)
 MIX_CROSSFADE_SEC = (0.05, 0.10, 0.25, 0.50)
 MIX_GAINS_DB = (-6.0, -3.0, 0.0, 3.0)
+PARTIAL_FAKE_RATIOS = (0.10, 0.20, 0.30, 0.50, 0.70)
 
 
 def mixed_labels(voice_fake, music_fake):
@@ -238,8 +239,44 @@ def mixed_labels(voice_fake, music_fake):
     return [int(vf or mf), vf, mf, 1, 1]
 
 
+def partial_fake_labels(component):
+    if component == "voice":
+        return [1,1,0,1,0]
+    if component == "music":
+        return [1,0,1,0,1]
+    raise ValueError(f"Unknown partial-fake component: {component}")
+
+
+def render_partial_fake_wave(real_wave, fake_wave, fake_ratio=0.2,
+                             position="middle", crossfade_sec=0.02,
+                             sr=TARGET_SR):
+    """Replace one contiguous region of real audio with fake audio."""
+    real=np.asarray(real_wave,dtype=np.float32)
+    fake=np.asarray(fake_wave,dtype=np.float32)
+    if real.size==0 or fake.size==0:
+        raise ValueError("partial-fake source waves must be non-empty")
+    total=len(real); ratio=float(np.clip(fake_ratio,0.0,1.0))
+    fake_len=max(1,min(total,int(round(total*ratio))))
+    if position=="start": start=0
+    elif position=="end": start=total-fake_len
+    elif position=="middle": start=(total-fake_len)//2
+    else: raise ValueError(f"Unknown partial-fake position: {position}")
+    repeats=(fake_len+len(fake)-1)//len(fake)
+    insert=np.tile(fake,repeats)[:fake_len].copy()
+    out=real.copy(); fade=min(int(round(crossfade_sec*sr)),fake_len//2,start,total-(start+fake_len))
+    if fade>0:
+        ramp=np.linspace(0,1,fade,dtype=np.float32)
+        insert[:fade]=out[start:start+fade]*(1-ramp)+insert[:fade]*ramp
+        insert[-fade:]=insert[-fade:]*(1-ramp)+out[start+fake_len-fade:start+fake_len]*ramp
+    out[start:start+fake_len]=insert
+    return np.clip(out,-1.0,1.0).astype(np.float32)
+
+
 def derive_split_group_id(row):
     """Stable original-identity group used by every train/validation split."""
+    explicit = str(row.get("split_group_id", ""))
+    if explicit and explicit.lower() != "nan":
+        return explicit
     source = str(row.get("source", row.get("dataset", ""))).lower()
     original_id = str(row.get("original_id", pathlib.Path(str(row.get("path", ""))).stem))
     speaker_id = str(row.get("speaker_id", "unknown"))
@@ -399,7 +436,15 @@ def load_manifest_row_wave(row, sr=TARGET_SR, is_training=False, use_demucs=Fals
                            task="multitask", separator=None):
     """Canonical manifest-row audio path shared by train, validation and calibration."""
     path_str = str(row["path"])
-    if path_str.startswith("MIX::"):
+    if path_str.startswith("PARTIAL::"):
+        _,component,sources=path_str.split("::",2)
+        real_path,fake_path=sources.split("|",1)
+        real,_=load_audio(real_path,target_sr=sr);fake,_=load_audio(fake_path,target_sr=sr)
+        wave=render_partial_fake_wave(
+            real,fake,float(row.get("partial_fake_ratio",0.2)),
+            str(row.get("partial_fake_position","middle")),
+            float(row.get("partial_crossfade_sec",0.02)),sr)
+    elif path_str.startswith("MIX::"):
         voice_path, music_path = path_str.split("MIX::", 1)[1].split("|", 1)
         voice, _ = load_audio(voice_path, target_sr=sr)
         music, _ = load_audio(music_path, target_sr=sr)
@@ -644,6 +689,10 @@ class AudioDataset(Dataset):
         self.use_demucs=use_demucs
         self.task=task
         self.device=device
+        # Validation audio and deterministic channel simulations are expensive
+        # to decode/resample repeatedly. Cache the final center crop per dataset
+        # instance; training remains uncached so random crops/augmentations vary.
+        self.eval_cache = {} if not is_training else None
         # For HTDemucs, lazy load separator
         self.separator=None
         self.separator_type="none"
@@ -666,6 +715,8 @@ class AudioDataset(Dataset):
     def __len__(self): return len(self.df)
 
     def __getitem__(self, idx):
+        if self.eval_cache is not None and idx in self.eval_cache:
+            return self.eval_cache[idx]
         row=self.df.iloc[idx]
         path_str=str(row["path"])
         wave = load_manifest_row_wave(
@@ -693,4 +744,7 @@ class AudioDataset(Dataset):
         # labels
         labels = torch.tensor([row.get(k,0) for k in ["file_fake","voice_fake","music_fake","voice_present","music_present"]], dtype=torch.float32)
         # For task-specific, we may mask irrelevant labels? Keep all but trainer will select
-        return torch.from_numpy(wave).float(), labels, str(path_str)
+        result = (torch.from_numpy(np.ascontiguousarray(wave)).float(), labels, str(path_str))
+        if self.eval_cache is not None:
+            self.eval_cache[idx] = result
+        return result

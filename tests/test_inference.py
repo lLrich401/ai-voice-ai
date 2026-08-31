@@ -13,6 +13,17 @@ def test_adaptive_segment_counts():
     assert len(script.select_aux_segments(np.ones(40 * 16000, np.float32))) == 3
 
 
+def test_task_specific_aggregation_and_df_gate_paths():
+    values=np.array([0.1,0.4,0.9])
+    assert script.aggregate_head_predictions(values,"voice_fake") == pytest.approx(0.65)
+    assert script.aggregate_head_predictions(values,"music_fake",{"music_fake_aggregation":"max"}) == pytest.approx(0.9)
+    assert script.aggregate_head_predictions(values,"voice_present") == pytest.approx(values.mean())
+    outputs={"voice_present":np.array([0.2,0.4,0.8,0.9])}
+    bounds=[(0,2),(2,4)]
+    assert script.select_df_indices(outputs,bounds,None)==[0,1]
+    assert script.select_df_indices(outputs,bounds,0.5)==[1]
+
+
 def test_segment_and_feature_fusion_are_identical_and_not_presence_gated():
     v = np.array([[0.4, 0.7, 0.2, 0.1, 0.3], [0.6, 0.9, 0.2, 0.2, 0.3]])
     m = np.array([[0.3, 0.2, 0.6, 0.4, 0.8], [0.5, 0.2, 0.8, 0.4, 0.9]])
@@ -113,6 +124,10 @@ def test_adaptive_df_second_crop_is_distant_and_conditioned():
     assert script.should_use_adaptive_df_second_crop(12.0, 0.5, 0.25, 0.75)
     assert not script.should_use_adaptive_df_second_crop(11.9, 0.5, 0.25, 0.75)
     assert not script.should_use_adaptive_df_second_crop(20.0, 0.9, 0.25, 0.75)
+    assert script.should_use_adaptive_df_second_crop(
+        10.0,0.9,0.2,0.8,10.0,voice_fake_probability=0.5,
+        music_fake_probability=0.9,trigger_mode="any_uncertain_disagreement")
+    assert abs(second_start-primary_start)>=3*16000
 
 
 def test_all_five_probabilities_are_finite_and_clipped():

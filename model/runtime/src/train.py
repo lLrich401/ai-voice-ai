@@ -33,16 +33,21 @@ HEADS = ("file_fake", "voice_fake", "music_fake", "voice_present", "music_presen
 
 
 def specialist_sample_weights(frame, task):
-    """Per-row weights targeting 40% component-only, 40% mixed, 20% other."""
-    mixed = frame["path"].astype(str).str.startswith("MIX::").to_numpy()
+    """Target 40/40/20 buckets and balance source/generator inside each."""
+    mixed = frame["path"].astype(str).str.startswith(("MIX::","PARTIAL::")).to_numpy()
     present = frame[f"{task}_present"].to_numpy(dtype=bool)
     component_only = present & ~mixed
     other = ~(mixed | component_only)
     weights = np.zeros(len(frame), dtype=np.float64)
+    domains=(frame.get("source",pd.Series("unknown",index=frame.index)).astype(str)+"::"+
+             frame.get("generator",pd.Series("unknown",index=frame.index)).astype(str)).to_numpy()
     for mask, fraction in ((component_only, 0.40), (mixed, 0.40), (other, 0.20)):
         count = int(mask.sum())
         if count:
-            weights[mask] = fraction / count
+            bucket_domains=np.unique(domains[mask])
+            for domain in bucket_domains:
+                domain_mask=mask&(domains==domain)
+                weights[domain_mask]=fraction/len(bucket_domains)/int(domain_mask.sum())
     if weights.sum() <= 0:
         weights[:] = 1.0 / max(1, len(weights))
     return weights / weights.sum()
@@ -219,6 +224,8 @@ def main():
     parser.add_argument("--save_path", default=None)
     parser.add_argument("--val_sets", nargs="+", default=["val_a","val_b","val_c","val_d"], help="which val sets to evaluate")
     parser.add_argument("--seed", type=int, default=20260830)
+    parser.add_argument("--aux_eval_interval", type=int, default=2,
+                        help="evaluate VAL-B/C/D every N epochs; VAL-A remains every epoch")
     args=parser.parse_args()
 
     random.seed(args.seed); np.random.seed(args.seed); torch.manual_seed(args.seed)
@@ -294,8 +301,9 @@ def main():
                                         num_samples=len(train_df), replacement=True)
     train_loader=DataLoader(train_ds, batch_size=args.batch_size, shuffle=sampler is None,
                             sampler=sampler, num_workers=0, pin_memory=False)
-    # Use smaller batch for validation on CPU for speed (AASIST batch 4 is fastest)
-    val_batch = min(args.batch_size, 4) if str(device)=="cpu" else args.batch_size
+    # AASIST is memory-heavy on CPU, while SpecCNN is substantially faster with
+    # the full batch. Do not inherit the AASIST-specific batch cap here.
+    val_batch = min(args.batch_size, 4) if str(device)=="cpu" and args.backbone=="aasist" else args.batch_size
     val_a_loader=DataLoader(val_a_ds, batch_size=val_batch, shuffle=False, num_workers=0)
 
     # Optional val_b/c/d loaders for evaluation
@@ -318,24 +326,27 @@ def main():
     pathlib.Path(args.save_path).parent.mkdir(parents=True, exist_ok=True)
 
     # Training loop with early stopping on VAL-A
-    patience=5; no_improve=0
+    patience=3; no_improve=0
     for epoch in range(args.epochs):
         loss=train_one_epoch(model, train_loader, opt, device, scaler, task=args.task)
         metrics_a=validate(model, val_a_loader, device)
         print(f"Epoch {epoch+1}/{args.epochs} loss {loss:.4f} VAL-A score {metrics_a['score']:.4f} file_eer {metrics_a['file_eer']:.3f} voice_eer {metrics_a['voice_eer']:.3f} music_eer {metrics_a['music_eer']:.3f} voice_auc {metrics_a['voice_auc']:.3f} music_auc {metrics_a['music_auc']:.3f}")
         epoch_metrics = {"val_a": metrics_a}
-        # evaluate others
-        for name, loader in val_loaders.items():
-            m=validate(model, loader, device)
-            epoch_metrics[name] = m
-            print(f"  {name} score {m['score']:.4f} file {m['file_eer']:.3f} voice {m['voice_eer']:.3f} music {m['music_eer']:.3f}")
+        full_evaluation = (epoch == 0 or (epoch + 1) % max(1, args.aux_eval_interval) == 0
+                           or epoch + 1 == args.epochs)
+        if full_evaluation:
+            for name, loader in val_loaders.items():
+                m=validate(model, loader, device)
+                epoch_metrics[name] = m
+                print(f"  {name} score {m['score']:.4f} file {m['file_eer']:.3f} voice {m['voice_eer']:.3f} music {m['music_eer']:.3f}")
         for split_name, split_metrics in epoch_metrics.items():
             training_history.append({"task":args.task,"epoch":epoch+1,"split":split_name,
                                      "train_loss":loss,**split_metrics})
         scheduler.step()
-        selection_score = checkpoint_selection_score(epoch_metrics, task=args.task)
-        print(f"  checkpoint composite {selection_score:.4f} ({args.task} responsibility + worst split + unseen VAL-B)")
-        if selection_score>best_score:
+        selection_score = checkpoint_selection_score(epoch_metrics, task=args.task) if full_evaluation else None
+        if selection_score is not None:
+            print(f"  checkpoint composite {selection_score:.4f} ({args.task} responsibility + worst split + unseen VAL-B)")
+        if selection_score is not None and selection_score>best_score:
             best_score=selection_score
             torch.save({"model": model.state_dict(), "epoch": epoch, "score": best_score,
                         "selection_score": best_score, "metrics_by_split": epoch_metrics,
@@ -346,7 +357,7 @@ def main():
             print(f"  saved {args.save_path} composite {best_score:.4f}")
             best_path=args.save_path
             no_improve=0
-        else:
+        elif selection_score is not None:
             no_improve+=1
             if no_improve>=patience:
                 print(f"Early stopping at epoch {epoch+1}")
@@ -360,7 +371,8 @@ def main():
         # Use multisegment validation for actual metrics
         try:
             for name, df in [("val_a",val_a)] + [(n, splits[n]) for n in ["val_b","val_c","val_d"] if n in splits and len(splits[n])>0]:
-                m=validate_multisegment(model, df, device, use_demucs=args.use_demucs, task=args.task)
+                m=validate_multisegment(model, df, device, use_demucs=args.use_demucs,
+                                        task=args.task, batch_size=val_batch)
                 print(f"Final {name} multisegment {m}")
         except Exception as e:
             print(f"Multisegment final val failed {e}, fallback to single-crop")

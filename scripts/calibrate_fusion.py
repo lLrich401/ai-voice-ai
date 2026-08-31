@@ -138,12 +138,25 @@ def adaptive_df(frame, config):
     second = frame["df_second"].to_numpy(float)
     if not config["enabled"]:
         return primary
-    use = (frame["duration_sec"].to_numpy(float) >= 12.0)
-    use &= primary > config["low"]
-    use &= primary < config["high"]
+    use = (frame["duration_sec"].to_numpy(float) >= config.get("minimum_duration",12.0))
+    primary_uncertain=(primary>config["low"])&(primary<config["high"])
+    if config.get("trigger_mode","primary")=="any_uncertain_disagreement":
+        voice=frame["vf"].to_numpy(float); music=frame["mf"].to_numpy(float)
+        component=((voice>config.get("component_low",.3))&(voice<config.get("component_high",.7)))
+        component|=((music>config.get("component_low",.3))&(music<config.get("component_high",.7)))
+        disagreement=np.ptp(np.column_stack([primary,voice,music]),axis=1)>=config.get("disagreement",.3)
+        use &= primary_uncertain|component|disagreement
+    else:
+        use &= primary_uncertain
     use &= np.isfinite(second)
-    combined = (np.maximum(primary, second) if config["aggregation"] == "max"
-                else (primary + second) / 2.0)
+    if config["aggregation"] == "max":
+        combined=np.maximum(primary,second)
+    elif config["aggregation"] == "logit_mean":
+        a=np.clip(primary,submission.OUTPUT_EPS,1-submission.OUTPUT_EPS)
+        b=np.clip(second,submission.OUTPUT_EPS,1-submission.OUTPUT_EPS)
+        combined=1/(1+np.exp(-(np.log(a/(1-a))+np.log(b/(1-b)))/2))
+    else:
+        combined=(primary+second)/2.0
     return np.where(use, combined, primary)
 
 
@@ -289,6 +302,12 @@ def main():
     adaptive_candidates += [{"enabled": True, "low": low, "high": high, "aggregation": aggregation}
                             for low, high in ((0.20, 0.80), (0.25, 0.75), (0.30, 0.70))
                             for aggregation in ("mean", "max")]
+    adaptive_candidates.append({
+        "enabled": True, "low": 0.2, "high": 0.8,
+        "aggregation": "logit_mean", "minimum_duration": 10.0,
+        "trigger_mode": "any_uncertain_disagreement",
+        "component_low": 0.3, "component_high": 0.7, "disagreement": 0.3,
+    })
     best = None
     for wv, wm, wo in detector_weights:
         for wdf in (0.0, 0.25, 0.5, 0.75, 1.0):
@@ -334,19 +353,18 @@ def main():
         if best_file_mode is None or candidate[0] > best_file_mode[0]:
             best_file_mode = candidate
     _, selected_weights, _ = best_file_mode
+    # Select the gate without second-crop effects, then select adaptive policy
+    # on the gated canonical path. This keeps the two decisions identifiable.
+    weights, _, _, _ = select_df_gate(
+        cache, selected_weights, adaptive_candidates[0], maximum_objective_loss=0.01)
     best_adaptive = None
     for adaptive in adaptive_candidates:
-        objective, metrics = robust_score(cache, selected_weights, adaptive)
+        objective, metrics = robust_score(cache, weights, adaptive)
         candidate = (objective, -int(adaptive["enabled"]), adaptive, metrics)
         if best_adaptive is None or candidate[:2] > best_adaptive[:2]:
             best_adaptive = candidate
-    objective, _, calibrated_adaptive, metrics = best_adaptive
-    # Runtime profiling showed that DF-Arena dominates wall time and that a
-    # second crop adds cost without a reliable robust-score gain. Select the
-    # primary-crop voice-presence gate using calibration folds only.
-    adaptive = adaptive_candidates[0]
-    weights, objective, metrics, _ = select_df_gate(
-        cache, selected_weights, adaptive, maximum_objective_loss=0.01)
+    objective, _, adaptive, metrics = best_adaptive
+    calibrated_adaptive = adaptive
     weights.update({
         "metric_version": "dacon236749-official-noninterpolated-v1",
         "pipeline_version": submission.PIPELINE_VERSION,
@@ -357,6 +375,11 @@ def main():
         "adaptive_df_enabled": adaptive["enabled"],
         "adaptive_df_low": adaptive["low"], "adaptive_df_high": adaptive["high"],
         "adaptive_df_aggregation": adaptive["aggregation"],
+        "adaptive_df_minimum_duration": adaptive.get("minimum_duration", 12.0),
+        "adaptive_df_trigger_mode": adaptive.get("trigger_mode", "primary"),
+        "adaptive_df_component_low": adaptive.get("component_low", 0.3),
+        "adaptive_df_component_high": adaptive.get("component_high", 0.7),
+        "adaptive_df_disagreement": adaptive.get("disagreement", 0.3),
         "specialist_max_segments": 3,
         "panns_max_segments": 3,
         "calibration_robust_objective": objective,

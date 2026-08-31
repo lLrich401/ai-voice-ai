@@ -8,6 +8,8 @@ from src.dataset import (
     assert_no_base_source_overlap,
     derive_split_group_id,
     mixed_labels,
+    partial_fake_labels,
+    render_partial_fake_wave,
     render_mixed_wave,
 )
 
@@ -53,6 +55,15 @@ def test_mix_modes_have_expected_lengths():
     assert len(render_mixed_wave(voice, music, "music_then_voice")) == 24000
     assert len(render_mixed_wave(voice, music, "partial_overlap")) == 20000
     assert len(render_mixed_wave(voice, music, "crossfade", crossfade_sec=0.25)) == 20000
+
+
+def test_partial_fake_render_and_labels():
+    real=np.zeros(1000,dtype=np.float32);fake=np.ones(100,dtype=np.float32)*0.5
+    rendered=render_partial_fake_wave(real,fake,0.2,"middle",crossfade_sec=0.0,sr=1000)
+    assert len(rendered)==len(real)
+    assert np.count_nonzero(rendered)==200
+    assert partial_fake_labels("voice")==[1,1,0,1,0]
+    assert partial_fake_labels("music")==[1,0,1,0,1]
 
 
 def test_base_source_leakage_detects_mixes():

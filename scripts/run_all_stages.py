@@ -10,6 +10,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from src.dataset import build_val_sets, scan_real_datasets
+from scripts.group_gtzan_near_duplicates import group_manifest
 
 
 def run(command):
@@ -27,6 +28,14 @@ def main():
     parser.add_argument("--use_demucs", action="store_true")
     args = parser.parse_args()
 
+    # Content-only grouping happens before every split build. It is idempotent
+    # and prevents decoded near-duplicates from crossing split families.
+    manifest = pathlib.Path("data/manifest.csv")
+    if manifest.exists():
+        import pandas as pd
+        source = pd.read_csv(manifest, usecols=["source"])["source"].astype(str)
+        if source.str.lower().eq("gtzan_real_v2").any():
+            group_manifest(manifest, "experiments/gtzan_near_duplicate_groups.json")
     # Always regenerate: legacy pre-split MIX rows must never be reused.
     build_val_sets(scan_real_datasets(), out_dir="data/splits", random_state=42)
     common = [

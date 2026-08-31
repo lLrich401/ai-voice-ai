@@ -1,0 +1,90 @@
+{
+  "status": "PASS",
+  "gtzan_rows": 985,
+  "fingerprint_threshold": 0.99999,
+  "waveform_correlation_threshold": 0.999,
+  "accepted_pairs": [
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00033.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00051.wav",
+      "fingerprint_similarity": 1.0,
+      "waveform_correlation": 0.9999957334007306
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00034.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00053.wav",
+      "fingerprint_similarity": 0.9999995827674866,
+      "waveform_correlation": 0.9999970253528717
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00035.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00055.wav",
+      "fingerprint_similarity": 0.9999995231628418,
+      "waveform_correlation": 0.9999981239434218
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00036.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00058.wav",
+      "fingerprint_similarity": 0.9999997615814209,
+      "waveform_correlation": 0.9999966705149103
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00037.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00060.wav",
+      "fingerprint_similarity": 1.000000238418579,
+      "waveform_correlation": 0.9999877756033039
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00038.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00062.wav",
+      "fingerprint_similarity": 0.9999999403953552,
+      "waveform_correlation": 0.9999926394383647
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00039.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00065.wav",
+      "fingerprint_similarity": 1.0,
+      "waveform_correlation": 0.9999979705189942
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00040.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00067.wav",
+      "fingerprint_similarity": 0.9999998211860657,
+      "waveform_correlation": 0.9999976660485432
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00042.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00068.wav",
+      "fingerprint_similarity": 1.0,
+      "waveform_correlation": 0.9999985836796688
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00043.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00069.wav",
+      "fingerprint_similarity": 1.0,
+      "waveform_correlation": 0.9999746247809661
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00044.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00070.wav",
+      "fingerprint_similarity": 1.0000001192092896,
+      "waveform_correlation": 0.999987638618508
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00045.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00071.wav",
+      "fingerprint_similarity": 1.0000001192092896,
+      "waveform_correlation": 0.9999976441486835
+    },
+    {
+      "left": "data/raw/gtzan_unique_v2/jazz.00046.wav",
+      "right": "data/raw/gtzan_unique_v2/jazz.00072.wav",
+      "fingerprint_similarity": 0.9999997019767761,
+      "waveform_correlation": 0.9999973941064969
+    }
+  ],
+  "rejected_fingerprint_candidates": [],
+  "duplicate_clusters": 13,
+  "rows_grouped": 26,
+  "policy": "content-only audit before splitting; labels and scores unused"
+}

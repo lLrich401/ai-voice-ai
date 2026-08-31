@@ -1,0 +1,72 @@
+{
+  "device": "cpu",
+  "cuda_available": false,
+  "runs": [
+    {
+      "task": "voice",
+      "backbone": "spec_cnn",
+      "seed": 42,
+      "epochs": 10,
+      "batch_size": 32,
+      "base_channels": 32,
+      "parameters": 173797,
+      "status": "NOT RUN",
+      "reason": "execute flag not supplied"
+    },
+    {
+      "task": "voice",
+      "backbone": "spec_cnn",
+      "seed": 2026,
+      "epochs": 10,
+      "batch_size": 32,
+      "base_channels": 32,
+      "parameters": 173797,
+      "status": "NOT RUN",
+      "reason": "execute flag not supplied"
+    },
+    {
+      "task": "voice",
+      "backbone": "spec_cnn",
+      "seed": 777,
+      "epochs": 10,
+      "batch_size": 32,
+      "base_channels": 32,
+      "parameters": 173797,
+      "status": "NOT RUN",
+      "reason": "execute flag not supplied"
+    },
+    {
+      "task": "voice",
+      "backbone": "aasist",
+      "seed": 42,
+      "epochs": 10,
+      "batch_size": 32,
+      "base_channels": 32,
+      "parameters": 572498,
+      "status": "NOT RUN",
+      "reason": "execute flag not supplied"
+    },
+    {
+      "task": "voice",
+      "backbone": "aasist",
+      "seed": 2026,
+      "epochs": 10,
+      "batch_size": 32,
+      "base_channels": 32,
+      "parameters": 572498,
+      "status": "NOT RUN",
+      "reason": "execute flag not supplied"
+    },
+    {
+      "task": "voice",
+      "backbone": "aasist",
+      "seed": 777,
+      "epochs": 10,
+      "batch_size": 32,
+      "base_channels": 32,
+      "parameters": 572498,
+      "status": "NOT RUN",
+      "reason": "execute flag not supplied"
+    }
+  ]
+}

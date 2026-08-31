@@ -1,0 +1,39 @@
+{
+  "device": "cpu",
+  "cuda_available": false,
+  "runs": [
+    {
+      "task": "music",
+      "backbone": "spec_cnn",
+      "seed": 42,
+      "epochs": 10,
+      "batch_size": 32,
+      "base_channels": 32,
+      "parameters": 173797,
+      "status": "NOT RUN",
+      "reason": "execute flag not supplied"
+    },
+    {
+      "task": "music",
+      "backbone": "spec_cnn",
+      "seed": 2026,
+      "epochs": 10,
+      "batch_size": 32,
+      "base_channels": 32,
+      "parameters": 173797,
+      "status": "NOT RUN",
+      "reason": "execute flag not supplied"
+    },
+    {
+      "task": "music",
+      "backbone": "spec_cnn",
+      "seed": 777,
+      "epochs": 10,
+      "batch_size": 32,
+      "base_channels": 32,
+      "parameters": 173797,
+      "status": "NOT RUN",
+      "reason": "execute flag not supplied"
+    }
+  ]
+}

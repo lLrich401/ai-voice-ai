@@ -89,6 +89,20 @@ def save_audio_bytes(audio_dict, out_path: Path):
         return str(out_path), ".wav"
     raise ValueError("Unknown audio format")
 
+def validate_content_uniqueness(paths, dataset_key, minimum_ratio=0.90):
+    """Fail fast when a downloader silently repeats audio under new filenames."""
+    paths = [Path(path) for path in paths]
+    if not paths:
+        return {"files": 0, "unique": 0, "ratio": 0.0}
+    digests = {hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    ratio = len(digests) / len(paths)
+    if ratio < float(minimum_ratio):
+        raise RuntimeError(
+            f"{dataset_key} content-integrity failure: {len(digests)}/{len(paths)} "
+            f"unique files ({ratio:.1%}, required >= {minimum_ratio:.1%})"
+        )
+    return {"files": len(paths), "unique": len(digests), "ratio": ratio}
+
 def download_hf_with_manifest(hf_id, local_dir, manifest_writer, config=None, split=None, max_samples=1000, dataset_key="unknown"):
     try:
         from datasets import load_dataset, Audio
@@ -136,6 +150,8 @@ def download_hf_with_manifest(hf_id, local_dir, manifest_writer, config=None, sp
         out_base = Path(local_dir) / hf_id.replace("/", "_")
         out_base.mkdir(parents=True, exist_ok=True)
         count=0
+        saved_paths=[]
+        pending_manifest_rows=[]
         for i, item in enumerate(ds):
             if count>=max_samples:
                 break
@@ -248,10 +264,16 @@ def download_hf_with_manifest(hf_id, local_dir, manifest_writer, config=None, sp
                 "hf_id": hf_id,
                 "original_id": base_name,
             }
-            manifest_writer.writerow(row)
+            pending_manifest_rows.append(row)
+            saved_paths.append(saved_path)
             count+=1
             if count%200==0:
                 print(f"  saved {count}/{max_samples} ...")
+        if hf_id == "sanchit-gandhi/gtzan":
+            integrity = validate_content_uniqueness(saved_paths, dataset_key, minimum_ratio=0.90)
+            print(f"GTZAN integrity: {integrity['unique']}/{integrity['files']} unique files")
+        for row in pending_manifest_rows:
+            manifest_writer.writerow(row)
         print(f"Saved {count} files to {out_base} with manifest")
         return count
     except Exception as e:

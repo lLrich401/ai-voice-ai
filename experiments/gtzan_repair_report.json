@@ -1,0 +1,75 @@
+{
+  "status": "PASS",
+  "parquet_shards": [
+    "C:\\Users\\lLrich\\.cache\\huggingface\\hub\\datasets--sanchit-gandhi--gtzan\\snapshots\\4bd857132cb0e731bef3ec68558e7acc0a85f144\\data\\train-00000-of-00003-abaaa5719027ce5c.parquet",
+    "C:\\Users\\lLrich\\.cache\\huggingface\\hub\\datasets--sanchit-gandhi--gtzan\\snapshots\\4bd857132cb0e731bef3ec68558e7acc0a85f144\\data\\train-00001-of-00003-40e2de07ad428882.parquet",
+    "C:\\Users\\lLrich\\.cache\\huggingface\\hub\\datasets--sanchit-gandhi--gtzan\\snapshots\\4bd857132cb0e731bef3ec68558e7acc0a85f144\\data\\train-00002-of-00003-6e2eb838540a06e5.parquet"
+  ],
+  "old_gtzan_rows_replaced": 500,
+  "parquet_input_rows": 999,
+  "new_gtzan_rows": 985,
+  "new_gtzan_unique_sha256": 985,
+  "source_duplicate_rows_deduplicated": 14,
+  "source_duplicates": [
+    {
+      "filename": "disco.00099.wav",
+      "sha256": "3496655d22b1ea1efd55457192b5a78547e71c868dc952dccef883191569804f"
+    },
+    {
+      "filename": "hiphop.00045.wav",
+      "sha256": "f6e83c68d87414dd6bb5463cba622b005c6f0becadddeb61ac988d2ff2af0685"
+    },
+    {
+      "filename": "hiphop.00078.wav",
+      "sha256": "44fd895ac99797974552a10640f9be9d11742f536ed87ef19d0329834a48d41a"
+    },
+    {
+      "filename": "metal.00061.wav",
+      "sha256": "e73f27709990c875796c260f6900b3bfd60824f09d581638b3fad8a52dbacbbd"
+    },
+    {
+      "filename": "metal.00062.wav",
+      "sha256": "d154129cb75855326d94b47cc1aae0e460187b452494aad895514d445f362a22"
+    },
+    {
+      "filename": "metal.00063.wav",
+      "sha256": "903b6ec068ed2186a45fdb6b2fe2e54b48980a7b03487bf20cbaae39b34ecbf8"
+    },
+    {
+      "filename": "metal.00064.wav",
+      "sha256": "b208f62da73a46e53b196e4997303269d6a93769b84bc5d1752627d0991b08f2"
+    },
+    {
+      "filename": "metal.00065.wav",
+      "sha256": "d7a7a94ac76dd141c4a99aef660336f48a6e504562a8972116cd0518eb87ee44"
+    },
+    {
+      "filename": "metal.00066.wav",
+      "sha256": "4de67c0fd52ad616a56a790916ab2a895893cde730d916b935b4b07e1fcae2a0"
+    },
+    {
+      "filename": "metal.00094.wav",
+      "sha256": "d15db60c6d1f784d0fa837d150c9ea536115ae03983d820d3c97a8d9e7f8ed3f"
+    },
+    {
+      "filename": "pop.00060.wav",
+      "sha256": "b1ce65d61443db6d5a7821490332b1f71c6597fbdd37e87ee2acdbcd882d8aa0"
+    },
+    {
+      "filename": "pop.00071.wav",
+      "sha256": "2301f6e86dfd5bb4d58cf5bd6bacdf1a1c6e3aa727dfd366afd85c7d63aad8bf"
+    },
+    {
+      "filename": "reggae.00082.wav",
+      "sha256": "f5bbaba83167c97f12dd477fadf436f1e32b4279efad43cf4771770a46f4857b"
+    },
+    {
+      "filename": "rock.00016.wav",
+      "sha256": "56e2b93b263a1f29ced0090d615d40755e9dc19b8066234355cfbb4ffcc2f019"
+    }
+  ],
+  "preserved_non_gtzan_rows": 1800,
+  "manifest_rows": 2785,
+  "output_directory": "data\\raw\\gtzan_unique_v2",
+  "policy": "exact source duplicates removed; manifest updated only after integrity checks"
+}
