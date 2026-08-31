@@ -2,6 +2,7 @@
 
 Generated 2026-08-31. `latest_results.json` is authoritative. Every value is a
 local measurement unless marked user-reported, projected, or NOT RUN.
+Implementation commit: `ef828d95401f110cbdfdeb4ee77effa38865b054`.
 
 ## 1. Problems found and changes made
 

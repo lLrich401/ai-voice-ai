@@ -3,7 +3,7 @@
   "status": "MEASURED_LOCAL_UNLESS_MARKED",
   "timestamp": "2026-08-31T14:18:35.7300858+09:00",
   "base_git_commit": "507efd3fb6b90da4bcd7afb4b00b3fee3a1ea959",
-  "implementation_git_commit": "PENDING_FIRST_COMMIT",
+  "implementation_git_commit": "ef828d95401f110cbdfdeb4ee77effa38865b054",
   "pipeline_version": "dacon236749-20260831-v6-panns16k",
   "checkpoints": {
     "voice_sha256": "3988a176a8da83f4be001bdd51eb297c6a5e95372f99d10b94e83f9db3156fa2",
