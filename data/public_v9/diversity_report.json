@@ -1,0 +1,46 @@
+{
+  "mlaad_rows": 320,
+  "mlaad_train_rows": 240,
+  "mlaad_unseen_validation_rows": 80,
+  "mlaad_train_generators": [
+    "MLAAD::Chatterbox",
+    "MLAAD::FireRedTTS-2.0",
+    "MLAAD::FishTTS",
+    "MLAAD::Higgs-Audio-V2",
+    "MLAAD::Microsoft VibeVoice 1.5B",
+    "MLAAD::MiniCPM-o-2.6",
+    "MLAAD::OpenVoiceV2",
+    "MLAAD::Qwen2.5-Omni",
+    "MLAAD::RVC",
+    "MLAAD::f5-tts",
+    "MLAAD::suno_bark",
+    "MLAAD::zonosTTS-v0.1"
+  ],
+  "mlaad_unseen_generators": [
+    "MLAAD::Cartesia.ai (Sonic-3)",
+    "MLAAD::DeepGram",
+    "MLAAD::Edge-TTS",
+    "MLAAD::Resemble.ai (April 12th, 2025)"
+  ],
+  "mlaad_cross_role_group_overlap": 0,
+  "mlaad_all_groups_paired_real_fake": true,
+  "sonics_rows": 320,
+  "sonics_generators": [
+    "SONICS::chirp-v2-xxl-alpha",
+    "SONICS::chirp-v3",
+    "SONICS::chirp-v3.5",
+    "SONICS::udio-120s",
+    "SONICS::udio-30s"
+  ],
+  "sonics_all_vocal_mixed_fake": true,
+  "mlaad_revision": "9143e5ea709575ebab6bec52840a1043aada7bb1",
+  "sonics_archives": [
+    "data/raw/sonics_official/fake_songs/part_01.zip",
+    "data/raw/sonics_official/fake_songs/part_02.zip"
+  ],
+  "notes": [
+    "Candidate data only; selected v7 model and final holdout are untouched.",
+    "CC BY-NC sources are suitable only for a non-commercial competition use case.",
+    "SONICS real YouTube IDs were deliberately not downloaded."
+  ]
+}

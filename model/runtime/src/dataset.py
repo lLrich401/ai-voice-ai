@@ -564,8 +564,13 @@ def load_manifest_row_wave(row, sr=TARGET_SR, is_training=False, use_demucs=Fals
     augment = str(row.get("augment", "none")).lower()
     if augment in ("codec_mp3", "codec"):
         wave = apply_codec_sim(wave, sr=sr)
+    elif augment.startswith("codec_"):
+        wave = apply_codec_sim(wave, sr=sr, profile=augment.removeprefix("codec_"))
     elif augment in ("telephone", "tel"):
         wave = apply_telephone_sim(wave, sr=sr)
+    elif augment.startswith("telephone_"):
+        wave = apply_telephone_sim(
+            wave, sr=sr, profile=augment.removeprefix("telephone_"))
     return np.asarray(wave, dtype=np.float32)
 
 def leakage_safe_split(df, test_size=0.2, random_state=42):
@@ -730,30 +735,100 @@ def build_val_sets(df, out_dir="data/splits", random_state=42):
     return splits
 
 # Augmentations for VAL-C/D simulation (applied at dataset __getitem__ if augment column set)
-def apply_codec_sim(wave, sr=16000):
-    # mp3 sim: lowpass 3.5k
+def _deterministic_quantize(wave, bits):
+    # Quantize around an explicit signed zero. Mapping [-1, 1] to an unsigned
+    # number of levels makes zero fall between two bins and adds a DC offset to
+    # silence (especially severe for the 6-bit telephone stress profile).
+    maximum = float((1 << (int(bits) - 1)) - 1)
+    if maximum < 1:
+        raise ValueError("quantization requires at least 2 bits")
+    source = np.clip(np.asarray(wave, dtype=np.float32), -1.0, 1.0)
+    return np.clip(np.round(source * maximum) / maximum, -1.0, 1.0).astype(np.float32)
+
+
+def _deterministic_resample_roundtrip(wave, sr, target_sr):
+    try:
+        from scipy.signal import resample_poly
+        import math
+        down_gcd = math.gcd(int(sr), int(target_sr))
+        low = resample_poly(wave, int(target_sr) // down_gcd, int(sr) // down_gcd)
+        up_gcd = math.gcd(int(target_sr), int(sr))
+        restored = resample_poly(low, int(sr) // up_gcd, int(target_sr) // up_gcd)
+        if len(restored) < len(wave):
+            restored = np.pad(restored, (0, len(wave) - len(restored)))
+        return np.asarray(restored[:len(wave)], dtype=np.float32)
+    except Exception:
+        return np.asarray(wave, dtype=np.float32)
+
+
+def apply_codec_sim(wave, sr=16000, profile="lowpass_3500"):
+    """Deterministic lossy-channel stress proxies.
+
+    The historical VAL-C transform is preserved as ``lowpass_3500``. Extra
+    profiles deliberately vary bandwidth, resampling and quantization; they
+    are codec stress proxies, not claims of bit-exact MP3/AAC/Opus encoding.
+    """
+    profiles = {
+        "mp3": (3500.0, None, None),
+        "lowpass_3500": (3500.0, None, None),
+        "lp35": (3500.0, None, None),
+        "lp52": (5200.0, None, 12),
+        "resample12_q12": (6500.0, 12000, 12),
+        "narrow_q8": (3200.0, 8000, 8),
+        "wide_q10": (7000.0, None, 10),
+    }
+    if profile not in profiles:
+        raise ValueError(f"unknown codec stress profile: {profile}")
+    cutoff, target_sr, bits = profiles[profile]
     try:
         from scipy.signal import butter, lfilter
-        b,a = butter(4, 3500/(sr/2), btype="low")
-        return lfilter(b,a,wave).astype(np.float32)
-    except:
-        return wave
+        b,a = butter(4, cutoff/(sr/2), btype="low")
+        result = lfilter(b,a,wave).astype(np.float32)
+    except Exception:
+        result = np.asarray(wave, dtype=np.float32)
+    if target_sr is not None:
+        result = _deterministic_resample_roundtrip(result, sr, target_sr)
+    if bits is not None:
+        result = _deterministic_quantize(result, bits)
+    return result.astype(np.float32)
 
-def apply_telephone_sim(wave, sr=16000):
+def apply_telephone_sim(wave, sr=16000, profile="mulaw"):
+    profiles = {
+        "mulaw": (300.0, 3400.0, "mulaw", 8),
+        "alaw": (200.0, 3800.0, "alaw", 8),
+        "narrow": (400.0, 3000.0, "mulaw", 8),
+        "gsm_proxy": (300.0, 3400.0, "linear", 6),
+    }
+    if profile not in profiles:
+        raise ValueError(f"unknown telephone stress profile: {profile}")
+    low_hz, high_hz, compander, bits = profiles[profile]
     try:
         from scipy.signal import butter, lfilter
         import librosa
-        b,a = butter(4, [300/(sr/2), 3400/(sr/2)], btype="band")
+        b,a = butter(4, [low_hz/(sr/2), high_hz/(sr/2)], btype="band")
         w = lfilter(b,a,wave)
         # 8k resample sim
         w8 = librosa.resample(w, orig_sr=sr, target_sr=8000)
         w = librosa.resample(w8, orig_sr=8000, target_sr=sr)
-        # mu-law
-        mu=255
         x=np.clip(w,-1,1)
-        enc=np.sign(x)*np.log1p(mu*np.abs(x))/np.log1p(mu)
-        quantized=np.round((enc+1)*127.5)/127.5 -1
-        decoded=np.sign(quantized)*(1/mu)*((1+mu)**np.abs(quantized)-1)
+        if compander == "mulaw":
+            mu=255
+            enc=np.sign(x)*np.log1p(mu*np.abs(x))/np.log1p(mu)
+            quantized=np.round((enc+1)*127.5)/127.5 -1
+            decoded=np.sign(quantized)*(1/mu)*((1+mu)**np.abs(quantized)-1)
+        elif compander == "alaw":
+            a_law=87.6; magnitude=np.abs(x); denominator=1.0+np.log(a_law)
+            compressed=np.where(magnitude < 1.0/a_law,
+                                a_law*magnitude/denominator,
+                                (1.0+np.log(a_law*np.maximum(magnitude,1e-12)))/denominator)
+            quantized=np.round((np.sign(x)*compressed+1.0)*127.5)/127.5-1.0
+            qmag=np.abs(quantized)
+            expanded=np.where(qmag < 1.0/denominator,
+                              qmag*denominator/a_law,
+                              np.exp(qmag*denominator-1.0)/a_law)
+            decoded=np.sign(quantized)*expanded
+        else:
+            decoded=_deterministic_quantize(x,bits)
         # Validation transforms must be byte-deterministic. Random noise here
         # previously made VAL-D and candidate selection change between runs.
         return decoded.astype(np.float32)[:len(wave)]
@@ -762,14 +837,14 @@ def apply_telephone_sim(wave, sr=16000):
         try:
             from scipy.signal import resample
             from scipy.signal import butter, lfilter
-            b,a = butter(4, [300/(sr/2), 3400/(sr/2)], btype="band")
+            b,a = butter(4, [low_hz/(sr/2), high_hz/(sr/2)], btype="band")
             w = lfilter(b,a,wave)
             n8=int(len(w)*8000/sr)
             w8=resample(w,n8)
             w=resample(w8,len(wave))
-            return w.astype(np.float32)
-        except:
-            return wave
+            return _deterministic_quantize(w,bits) if compander == "linear" else w.astype(np.float32)
+        except Exception:
+            return np.asarray(wave, dtype=np.float32)
 
 class AudioDataset(Dataset):
     def __init__(self, df, sr=16000, seg_sec=4.0, is_training=True, use_demucs=False, task="multitask", device="cpu",

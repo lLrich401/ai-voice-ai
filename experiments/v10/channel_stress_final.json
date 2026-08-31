@@ -1,0 +1,21 @@
+{
+  "status": "MEASURED_NON_FINAL_CHANNEL_STRESS",
+  "final_holdout": "NOT RUN",
+  "source_split": "data/splits/val_a.csv",
+  "source_split_sha256": "e17d764df6ed8df0268b5dbded9537fe4d63a19b65465f59ede3d7ac134b56bc",
+  "samples_per_profile": 192,
+  "historical_diagnostic_cache_overlap": 0,
+  "metric_note": "Same content is reused across profiles; compare each profile with clean. GSM is a deterministic low-bit proxy, not bit-exact GSM.",
+  "profiles": {
+    "clean": {"file_eer": 0.0733134328, "voice_eer": 0.0746753247, "music_eer": 0.0, "voice_auc": 0.9835605964, "music_auc": 0.9988603989, "ads": 0.9484082186, "cps": 0.9912104976, "total": 0.9526884465},
+    "codec_lp35": {"file_eer": 0.0578507463, "voice_eer": 0.0527597403, "music_eer": 0.0, "voice_auc": 0.9829234102, "music_auc": 0.9996581197, "ads": 0.9605226788, "cps": 0.9912907649, "total": 0.9635994874},
+    "codec_lp52_q12": {"file_eer": 0.0618507463, "voice_eer": 0.0681818182, "music_eer": 0.0, "voice_auc": 0.9838154709, "music_auc": 0.9995441595, "ads": 0.9554382632, "cps": 0.9916798152, "total": 0.9590624184},
+    "codec_resample12_q12": {"file_eer": 0.0578507463, "voice_eer": 0.0681818182, "music_eer": 0.0, "voice_auc": 0.9830508475, "music_auc": 0.9994301994, "ads": 0.9574382632, "cps": 0.9912405234, "total": 0.9608184893},
+    "codec_narrow_q8": {"file_eer": 0.0887761194, "voice_eer": 0.0746753247, "music_eer": 0.0083333333, "voice_auc": 0.9816490378, "music_auc": 0.9997720798, "ads": 0.9381768754, "cps": 0.9907105588, "total": 0.9434302437},
+    "codec_wide_q10": {"file_eer": 0.0733134328, "voice_eer": 0.0681818182, "music_eer": 0.0, "voice_auc": 0.9838154709, "music_auc": 0.9993162393, "ads": 0.9497069199, "cps": 0.9915658551, "total": 0.9538928135},
+    "telephone_mulaw": {"file_eer": 0.0578507463, "voice_eer": 0.0527597403, "music_eer": 0.0, "voice_auc": 0.9776984835, "music_auc": 1.0, "ads": 0.9605226788, "cps": 0.9888492417, "total": 0.9633553351},
+    "telephone_alaw": {"file_eer": 0.0578507463, "voice_eer": 0.0527597403, "music_eer": 0.0, "voice_auc": 0.9822862240, "music_auc": 1.0, "ads": 0.9605226788, "cps": 0.9911431120, "total": 0.9635847221},
+    "telephone_narrow": {"file_eer": 0.0578507463, "voice_eer": 0.0527597403, "music_eer": 0.0, "voice_auc": 0.9751497388, "music_auc": 0.9998860399, "ads": 0.9605226788, "cps": 0.9875178893, "total": 0.9632221999},
+    "telephone_lowbit_proxy": {"file_eer": 0.1197014925, "voice_eer": 0.1428571429, "music_eer": 0.0, "voice_auc": 0.9722186823, "music_auc": 0.9961253561, "ads": 0.9115778252, "cps": 0.9841720192, "total": 0.9188372446}
+  }
+}

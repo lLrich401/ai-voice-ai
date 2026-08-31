@@ -1,0 +1,161 @@
+{
+  "status": "SUPERSEDED_UNSIGNED_QUANTIZER_RESULTS",
+  "superseded_by": "experiments/v10/channel_stress_final.json",
+  "final_holdout": "NOT RUN",
+  "source_split": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\splits\\val_a.csv",
+  "source_split_sha256": "e17d764df6ed8df0268b5dbded9537fe4d63a19b65465f59ede3d7ac134b56bc",
+  "diagnostic_cache_overlap": 0,
+  "samples_per_profile": 192,
+  "profiles": {
+    "clean": {
+      "augment": "none",
+      "runtime_seconds": 193.60474159999285,
+      "metrics": {
+        "file_eer": 0.0733134328358209,
+        "voice_eer": 0.07467532467532466,
+        "music_eer": 0.0,
+        "voice_auc": 0.9835605964062699,
+        "music_auc": 0.9988603988603988,
+        "ads": 0.9484082186470246,
+        "cps": 0.9912104976333344,
+        "score": 0.9526884465456557,
+        "total": 0.9526884465456557
+      }
+    },
+    "codec_lp35": {
+      "augment": "codec_lp35",
+      "runtime_seconds": 181.5379932000069,
+      "metrics": {
+        "file_eer": 0.05785074626865669,
+        "voice_eer": 0.05275974025974028,
+        "music_eer": 0.0,
+        "voice_auc": 0.9829234102204665,
+        "music_auc": 0.9996581196581196,
+        "ads": 0.9605226788137236,
+        "cps": 0.991290764939293,
+        "score": 0.9635994874262805,
+        "total": 0.9635994874262805
+      }
+    },
+    "codec_lp52": {
+      "augment": "codec_lp52",
+      "runtime_seconds": 186.27004189998843,
+      "metrics": {
+        "file_eer": 0.06185074626865669,
+        "voice_eer": 0.05275974025974028,
+        "music_eer": 0.0,
+        "voice_auc": 0.9835605964062698,
+        "music_auc": 0.9994301994301994,
+        "ads": 0.9585226788137235,
+        "cps": 0.9914953979182346,
+        "score": 0.9618199507241747,
+        "total": 0.9618199507241747
+      }
+    },
+    "codec_resample12_q12": {
+      "augment": "codec_resample12_q12",
+      "runtime_seconds": 179.75591250002617,
+      "metrics": {
+        "file_eer": 0.05785074626865669,
+        "voice_eer": 0.06818181818181816,
+        "music_eer": 0.0,
+        "voice_auc": 0.9834331591691091,
+        "music_auc": 0.9994301994301994,
+        "ads": 0.9574382632293081,
+        "cps": 0.9914316792996543,
+        "score": 0.9608376048363428,
+        "total": 0.9608376048363428
+      }
+    },
+    "codec_narrow_q8": {
+      "augment": "codec_narrow_q8",
+      "runtime_seconds": 188.0529877000081,
+      "metrics": {
+        "file_eer": 0.08877611940298509,
+        "voice_eer": 0.05275974025974028,
+        "music_eer": 0.008333333333333333,
+        "voice_auc": 0.9817764750860201,
+        "music_auc": 0.9985185185185185,
+        "ads": 0.9425599922465594,
+        "cps": 0.9901474968022692,
+        "score": 0.9473187427021305,
+        "total": 0.9473187427021305
+      }
+    },
+    "codec_wide_q10": {
+      "augment": "codec_wide_q10",
+      "runtime_seconds": 215.9857600000105,
+      "metrics": {
+        "file_eer": 0.05785074626865669,
+        "voice_eer": 0.06818181818181816,
+        "music_eer": 0.0,
+        "voice_auc": 0.9836880336434305,
+        "music_auc": 0.9992022792022792,
+        "ads": 0.9574382632293081,
+        "cps": 0.9914451564228548,
+        "score": 0.9608389525486629,
+        "total": 0.9608389525486629
+      }
+    },
+    "telephone_mulaw": {
+      "augment": "telephone_mulaw",
+      "runtime_seconds": 241.44090220000362,
+      "metrics": {
+        "file_eer": 0.05785074626865669,
+        "voice_eer": 0.05275974025974028,
+        "music_eer": 0.0,
+        "voice_auc": 0.9776984834968778,
+        "music_auc": 1.0,
+        "ads": 0.9605226788137236,
+        "cps": 0.9888492417484389,
+        "score": 0.9633553351071951,
+        "total": 0.9633553351071951
+      }
+    },
+    "telephone_alaw": {
+      "augment": "telephone_alaw",
+      "runtime_seconds": 212.6562050000066,
+      "metrics": {
+        "file_eer": 0.05785074626865669,
+        "voice_eer": 0.05275974025974028,
+        "music_eer": 0.0,
+        "voice_auc": 0.9822862240346628,
+        "music_auc": 1.0,
+        "ads": 0.9605226788137236,
+        "cps": 0.9911431120173314,
+        "score": 0.9635847221340843,
+        "total": 0.9635847221340843
+      }
+    },
+    "telephone_narrow": {
+      "augment": "telephone_narrow",
+      "runtime_seconds": 204.85277729999507,
+      "metrics": {
+        "file_eer": 0.05785074626865669,
+        "voice_eer": 0.05275974025974028,
+        "music_eer": 0.0,
+        "voice_auc": 0.9751497387536638,
+        "music_auc": 0.99988603988604,
+        "ads": 0.9605226788137236,
+        "cps": 0.987517889319852,
+        "score": 0.9632221998643364,
+        "total": 0.9632221998643364
+      }
+    },
+    "telephone_gsm_proxy": {
+      "augment": "telephone_gsm_proxy",
+      "runtime_seconds": 211.758842500014,
+      "metrics": {
+        "file_eer": 0.13516417910447764,
+        "voice_eer": 0.1801948051948052,
+        "music_eer": 0.06666666666666665,
+        "voice_auc": 0.9769338600739135,
+        "music_auc": 0.997834757834758,
+        "ads": 0.8763789494088001,
+        "cps": 0.9873843089543357,
+        "score": 0.8874794853633536,
+        "total": 0.8874794853633536
+      }
+    }
+  }
+}

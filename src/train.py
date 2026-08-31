@@ -36,7 +36,7 @@ HEADS = ("file_fake", "voice_fake", "music_fake", "voice_present", "music_presen
 
 
 def specialist_sample_weights(frame, task):
-    """Target 40/40/20 buckets and balance source/generator inside each."""
+    """Target 40/40/20 buckets, then balance labels and domains inside each."""
     mixed = frame["path"].astype(str).str.startswith(("MIX::","PARTIAL::")).to_numpy()
     present = frame[f"{task}_present"].to_numpy(dtype=bool)
     component_only = present & ~mixed
@@ -44,13 +44,24 @@ def specialist_sample_weights(frame, task):
     weights = np.zeros(len(frame), dtype=np.float64)
     domains=(frame.get("source",pd.Series("unknown",index=frame.index)).astype(str)+"::"+
              frame.get("generator",pd.Series("unknown",index=frame.index)).astype(str)).to_numpy()
-    for mask, fraction in ((component_only, 0.40), (mixed, 0.40), (other, 0.20)):
+    labels = (frame[f"{task}_fake"].to_numpy(dtype=int)
+              if f"{task}_fake" in frame.columns else None)
+    for mask, fraction, balance_label in (
+        (component_only, 0.40, True), (mixed, 0.40, True), (other, 0.20, False)
+    ):
         count = int(mask.sum())
         if count:
-            bucket_domains=np.unique(domains[mask])
-            for domain in bucket_domains:
-                domain_mask=mask&(domains==domain)
-                weights[domain_mask]=fraction/len(bucket_domains)/int(domain_mask.sum())
+            # A source with ten fake generator IDs and one real ID must not
+            # become 10:1 fake merely because every domain receives equal
+            # mass. Balance the defined component label first, then domains.
+            bucket_labels = np.unique(labels[mask]) if labels is not None and balance_label else [None]
+            for label in bucket_labels:
+                label_mask = mask if label is None else mask & (labels == label)
+                bucket_domains=np.unique(domains[label_mask])
+                for domain in bucket_domains:
+                    domain_mask=label_mask&(domains==domain)
+                    weights[domain_mask]=(fraction/len(bucket_labels)/len(bucket_domains)
+                                          /int(domain_mask.sum()))
     if weights.sum() <= 0:
         weights[:] = 1.0 / max(1, len(weights))
     return weights / weights.sum()
@@ -250,17 +261,23 @@ def main():
     parser.add_argument("--backbone", choices=["aasist","spec_cnn","fusion"], default="aasist")
     parser.add_argument("--use_demucs", action="store_true", help="use HTDemucs vocals/music stems")
     parser.add_argument("--batch_size", type=int, default=16)
+    parser.add_argument("--num_workers", type=int, default=0,
+                        help="audio decode/augmentation workers; use >0 for GPU training")
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seg_sec", type=float, default=4.0)
     parser.add_argument("--base_channels", type=int, default=32)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--save_path", default=None)
+    parser.add_argument(
+        "--init_checkpoint", default=None,
+        help="strictly load a compatible checkpoint before controlled fine-tuning",
+    )
     parser.add_argument("--val_sets", nargs="+", default=["val_a","val_b","val_c","val_d"], help="which val sets to evaluate")
     parser.add_argument("--seed", type=int, default=20260830)
     parser.add_argument("--aux_eval_interval", type=int, default=2,
                         help="evaluate VAL-B/C/D every N epochs; VAL-A remains every epoch")
-    parser.add_argument("--augmentation_profile", choices=("baseline", "voice_channel_v7"),
+    parser.add_argument("--augmentation_profile", choices=("baseline", "voice_channel_v7", "voice_channel_v9", "voice_channel_v10"),
                         default="baseline")
     parser.add_argument("--partial_fake_count", type=int, default=0,
                         help="TRAIN-only partial voice examples; zero keeps the v6 baseline")
@@ -327,6 +344,21 @@ def main():
     # For music task, filter to music_present==1
     # But to keep file_fake training balanced, we keep all
     train_df=splits["train"]
+    if args.task in ("voice", "music"):
+        present_column = f"{args.task}_present"
+        before = len(train_df)
+        present_rows = train_df[train_df[present_column].astype(int).eq(1)]
+        absent_rows = train_df[train_df[present_column].astype(int).eq(0)]
+        # The presence head needs genuine negatives for CPS. Cap rather than
+        # delete them: the specialist sampler still assigns this pool 20% of
+        # draws, while redundant absent rows no longer inflate epoch length.
+        absent_cap = min(len(absent_rows), max(400, len(present_rows) // 4))
+        absent_rows = absent_rows.sample(absent_cap, random_state=args.seed)
+        train_df = pd.concat([present_rows, absent_rows], ignore_index=True)
+        print(
+            f"{args.task} responsibility balance: {before} -> {len(train_df)} "
+            f"({len(present_rows)} present + {len(absent_rows)} presence negatives)"
+        )
     if args.partial_fake_count:
         if args.task != "voice":
             raise ValueError("partial_fake_count is currently defined for the voice task only")
@@ -357,8 +389,11 @@ def main():
                 train_df, sample_weights, score_table, task=args.task)
         sampler = WeightedRandomSampler(torch.as_tensor(sample_weights, dtype=torch.double),
                                         num_samples=len(train_df), replacement=True)
-    train_loader=DataLoader(train_ds, batch_size=args.batch_size, shuffle=sampler is None,
-                            sampler=sampler, num_workers=0, pin_memory=False)
+    train_loader=DataLoader(
+        train_ds, batch_size=args.batch_size, shuffle=sampler is None,
+        sampler=sampler, num_workers=args.num_workers, pin_memory=False,
+        persistent_workers=args.num_workers > 0,
+    )
     # AASIST is memory-heavy on CPU, while SpecCNN is substantially faster with
     # the full batch. Do not inherit the AASIST-specific batch cap here.
     val_batch = min(args.batch_size, 4) if str(device)=="cpu" and args.backbone=="aasist" else args.batch_size
@@ -371,17 +406,51 @@ def main():
             ds=AudioDataset(df, sr=16000, seg_sec=args.seg_sec, is_training=False, use_demucs=args.use_demucs, task=args.task, device=str(device))
             val_loaders[name]=DataLoader(ds, batch_size=val_batch, shuffle=False, num_workers=0)
 
+    if args.save_path is None:
+        args.save_path=f"model/{args.task}_{args.backbone}.pt" if args.task!="multitask" else "model/best.pt"
+    pathlib.Path(args.save_path).parent.mkdir(parents=True, exist_ok=True)
+
     # Model
     model=get_model(args.task, backbone=args.backbone, base_channels=args.base_channels, device=device)
+    initial_checkpoint = None
+    if args.init_checkpoint:
+        init_path = pathlib.Path(args.init_checkpoint)
+        if not init_path.is_file():
+            raise FileNotFoundError(f"initial checkpoint not found: {init_path}")
+        initial_checkpoint = torch.load(init_path, map_location="cpu")
+        expected = {
+            "task": args.task, "backbone": args.backbone,
+            "base_channels": int(args.base_channels), "sample_rate": 16000,
+        }
+        mismatch = {key: (initial_checkpoint.get(key), value)
+                    for key, value in expected.items()
+                    if initial_checkpoint.get(key) != value}
+        if mismatch:
+            raise ValueError(f"incompatible initial checkpoint: {mismatch}")
+        if tuple(initial_checkpoint.get("label_heads", ())) != HEADS:
+            raise ValueError("incompatible initial checkpoint label_heads")
+        model.load_state_dict(initial_checkpoint["model"], strict=True)
+        print(f"Strictly initialized from {init_path}")
     opt=torch.optim.AdamW(model.parameters(), lr=args.lr)
     scheduler=torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=args.epochs)
     scaler=GradScaler(enabled=(device.type=="cuda"))
     best_score=-1
     best_path=None
     training_history=[]
-    if args.save_path is None:
-        args.save_path=f"model/{args.task}_{args.backbone}.pt" if args.task!="multitask" else "model/best.pt"
-    pathlib.Path(args.save_path).parent.mkdir(parents=True, exist_ok=True)
+    if initial_checkpoint is not None:
+        initial_metrics = {"val_a": validate(model, val_a_loader, device)}
+        for name, loader in val_loaders.items():
+            initial_metrics[name] = validate(model, loader, device)
+        best_score = checkpoint_selection_score(initial_metrics, task=args.task)
+        torch.save({
+            **initial_checkpoint, "model": model.state_dict(), "epoch": -1,
+            "score": best_score, "selection_score": best_score,
+            "metrics_by_split": initial_metrics,
+            "initial_checkpoint": str(args.init_checkpoint),
+            "augmentation_profile": "initial_unmodified",
+        }, args.save_path)
+        best_path = args.save_path
+        print(f"Initial checkpoint composite {best_score:.4f}; preserved at {args.save_path}")
 
     # Training loop with early stopping on VAL-A
     patience=3; no_improve=0
@@ -413,6 +482,7 @@ def main():
                         "sample_rate": 16000, "seg_sec": float(args.seg_sec),
                         "label_heads": list(HEADS), "use_demucs": bool(args.use_demucs),
                         "augmentation_profile": args.augmentation_profile,
+                        "initial_checkpoint": args.init_checkpoint,
                         "partial_fake_count": int(args.partial_fake_count),
                         "hard_mining_scores": args.hard_mining_scores}, args.save_path)
             print(f"  saved {args.save_path} composite {best_score:.4f}")
@@ -431,7 +501,12 @@ def main():
         print(f"Loaded best {best_path} for final val (multi-segment)")
         # Use multisegment validation for actual metrics
         try:
-            for name, df in [("val_a",val_a)] + [(n, splits[n]) for n in ["val_b","val_c","val_d"] if n in splits and len(splits[n])>0]:
+            final_validation_frames = {
+                "val_a": val_a, "val_b": val_b, "val_c": val_c, "val_d": val_d,
+            }
+            for name, df in final_validation_frames.items():
+                if len(df) == 0:
+                    continue
                 m=validate_multisegment(model, df, device, use_demucs=args.use_demucs,
                                         task=args.task, batch_size=val_batch)
                 print(f"Final {name} multisegment {m}")

@@ -1,0 +1,27 @@
+{
+  "status": "MEASURED_NON_FINAL_VALIDATION",
+  "decision": "KEEP_SELECTED_V7_PIPELINE",
+  "final_holdout": "NOT RUN",
+  "selected_voice_checkpoint_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+  "selected_music_checkpoint_sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+  "selected_fusion_sha256": "87d46c317398bed0a9dc87c6b451246851ba6c34683e4468a0251461f7c42402",
+  "voice_candidate": {
+    "name": "v9_aasist",
+    "sha256": "5697576ec5b813267cb1de9957f3d71500a7cd3b4668c98ac57b5b4a10107c40",
+    "decision": "REJECT",
+    "reason": "VAL-B voice EER and total regressed; no-domain rule failed"
+  },
+  "music_candidate": {
+    "name": "v9_expanded_music_spec_cnn",
+    "sha256": "531ac6cd8f1f2b56d5c4760d7e95b146e1ea09fdc6ebd830167427d6206cf03a",
+    "decision": "REJECT",
+    "reason": "unseen-music worst domain improved, but original-domain total and independent calibration objective regressed"
+  },
+  "fusion": {
+    "current_objective": 0.8883663603678957,
+    "candidate_before_recalibration": 0.882999381173059,
+    "candidate_after_recalibration": 0.8848713515014921,
+    "decision": "KEEP_CURRENT",
+    "submission_files_mutated": false
+  }
+}

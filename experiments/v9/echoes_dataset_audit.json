@@ -1,0 +1,16 @@
+{
+  "dataset": "Octavian97/Echoes",
+  "revision": "14b0c76c6a691c42fadfab9fb6a4eb1ee8c628a2",
+  "declared_license": "CC BY-SA 4.0",
+  "archive_members": 4509,
+  "generated_audio_rows_declared": 4468,
+  "bona_fide_audio_files_in_archive": 0,
+  "manifest_files": [
+    "Echoes/dataset_manifest.csv"
+  ],
+  "decision": "RAW_ARCHIVE_ALONE_REJECTED; SUPERSEDED_BY_LICENSED_FMA_PAIRING",
+  "reason": "The archive pairs generated rows to original_audio names in metadata, but does not distribute the bona fide reference audio. It therefore cannot supply acoustic real/fake pairs without obtaining the originals through a separate rights path.",
+  "training_use": "RAW ARCHIVE ALONE NOT USED; 55 LICENSE-FILTERED FMA CONTENT GROUPS PAIRED BY scripts/prepare_echoes_paired_v9.py",
+  "paired_result": "data/public_v9/echoes_fma_paired_report.json",
+  "final_holdout": "NOT READ / NOT RUN"
+}

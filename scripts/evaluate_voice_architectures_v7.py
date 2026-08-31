@@ -21,6 +21,7 @@ from scripts.calibrate_fusion import score_frame
 from src.dataset import load_manifest_row_wave
 from src.metrics import compute_eer
 from src.models.beats_backbone import MusicMultitask
+from src.models.aasist import AASISTMultitask
 
 SPLITS = ("val_a", "val_b", "val_c", "val_d")
 
@@ -29,11 +30,17 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def load_spec(path, device):
+def load_voice(path, device):
     checkpoint = torch.load(path, map_location="cpu")
-    if checkpoint.get("backbone") != "spec_cnn" or checkpoint.get("task") != "voice":
-        raise RuntimeError("not a strict voice SpecCNN checkpoint")
-    model = MusicMultitask(base_channels=int(checkpoint.get("base_channels", 32)))
+    if checkpoint.get("task") != "voice":
+        raise RuntimeError("not a strict voice checkpoint")
+    backbone = checkpoint.get("backbone")
+    if backbone == "spec_cnn":
+        model = MusicMultitask(base_channels=int(checkpoint.get("base_channels", 32)))
+    elif backbone == "aasist":
+        model = AASISTMultitask(base_channels=int(checkpoint.get("base_channels", 32)))
+    else:
+        raise RuntimeError(f"unsupported strict voice backbone: {backbone}")
     model.load_state_dict(checkpoint["model"], strict=True)
     return model.to(device).eval(), checkpoint
 
@@ -45,7 +52,10 @@ def main():
     parser.add_argument("--only-current-and-extra", action="store_true")
     parser.add_argument("--output", default="experiments/v7/voice_architecture_ablation.json")
     args = parser.parse_args()
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() else
+        "xpu" if hasattr(torch, "xpu") and torch.xpu.is_available() else "cpu"
+    )
     weights = json.loads((ROOT / "model/fusion_weights.json").read_text(encoding="utf-8"))
     adaptive = {"enabled": False, "low": 0.0, "high": 1.0, "aggregation": "mean"}
     candidates = [
@@ -71,7 +81,7 @@ def main():
             results.append({"candidate": name, "status": "NOT RUN", "reason": "checkpoint missing"})
             continue
         try:
-            model, metadata = load_spec(path, device)
+            model, metadata = load_voice(path, device)
         except Exception as error:
             results.append({"candidate": name, "status": "REJECTED", "reason": str(error)})
             continue
@@ -127,7 +137,11 @@ def main():
         "final_holdout": "NOT RUN",
         "results": results,
         "new_aasist_training": {
-            "status": "NOT RUN", "reason": "CUDA unavailable; CPU-only run would not be a controlled practical experiment"},
+            "status": "MEASURED" if any(
+                item.get("candidate", "").startswith("v9_aasist")
+                and item.get("status", "").startswith("MEASURED") for item in results
+            ) else "NOT RUN"
+        },
         "ssl_backbone": {"status": "NOT RUN", "reason": "no licensed offline checkpoint is bundled"},
         "selected": selected["candidate"],
         "decision": ("ADOPT" if eligible else "KEEP_CURRENT_NO_STRICT_ROBUST_IMPROVEMENT"),

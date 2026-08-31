@@ -12,6 +12,11 @@ third-party artifact. Training audio is not included in `submit.zip`.
 | MusicGen outputs | https://huggingface.co/facebook/musicgen-large | Model weights CC BY-NC 4.0; non-commercial restriction. Output rights may also depend on prompts/source material | Do not assume commercial or unrestricted redistribution | 150 fake music |
 | AudioLDM2 outputs | https://audioldm.github.io/audioldm2/ | Exact checkpoint/output license used by the historical generator run was not recorded | **Unknown; do not redistribute until verified** | 150 fake music |
 | Project procedural v8 | `tools/procedural_audio_v8.py` | Project-authored numeric synthesis with no corpus, text, MIDI, pretrained model, sample, or web input | Project-owned output; organiser eligibility remains the final authority | 930 generated fake files in a separate candidate manifest |
+| MLAAD-tiny v9 candidate | https://huggingface.co/datasets/mueller91/MLAAD-tiny (pinned revision `9143e5e`) | Fake audio CC BY-NC 4.0; paired originals retain the M-AILABS corpus notice | Attribution/non-commercial conditions apply; audio is not committed | 120 matched train real/fake pairs across 12 TTS/VC families; 40 disjoint unseen-validation pairs across 4 families |
+| SONICS v9 candidate | https://github.com/awsaf49/sonics | Dataset CC BY-NC 4.0 | Attribution/non-commercial conditions apply; audio is not committed | 320 vocal synthetic songs across five Suno/Udio model generations |
+| GuitarSet v9 candidate | https://zenodo.org/records/3371780 | CC BY 4.0 | Attribution required; audio is not committed | 360 real microphone recordings from 6 players |
+| MTG-Jamendo v9 candidate | https://github.com/MTG/mtg-jamendo-dataset | Per-track Creative Commons licenses; metadata code/repository terms are separate | Only tracks with an explicit CC license permitting derivatives are accepted | 350 real low-bitrate tracks from 294 artists; checksum-pinned official shard |
+| Echoes + FMA paired v9 candidate | https://huggingface.co/datasets/Octavian97/Echoes and https://github.com/mdeff/fma | Echoes generated audio CC BY-SA 4.0; each original FMA track retains its artist-selected CC license | Unknown and NoDerivatives FMA rows are rejected; attribution/ShareAlike/non-commercial terms vary per pair | 55 content-matched groups, 10 train and 2 unseen fake generators, 295 deduplicated rows |
 
 All local audio was decoded to mono 16 kHz. Training adds common random gain,
 noise, EQ/band-limit, reverb, clipping and dynamic-range transforms regardless
@@ -46,6 +51,42 @@ fake/component diversity needed to form metric-complete training and
 validation splits. Consequently `best_approved_only.pt` is **NOT RUN** rather
 than being produced from an invalid one-class experiment. No unresolved row is
 automatically promoted to approved status.
+
+## Public diversity v9 candidate
+
+`scripts/prepare_public_diversity_v9.py` pins MLAAD-tiny to one repository
+revision and downloads only exact real/fake content pairs. The split group is
+the original utterance identity, not the generator or rendered filename. The
+12 training generators and four unseen-validation generators have zero content
+group overlap. This directly removes the old voice shortcut in which real and
+fake labels identified different source corpora.
+
+The same script extracts five official SONICS generator families. Together with
+the existing MusicGen family and ten training Echoes generators, the candidate
+TRAIN pool contains 16 non-mix music generator families (AudioLDM2 remains an
+existing held-out family).
+SONICS real tracks are represented only by YouTube
+IDs and are deliberately not downloaded; doing so would bypass the repository's
+audio-distribution and per-track rights boundary.
+
+`scripts/prepare_real_music_v9.py` adds two independent real-music sources. It
+verifies the official GuitarSet archive size, the official MTG-Jamendo shard
+and per-track hashes, and rejects missing, unknown, or NoDerivatives licenses.
+FMA support remains optional because the full official archive is large; FMA
+tracks are likewise filtered by their artist-selected per-track licenses.
+
+`scripts/prepare_echoes_paired_v9.py` pins and hashes the Echoes archive, resolves
+its exact `title - artist` reference against official FMA metadata, and downloads
+only the matching FMA originals from official storage. Every accepted group has
+both its real original and at least one generated counterpart. Ten generator
+families are training candidates; DiffRhythm and SongGen plus their original
+content are isolated in VAL-B. Unknown, ambiguous, and NoDerivatives originals
+are rejected before acquisition.
+
+All v9 artifacts are candidates only. They do not overwrite the selected v7
+checkpoint, do not read the v6 final holdout, and are not included in
+`submit.zip`. CC BY-NC data assumes the DACON run is non-commercial; this record
+is not legal advice and organizer rules remain authoritative.
 
 ## Project-created procedural v8 candidate
 

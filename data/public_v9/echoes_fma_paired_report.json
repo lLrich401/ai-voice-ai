@@ -1,0 +1,26 @@
+{
+  "rows": 295,
+  "content_groups": 55,
+  "train_content_groups": 35,
+  "unseen_validation_content_groups": 20,
+  "train_generators": [
+    "Echoes::acestep",
+    "Echoes::audioldm",
+    "Echoes::brev",
+    "Echoes::elevenlabs",
+    "Echoes::mubert",
+    "Echoes::musicgen",
+    "Echoes::producer",
+    "Echoes::stableaudio",
+    "Echoes::suno",
+    "Echoes::udio"
+  ],
+  "unseen_generators": [
+    "Echoes::diffrhythm",
+    "Echoes::songgen"
+  ],
+  "cross_role_group_overlap": 0,
+  "all_groups_paired": true,
+  "echoes_archive_sha256": "8746dcb367f2f547399201d442ffab9121c36415815947ed4784e29b60e25b59",
+  "final_holdout": "NOT READ / NOT RUN"
+}

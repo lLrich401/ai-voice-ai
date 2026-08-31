@@ -1,0 +1,40 @@
+{
+  "status": "MEASURED_NON_FINAL_VALIDATION",
+  "decision": "KEEP_SELECTED_V7_PIPELINE",
+  "final_holdout": "NOT RUN",
+  "selected_voice_checkpoint_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+  "selected_model_changed": false,
+  "fusion_changed": false,
+  "val_c_d_diagnosis": {
+    "val_c": "Historical VAL-C is one fixed 3.5 kHz low-pass, not a real codec suite. Independent stress shows the severe 8 kHz + 8-bit profile moves the bottleneck to FILE/MUSIC while VOICE EER remains at clean baseline.",
+    "val_d": "Historical difficult rows show a disproportionate DF fake-score drop, but independent content does not reproduce a general telephone EER regression. Dynamic channel-dependent DF weighting was rejected as content-specific overfit.",
+    "quantizer_bug": "Unsigned-level mapping introduced DC into silence; replaced with signed zero-preserving quantization and all quantized profiles were rerun."
+  },
+  "candidates": {
+    "v10_scratch": {"decision": "REJECT", "reason": "VAL-B and VAL-D voice EER regressed"},
+    "v10_finetune": {"decision": "REJECT", "reason": "VAL-D voice EER improved 0.208333 to 0.187500, but VAL-B regressed 0.145833 to 0.166667"},
+    "v10_weight_interpolation": {"decision": "REJECT", "reason": "D improvement begins near alpha 0.60 exactly where VAL-B regression begins; no strict no-regression candidate"}
+  },
+  "selected_validation": {
+    "val_a": {"voice_eer": 0.1458333333, "file_eer": 0.0854166667, "total": 0.9277506510},
+    "val_b": {"voice_eer": 0.1458333333, "file_eer": 0.1479166667, "total": 0.8973470052},
+    "val_c": {"voice_eer": 0.1666666667, "file_eer": 0.1020833333, "total": 0.9158496094},
+    "val_d": {"voice_eer": 0.2083333333, "file_eer": 0.1479166667, "total": 0.8873990885}
+  },
+  "artifacts": {
+    "channel_stress": "experiments/v10/channel_stress_final.json",
+    "scratch_ablation": "experiments/v10/voice_architecture_ablation.json",
+    "finetune_ablation": "experiments/v10/voice_finetune_ablation.json",
+    "interpolation_ablation": "experiments/v10/voice_interpolation_boundary.json"
+  },
+  "verification": {
+    "pytest": "77 passed in 18.97s",
+    "runtime_source_byte_equal": true,
+    "submission_validation": "PASS",
+    "offline_smoke_files": 3,
+    "offline_smoke_seconds": 5.4,
+    "submit_zip_size_bytes": 935630022,
+    "submit_zip_sha256": "885156505bd7ad8a1a0632ffe83799b5c982093b08e4256c7e7cd9ccd4da44e0",
+    "official_server_runtime": "NOT RUN"
+  }
+}

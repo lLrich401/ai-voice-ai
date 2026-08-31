@@ -1,0 +1,67 @@
+{
+  "status": "MEASURED_NON_FINAL_EXPANDED_VALIDATION",
+  "final_holdout": "NOT RUN",
+  "results": {
+    "current_music_spec_cnn": {
+      "checkpoint_sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+      "domains": {
+        "val_a": {
+          "music_eer": 0.0,
+          "music_auc": 0.9987441085993284,
+          "file_eer": 0.22903924180948343,
+          "score": 0.7423328173442842
+        },
+        "val_b": {
+          "music_eer": 0.1818181818181818,
+          "music_auc": 0.9979578392621871,
+          "file_eer": 0.31429217548620536,
+          "score": 0.6825552919352362
+        },
+        "val_c": {
+          "music_eer": 0.0,
+          "music_auc": 0.9998871108853329,
+          "file_eer": 0.23455762126809182,
+          "score": 0.7565430161232539
+        },
+        "val_d": {
+          "music_eer": 0.0,
+          "music_auc": 0.9999576665819998,
+          "file_eer": 0.2235208623508751,
+          "score": 0.7526345222557453
+        }
+      }
+    },
+    "v9_expanded_music_spec_cnn": {
+      "checkpoint_sha256": "531ac6cd8f1f2b56d5c4760d7e95b146e1ea09fdc6ebd830167427d6206cf03a",
+      "domains": {
+        "val_a": {
+          "music_eer": 0.01578991107786922,
+          "music_auc": 0.9995625546806649,
+          "file_eer": 0.20293102404166413,
+          "score": 0.742769363146261
+        },
+        "val_b": {
+          "music_eer": 0.10245310245310246,
+          "music_auc": 0.9976504172156346,
+          "file_eer": 0.24737675260063322,
+          "score": 0.7155724626591266
+        },
+        "val_c": {
+          "music_eer": 0.01578991107786922,
+          "music_auc": 0.9999012220246662,
+          "file_eer": 0.2084494035002725,
+          "score": 0.7422308161312473
+        },
+        "val_d": {
+          "music_eer": 0.013172110030748802,
+          "music_auc": 0.9992944430333305,
+          "file_eer": 0.2385923212014776,
+          "score": 0.7311123594085064
+        }
+      }
+    }
+  },
+  "no_domain_music_eer_regression": false,
+  "no_domain_music_auc_regression": false,
+  "decision": "REJECT"
+}

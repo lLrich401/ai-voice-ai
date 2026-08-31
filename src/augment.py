@@ -20,6 +20,15 @@ except:
 
 import math
 
+
+def _fast_fir(wave, impulse):
+    """Length-preserving FIR convolution without quadratic NumPy cost."""
+    try:
+        from scipy.signal import fftconvolve
+        return fftconvolve(wave, impulse, mode="full")[:len(wave)]
+    except Exception:
+        return np.convolve(wave, impulse, mode="full")[:len(wave)]
+
 def random_gain(wave, low_db=-12, high_db=6):
     gain_db = random.uniform(low_db, high_db)
     gain = 10**(gain_db/20)
@@ -131,6 +140,15 @@ def alaw_encode_decode(wave, a=87.6, p=1.0):
     )
     return (np.sign(quantized) * expanded).astype(np.float32)
 
+
+def signed_linear_quantize(wave, bits=8):
+    """Linear PCM stress quantizer that preserves signed zero exactly."""
+    maximum = float((1 << (int(bits) - 1)) - 1)
+    if maximum < 1:
+        raise ValueError("quantization requires at least 2 bits")
+    source = np.clip(np.asarray(wave, dtype=np.float32), -1.0, 1.0)
+    return np.clip(np.round(source * maximum) / maximum, -1.0, 1.0).astype(np.float32)
+
 def resample_roundtrip(wave, sr=16000, target_rates=(8000, 11025, 12000), p=0.25):
     """Simulate unknown capture rates while returning the canonical sample rate."""
     if random.random() > p:
@@ -167,10 +185,41 @@ def reverb_aug(wave, sr=16000, p=0.2):
     ir_len = int(rt60 * sr * 0.5)
     ir = np.exp(-3*np.arange(ir_len)/(rt60*sr)) * np.random.randn(ir_len)*0.3
     ir[0]=1
-    reverbed = np.convolve(wave, ir, mode='full')[:len(wave)]
+    reverbed = _fast_fir(wave, ir)
     mix = random.uniform(0.1, 0.4)
     out = (1-mix)*wave + mix*reverbed / (np.max(np.abs(reverbed))+1e-6) * np.max(np.abs(wave))
     return np.clip(out, -1, 1).astype(np.float32)
+
+
+def rerecording_simulation(wave, sr=16000, p=0.25):
+    """Moderate loudspeaker-room-microphone simulation.
+
+    This is deliberately a compact channel model rather than a synthetic fake
+    generator.  It preserves speech content and synthesis traces while adding
+    a short room response, speaker/microphone coloration, mild non-linearity,
+    and a realistic low noise floor.
+    """
+    if random.random() > p or len(wave) == 0:
+        return wave
+    source = np.asarray(wave, dtype=np.float32)
+    ir_length = max(8, int(round(random.uniform(0.025, 0.12) * sr)))
+    impulse = np.zeros(ir_length, dtype=np.float32)
+    impulse[0] = 1.0
+    for _ in range(random.randint(2, 6)):
+        delay = random.randint(max(1, int(0.003 * sr)), ir_length - 1)
+        impulse[delay] += random.uniform(-0.35, 0.35) * np.exp(-3.0 * delay / ir_length)
+    tail = np.random.randn(ir_length).astype(np.float32)
+    tail *= np.exp(-5.0 * np.arange(ir_length, dtype=np.float32) / ir_length)
+    impulse += tail * random.uniform(0.002, 0.015)
+    recorded = _fast_fir(source, impulse)
+    recorded = high_pass_filter(recorded, sr, random.uniform(60.0, 180.0))
+    recorded = low_pass_filter(recorded, sr, random.uniform(4200.0, 7600.0))
+    drive = random.uniform(1.0, 1.8)
+    recorded = np.tanh(recorded * drive) / np.tanh(drive)
+    signal_rms = float(np.sqrt(np.mean(recorded ** 2) + 1e-12))
+    noise_rms = signal_rms / (10.0 ** (random.uniform(28.0, 45.0) / 20.0))
+    recorded += np.random.randn(len(recorded)).astype(np.float32) * noise_rms
+    return np.clip(recorded, -1.0, 1.0).astype(np.float32)
 
 def clipping_aug(wave, p=0.1):
     if random.random() > p:
@@ -193,6 +242,48 @@ class AugmentationPipeline:
     def __call__(self, wave):
         if not self.is_training:
             return wave
+        if self.profile == "voice_channel_v10":
+            # One primary channel is chosen for every source/class. Avoiding a
+            # stack of unrelated heavy transforms preserves synthesis traces
+            # and prevents the augmentation recipe itself becoming a shortcut.
+            channels = (
+                "clean", "clean", "clean",
+                "codec_variable", "codec_narrow",
+                "telephone_mulaw", "telephone_alaw", "telephone_narrow",
+                "telephone_lowbit", "rerecord",
+            )
+            channel = random.choice(channels)
+            if channel == "codec_variable":
+                wave = low_pass_filter(wave, self.sr, random.uniform(4200.0, 7000.0))
+                if random.random() < 0.6:
+                    wave = resample_roundtrip(
+                        wave, self.sr, target_rates=(11025, 12000), p=1.0)
+                wave = signed_linear_quantize(wave, random.choice((10, 12)))
+            elif channel == "codec_narrow":
+                wave = low_pass_filter(wave, self.sr, random.uniform(3000.0, 3600.0))
+                wave = resample_roundtrip(wave, self.sr, target_rates=(8000,), p=1.0)
+                wave = signed_linear_quantize(wave, 8)
+            elif channel.startswith("telephone_"):
+                low, high = ((400.0, 3000.0) if channel == "telephone_narrow"
+                             else (300.0, 3400.0))
+                wave = band_pass_filter(wave, self.sr, low, high)
+                wave = resample_roundtrip(wave, self.sr, target_rates=(8000,), p=1.0)
+                if channel == "telephone_mulaw" or channel == "telephone_narrow":
+                    wave = mulaw_encode_decode(wave, p=1.0)
+                elif channel == "telephone_alaw":
+                    wave = alaw_encode_decode(wave, p=1.0)
+                else:
+                    # Deliberately low-probability severe robustness stress;
+                    # this is not represented as a bit-exact GSM codec.
+                    wave = signed_linear_quantize(wave, 6)
+            elif channel == "rerecord":
+                wave = rerecording_simulation(wave, self.sr, p=1.0)
+            if random.random() < 0.7:
+                wave = random_gain(wave, -4.0, 4.0)
+            wave = add_noise(wave, (18, 40), p=0.2)
+            wave = reverb_aug(wave, self.sr, p=0.08)
+            wave = short_dropout(wave, self.sr, max_duration_sec=0.04, p=0.05)
+            return np.clip(wave, -1.0, 1.0).astype(np.float32)
         wave = random_gain(wave, -6, 6)
         wave = add_noise(wave, (10, 30), p=0.3)
         if random.random() < 0.5:
@@ -200,11 +291,16 @@ class AugmentationPipeline:
         wave = reverb_aug(wave, self.sr, p=0.15)
         wave = clipping_aug(wave, p=0.05)
         wave = dynamic_range_compression(wave, p=0.1)
-        if self.profile == "voice_channel_v7":
+        if self.profile in ("voice_channel_v7", "voice_channel_v9"):
             # Exactly one primary channel family is selected so the synthesis
             # trace is not destroyed by a stack of unrealistically strong
             # transformations. Remaining perturbations are deliberately mild.
-            channel = random.choice(("clean", "telephone", "mulaw", "alaw", "low_bitrate"))
+            channels = ["clean", "telephone", "mulaw", "alaw", "low_bitrate"]
+            if self.profile == "voice_channel_v9":
+                # Two slots give re-recording meaningful exposure without
+                # stacking it on every sample or erasing generator artifacts.
+                channels.extend(("rerecord", "rerecord"))
+            channel = random.choice(channels)
             if channel == "telephone":
                 wave = telephone_simulation(wave, self.sr, p=1.0)
             elif channel == "mulaw":
@@ -213,8 +309,17 @@ class AugmentationPipeline:
                 wave = alaw_encode_decode(wave, p=1.0)
             elif channel == "low_bitrate":
                 wave = low_pass_filter(wave, self.sr, random.uniform(2800, 5200))
-            wave = resample_roundtrip(wave, self.sr, p=0.35)
-            wave = short_dropout(wave, self.sr, p=0.08)
+            elif channel == "rerecord":
+                wave = rerecording_simulation(wave, self.sr, p=1.0)
+            wave = resample_roundtrip(
+                wave, self.sr,
+                target_rates=(8000, 11025, 12000, 22050, 44100),
+                p=0.45 if self.profile == "voice_channel_v9" else 0.35,
+            )
+            wave = short_dropout(
+                wave, self.sr, max_duration_sec=0.06,
+                p=0.12 if self.profile == "voice_channel_v9" else 0.08,
+            )
         elif self.profile != "baseline":
             raise ValueError(f"Unknown augmentation profile: {self.profile}")
         wave = np.clip(wave, -1.0, 1.0)

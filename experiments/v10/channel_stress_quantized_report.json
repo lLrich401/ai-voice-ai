@@ -1,0 +1,85 @@
+{
+  "status": "MEASURED_NON_FINAL_CHANNEL_STRESS",
+  "final_holdout": "NOT RUN",
+  "source_split": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\splits\\val_a.csv",
+  "source_split_sha256": "e17d764df6ed8df0268b5dbded9537fe4d63a19b65465f59ede3d7ac134b56bc",
+  "diagnostic_cache_overlap": 0,
+  "samples_per_profile": 192,
+  "profiles": {
+    "codec_lp52": {
+      "augment": "codec_lp52",
+      "runtime_seconds": 223.5614818999893,
+      "metrics": {
+        "file_eer": 0.06185074626865669,
+        "voice_eer": 0.06818181818181816,
+        "music_eer": 0.0,
+        "voice_auc": 0.9838154708805913,
+        "music_auc": 0.9995441595441595,
+        "ads": 0.9554382632293081,
+        "cps": 0.9916798152123754,
+        "score": 0.9590624184276149,
+        "total": 0.9590624184276149
+      }
+    },
+    "codec_resample12_q12": {
+      "augment": "codec_resample12_q12",
+      "runtime_seconds": 200.76826519999304,
+      "metrics": {
+        "file_eer": 0.05785074626865669,
+        "voice_eer": 0.06818181818181816,
+        "music_eer": 0.0,
+        "voice_auc": 0.9830508474576272,
+        "music_auc": 0.9994301994301994,
+        "ads": 0.9574382632293081,
+        "cps": 0.9912405234439132,
+        "score": 0.9608184892507687,
+        "total": 0.9608184892507687
+      }
+    },
+    "codec_narrow_q8": {
+      "augment": "codec_narrow_q8",
+      "runtime_seconds": 196.54626559998724,
+      "metrics": {
+        "file_eer": 0.08877611940298509,
+        "voice_eer": 0.07467532467532466,
+        "music_eer": 0.008333333333333333,
+        "voice_auc": 0.9816490378488595,
+        "music_auc": 0.9997720797720797,
+        "ads": 0.9381768753634425,
+        "cps": 0.9907105588104697,
+        "score": 0.9434302437081452,
+        "total": 0.9434302437081452
+      }
+    },
+    "codec_wide_q10": {
+      "augment": "codec_wide_q10",
+      "runtime_seconds": 186.2805812000006,
+      "metrics": {
+        "file_eer": 0.0733134328358209,
+        "voice_eer": 0.06818181818181816,
+        "music_eer": 0.0,
+        "voice_auc": 0.9838154708805914,
+        "music_auc": 0.9993162393162393,
+        "ads": 0.949706919945726,
+        "cps": 0.9915658550984153,
+        "score": 0.953892813460995,
+        "total": 0.953892813460995
+      }
+    },
+    "telephone_gsm_proxy": {
+      "augment": "telephone_gsm_proxy",
+      "runtime_seconds": 181.2002520999813,
+      "metrics": {
+        "file_eer": 0.11970149253731344,
+        "voice_eer": 0.14285714285714288,
+        "music_eer": 0.0,
+        "voice_auc": 0.9722186822989678,
+        "music_auc": 0.9961253561253562,
+        "ads": 0.9115778251599147,
+        "cps": 0.984172019212162,
+        "score": 0.9188372445651394,
+        "total": 0.9188372445651394
+      }
+    }
+  }
+}

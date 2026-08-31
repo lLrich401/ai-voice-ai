@@ -1,0 +1,84 @@
+{
+  "rows": 1645,
+  "decoded": 1645,
+  "failures": [],
+  "status": "PASS",
+  "thresholds": {
+    "min_duration_seconds": 0.5,
+    "min_rms_dbfs": -60.0,
+    "max_clipping_fraction": 0.05
+  },
+  "by_dataset": {
+    "echoes_fma_paired": {
+      "files": 295,
+      "duration_hours": 12.23276083715199,
+      "duration_median_seconds": 150.9673469387755,
+      "sample_rates": {
+        "44100": 155,
+        "48000": 80,
+        "16000": 40,
+        "32000": 20
+      },
+      "channels": {
+        "2": 234,
+        "1": 61
+      },
+      "rms_dbfs_median": -19.150566038975292,
+      "clipping_fraction_p99": 0.028976770833333346
+    },
+    "guitarset_mic": {
+      "files": 360,
+      "duration_hours": 3.0467878306878307,
+      "duration_median_seconds": 29.497392290249433,
+      "sample_rates": {
+        "44100": 360
+      },
+      "channels": {
+        "1": 360
+      },
+      "rms_dbfs_median": -26.87278896112919,
+      "clipping_fraction_p99": 3.7792894935752077e-06
+    },
+    "mlaad_tiny_matched": {
+      "files": 320,
+      "duration_hours": 0.6547064756944443,
+      "duration_median_seconds": 6.9253125,
+      "sample_rates": {
+        "16000": 320
+      },
+      "channels": {
+        "1": 320
+      },
+      "rms_dbfs_median": -24.911602341810827,
+      "clipping_fraction_p99": 1.885416666666669e-05
+    },
+    "mtg_jamendo_cc": {
+      "files": 350,
+      "duration_hours": 22.357913829640655,
+      "duration_median_seconds": 211.59665625000002,
+      "sample_rates": {
+        "44100": 338,
+        "48000": 12
+      },
+      "channels": {
+        "1": 350
+      },
+      "rms_dbfs_median": -18.768031331532022,
+      "clipping_fraction_p99": 0.0018876417233560058
+    },
+    "sonics_official": {
+      "files": 320,
+      "duration_hours": 11.60912673611111,
+      "duration_median_seconds": 131.1146875,
+      "sample_rates": {
+        "16000": 320
+      },
+      "channels": {
+        "1": 320
+      },
+      "rms_dbfs_median": -17.39801566410989,
+      "clipping_fraction_p99": 0.000125
+    }
+  },
+  "final_holdout": "NOT READ / NOT RUN"
+}

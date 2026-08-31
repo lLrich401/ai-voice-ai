@@ -1,0 +1,10 @@
+{
+  "torch": "2.13.0+xpu",
+  "cuda_available": false,
+  "cuda_device_count": 0,
+  "xpu_available": true,
+  "xpu_device_count": 1,
+  "device": "xpu",
+  "device_name": "Intel(R) Arc(TM) B390 GPU",
+  "final_holdout": "PROHIBITED / NOT RUN"
+}

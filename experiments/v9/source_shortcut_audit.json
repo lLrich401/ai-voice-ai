@@ -1,0 +1,38 @@
+{
+  "dataset": "MLAAD-tiny and Echoes-FMA matched candidates",
+  "rows": 320,
+  "real_rows": 160,
+  "fake_rows": 160,
+  "content_groups": 160,
+  "groups_with_both_real_and_fake": 160,
+  "train_validation_content_group_overlap": 0,
+  "container_feature_counts": {
+    "real": {
+      "sample_rate_16000": 160,
+      "mono": 160,
+      "pcm_16": 160
+    },
+    "fake": {
+      "sample_rate_16000": 160,
+      "mono": 160,
+      "pcm_16": 160
+    }
+  },
+  "duration_seconds": {
+    "real_mean": 7.46,
+    "real_median": 7.55,
+    "fake_mean": 7.265,
+    "fake_median": 6.5
+  },
+  "conclusion": "Dataset/source/container identifiers are label-balanced and exact original-content pairs share one split group. Duration is not forced equal because duration itself may be a generator behavior; training channel randomization further reduces codec shortcuts.",
+  "music_pair_audit": {
+    "dataset": "Echoes-FMA-paired",
+    "rows": 295,
+    "content_groups": 55,
+    "groups_with_both_real_and_fake": 55,
+    "train_validation_content_group_overlap": 0,
+    "train_fake_generators": 10,
+    "unseen_validation_fake_generators": 2
+  },
+  "final_holdout": "NOT READ / NOT RUN"
+}

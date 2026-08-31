@@ -1,0 +1,278 @@
+{
+  "status": "MEASURED_INDEPENDENT_CALIBRATION_CANDIDATE_ONLY",
+  "final_holdout": "NOT RUN",
+  "selected_submission_files_mutated": false,
+  "current_model_current_weights_objective": 0.8883663603678957,
+  "candidate_current_weights_objective": 0.882999381173059,
+  "candidate_recalibrated_objective": 0.8848713515014921,
+  "current_folds": {
+    "cal_a": {
+      "file_eer": 0.14285714285714288,
+      "voice_eer": 0.24640760979558793,
+      "music_eer": 0.0,
+      "voice_auc": 0.9002347417840375,
+      "music_auc": 0.9631661442006269,
+      "ads": 0.879289906612311,
+      "cps": 0.9317004429923321,
+      "score": 0.8845309602503132,
+      "total": 0.8845309602503132
+    },
+    "cal_b": {
+      "file_eer": 0.12666255313314134,
+      "voice_eer": 0.19683598794662074,
+      "music_eer": 0.011667345000678363,
+      "voice_auc": 0.8764447987245915,
+      "music_auc": 0.9864606562599555,
+      "ads": 0.8938013223439016,
+      "cps": 0.9314527274922735,
+      "score": 0.8975664628587389,
+      "total": 0.8975664628587389
+    },
+    "cal_c": {
+      "file_eer": 0.1486842105263158,
+      "voice_eer": 0.20479962721342032,
+      "music_eer": 0.011680988184747602,
+      "voice_auc": 0.9151138716356109,
+      "music_auc": 0.9820577516119987,
+      "ads": 0.8811936728387337,
+      "cps": 0.9485858116238048,
+      "score": 0.8879328867172409,
+      "total": 0.8879328867172409
+    }
+  },
+  "candidate_initial_folds": {
+    "cal_a": {
+      "file_eer": 0.14285714285714288,
+      "voice_eer": 0.24640760979558793,
+      "music_eer": 0.011717171717171706,
+      "voice_auc": 0.9002347417840375,
+      "music_auc": 0.9780564263322884,
+      "ads": 0.8757747550971594,
+      "cps": 0.939145584058163,
+      "score": 0.8821118379932598,
+      "total": 0.8821118379932598
+    },
+    "cal_b": {
+      "file_eer": 0.15535444947209653,
+      "voice_eer": 0.19683598794662074,
+      "music_eer": 0.011667345000678363,
+      "voice_auc": 0.8764447987245915,
+      "music_auc": 0.985584581076776,
+      "ads": 0.879455374174424,
+      "cps": 0.9310146899006837,
+      "score": 0.8846113057470499,
+      "total": 0.8846113057470499
+    },
+    "cal_c": {
+      "file_eer": 0.1581140350877193,
+      "voice_eer": 0.20479962721342032,
+      "music_eer": 0.011680988184747602,
+      "voice_auc": 0.9151138716356109,
+      "music_auc": 0.9765909728062797,
+      "ads": 0.876478760558032,
+      "cps": 0.9458524222209452,
+      "score": 0.8834161267243233,
+      "total": 0.8834161267243233
+    }
+  },
+  "candidate_recalibrated_folds": {
+    "cal_a": {
+      "file_eer": 0.14285714285714288,
+      "voice_eer": 0.24640760979558793,
+      "music_eer": 0.011717171717171706,
+      "voice_auc": 0.9002347417840375,
+      "music_auc": 0.9780564263322884,
+      "ads": 0.8757747550971594,
+      "cps": 0.939145584058163,
+      "score": 0.8821118379932598,
+      "total": 0.8821118379932598
+    },
+    "cal_b": {
+      "file_eer": 0.14695598519127934,
+      "voice_eer": 0.19683598794662074,
+      "music_eer": 0.011667345000678363,
+      "voice_auc": 0.8764447987245915,
+      "music_auc": 0.985584581076776,
+      "ads": 0.8836546063148327,
+      "cps": 0.9310146899006837,
+      "score": 0.888390614673418,
+      "total": 0.888390614673418
+    },
+    "cal_c": {
+      "file_eer": 0.1486842105263158,
+      "voice_eer": 0.20479962721342032,
+      "music_eer": 0.011680988184747602,
+      "voice_auc": 0.9151138716356109,
+      "music_auc": 0.9765909728062797,
+      "ads": 0.8811936728387337,
+      "cps": 0.9458524222209452,
+      "score": 0.8876595477769549,
+      "total": 0.8876595477769549
+    }
+  },
+  "candidate_weights": {
+    "w_voice_file": 0.25,
+    "w_music_file": 0.5,
+    "w_prob_or": 0.25,
+    "w_df_arena": 0.25,
+    "w_df_voice_component": 0.3,
+    "w_df_music_component": 0.05,
+    "w_panns_presence": 0.75,
+    "file_fusion_mode": "legacy",
+    "df_gate_policy": "off",
+    "adaptive_df_enabled": false,
+    "music_checkpoint_sha256": "531ac6cd8f1f2b56d5c4760d7e95b146e1ea09fdc6ebd830167427d6206cf03a"
+  },
+  "coordinate_trace": [
+    {
+      "pass": 1,
+      "coordinate": "detector",
+      "objective": 0.8838812199225448,
+      "weights": {
+        "w_voice_file": 0.25,
+        "w_music_file": 0.5,
+        "w_prob_or": 0.25,
+        "w_df_arena": 0.25,
+        "w_df_voice_component": 0.3,
+        "w_df_music_component": 0.0,
+        "w_panns_presence": 0.75,
+        "file_fusion_mode": "legacy"
+      }
+    },
+    {
+      "pass": 1,
+      "coordinate": "w_df_arena",
+      "objective": 0.8838812199225448,
+      "weights": {
+        "w_voice_file": 0.25,
+        "w_music_file": 0.5,
+        "w_prob_or": 0.25,
+        "w_df_arena": 0.25,
+        "w_df_voice_component": 0.3,
+        "w_df_music_component": 0.0,
+        "w_panns_presence": 0.75,
+        "file_fusion_mode": "legacy"
+      }
+    },
+    {
+      "pass": 1,
+      "coordinate": "w_df_voice_component",
+      "objective": 0.8838812199225448,
+      "weights": {
+        "w_voice_file": 0.25,
+        "w_music_file": 0.5,
+        "w_prob_or": 0.25,
+        "w_df_arena": 0.25,
+        "w_df_voice_component": 0.3,
+        "w_df_music_component": 0.0,
+        "w_panns_presence": 0.75,
+        "file_fusion_mode": "legacy"
+      }
+    },
+    {
+      "pass": 1,
+      "coordinate": "w_df_music_component",
+      "objective": 0.8848713515014921,
+      "weights": {
+        "w_voice_file": 0.25,
+        "w_music_file": 0.5,
+        "w_prob_or": 0.25,
+        "w_df_arena": 0.25,
+        "w_df_voice_component": 0.3,
+        "w_df_music_component": 0.05,
+        "w_panns_presence": 0.75,
+        "file_fusion_mode": "legacy"
+      }
+    },
+    {
+      "pass": 1,
+      "coordinate": "w_panns_presence",
+      "objective": 0.8848713515014921,
+      "weights": {
+        "w_voice_file": 0.25,
+        "w_music_file": 0.5,
+        "w_prob_or": 0.25,
+        "w_df_arena": 0.25,
+        "w_df_voice_component": 0.3,
+        "w_df_music_component": 0.05,
+        "w_panns_presence": 0.75,
+        "file_fusion_mode": "legacy"
+      }
+    },
+    {
+      "pass": 2,
+      "coordinate": "detector",
+      "objective": 0.8848713515014921,
+      "weights": {
+        "w_voice_file": 0.25,
+        "w_music_file": 0.5,
+        "w_prob_or": 0.25,
+        "w_df_arena": 0.25,
+        "w_df_voice_component": 0.3,
+        "w_df_music_component": 0.05,
+        "w_panns_presence": 0.75,
+        "file_fusion_mode": "legacy"
+      }
+    },
+    {
+      "pass": 2,
+      "coordinate": "w_df_arena",
+      "objective": 0.8848713515014921,
+      "weights": {
+        "w_voice_file": 0.25,
+        "w_music_file": 0.5,
+        "w_prob_or": 0.25,
+        "w_df_arena": 0.25,
+        "w_df_voice_component": 0.3,
+        "w_df_music_component": 0.05,
+        "w_panns_presence": 0.75,
+        "file_fusion_mode": "legacy"
+      }
+    },
+    {
+      "pass": 2,
+      "coordinate": "w_df_voice_component",
+      "objective": 0.8848713515014921,
+      "weights": {
+        "w_voice_file": 0.25,
+        "w_music_file": 0.5,
+        "w_prob_or": 0.25,
+        "w_df_arena": 0.25,
+        "w_df_voice_component": 0.3,
+        "w_df_music_component": 0.05,
+        "w_panns_presence": 0.75,
+        "file_fusion_mode": "legacy"
+      }
+    },
+    {
+      "pass": 2,
+      "coordinate": "w_df_music_component",
+      "objective": 0.8848713515014921,
+      "weights": {
+        "w_voice_file": 0.25,
+        "w_music_file": 0.5,
+        "w_prob_or": 0.25,
+        "w_df_arena": 0.25,
+        "w_df_voice_component": 0.3,
+        "w_df_music_component": 0.05,
+        "w_panns_presence": 0.75,
+        "file_fusion_mode": "legacy"
+      }
+    },
+    {
+      "pass": 2,
+      "coordinate": "w_panns_presence",
+      "objective": 0.8848713515014921,
+      "weights": {
+        "w_voice_file": 0.25,
+        "w_music_file": 0.5,
+        "w_prob_or": 0.25,
+        "w_df_arena": 0.25,
+        "w_df_voice_component": 0.3,
+        "w_df_music_component": 0.05,
+        "w_panns_presence": 0.75,
+        "file_fusion_mode": "legacy"
+      }
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+  "final_holdout": "NOT RUN",
+  "results": [
+    {
+      "candidate": "current_spec_cnn",
+      "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+      "checkpoint_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+      "checkpoint_metadata_score": 0.6076511176205768,
+      "domains": {
+        "val_a": {
+          "raw_voice_eer": 0.41666666666666663,
+          "voice_eer": 0.14583333333333337,
+          "file_eer": 0.08541666666666667,
+          "total": 0.9277506510416667
+        },
+        "val_b": {
+          "raw_voice_eer": 0.39583333333333337,
+          "voice_eer": 0.14583333333333337,
+          "file_eer": 0.1479166666666667,
+          "total": 0.8973470052083334
+        },
+        "val_c": {
+          "raw_voice_eer": 0.35416666666666663,
+          "voice_eer": 0.16666666666666663,
+          "file_eer": 0.10208333333333333,
+          "total": 0.915849609375
+        },
+        "val_d": {
+          "raw_voice_eer": 0.45833333333333337,
+          "voice_eer": 0.20833333333333337,
+          "file_eer": 0.1479166666666667,
+          "total": 0.8873990885416667
+        }
+      },
+      "mean_voice_eer": 0.16666666666666669,
+      "worst_voice_eer": 0.20833333333333337,
+      "mean_total": 0.9070865885416667,
+      "worst_total": 0.8873990885416667,
+      "runtime_seconds": 12.85122440001578,
+      "no_domain_voice_regression": true,
+      "no_domain_total_regression": true
+    },
+    {
+      "candidate": "v10_channel",
+      "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+      "checkpoint_sha256": "c89ea3653369e93a2dd441af9e3fa16597d1bbc380e4ebccb6d294c1e1be3a80",
+      "checkpoint_metadata_score": 0.7251283638527704,
+      "domains": {
+        "val_a": {
+          "raw_voice_eer": 0.35416666666666663,
+          "voice_eer": 0.14583333333333337,
+          "file_eer": 0.10208333333333333,
+          "total": 0.9196972656250001
+        },
+        "val_b": {
+          "raw_voice_eer": 0.39583333333333337,
+          "voice_eer": 0.1875,
+          "file_eer": 0.125,
+          "total": 0.9010709635416666
+        },
+        "val_c": {
+          "raw_voice_eer": 0.375,
+          "voice_eer": 0.16666666666666663,
+          "file_eer": 0.10208333333333333,
+          "total": 0.9155891927083334
+        },
+        "val_d": {
+          "raw_voice_eer": 0.41666666666666663,
+          "voice_eer": 0.22916666666666663,
+          "file_eer": 0.1479166666666667,
+          "total": 0.8835188802083332
+        }
+      },
+      "mean_voice_eer": 0.18229166666666666,
+      "worst_voice_eer": 0.22916666666666663,
+      "mean_total": 0.9049690755208334,
+      "worst_total": 0.8835188802083332,
+      "runtime_seconds": 8.928505199990468,
+      "no_domain_voice_regression": false,
+      "no_domain_total_regression": false
+    }
+  ],
+  "new_aasist_training": {
+    "status": "NOT RUN"
+  },
+  "ssl_backbone": {
+    "status": "NOT RUN",
+    "reason": "no licensed offline checkpoint is bundled"
+  },
+  "selected": "current_spec_cnn",
+  "decision": "KEEP_CURRENT_NO_STRICT_ROBUST_IMPROVEMENT"
+}

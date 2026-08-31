@@ -1,0 +1,210 @@
+{
+  "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+  "final_holdout": "NOT RUN",
+  "results": [
+    {
+      "candidate": "current_spec_cnn",
+      "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+      "checkpoint_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+      "checkpoint_metadata_score": 0.6076511176205768,
+      "domains": {
+        "val_a": {
+          "raw_voice_eer": 0.41666666666666663,
+          "voice_eer": 0.14583333333333337,
+          "file_eer": 0.08541666666666667,
+          "total": 0.9277506510416667
+        },
+        "val_b": {
+          "raw_voice_eer": 0.39583333333333337,
+          "voice_eer": 0.14583333333333337,
+          "file_eer": 0.1479166666666667,
+          "total": 0.8973470052083334
+        },
+        "val_c": {
+          "raw_voice_eer": 0.35416666666666663,
+          "voice_eer": 0.16666666666666663,
+          "file_eer": 0.10208333333333333,
+          "total": 0.915849609375
+        },
+        "val_d": {
+          "raw_voice_eer": 0.45833333333333337,
+          "voice_eer": 0.20833333333333337,
+          "file_eer": 0.1479166666666667,
+          "total": 0.8873990885416667
+        }
+      },
+      "mean_voice_eer": 0.16666666666666669,
+      "worst_voice_eer": 0.20833333333333337,
+      "mean_total": 0.9070865885416667,
+      "worst_total": 0.8873990885416667,
+      "runtime_seconds": 12.739255599997705,
+      "no_domain_voice_regression": true,
+      "no_domain_total_regression": true
+    },
+    {
+      "candidate": "v10_interp_055",
+      "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+      "checkpoint_sha256": "9212e31f9872682b5a854f61d394fd9862bb9a3d58640d6bf698ad46300d9e91",
+      "checkpoint_metadata_score": null,
+      "domains": {
+        "val_a": {
+          "raw_voice_eer": 0.35416666666666663,
+          "voice_eer": 0.14583333333333337,
+          "file_eer": 0.08541666666666667,
+          "total": 0.927685546875
+        },
+        "val_b": {
+          "raw_voice_eer": 0.45833333333333337,
+          "voice_eer": 0.16666666666666663,
+          "file_eer": 0.1479166666666667,
+          "total": 0.893662109375
+        },
+        "val_c": {
+          "raw_voice_eer": 0.33333333333333337,
+          "voice_eer": 0.16666666666666663,
+          "file_eer": 0.10208333333333333,
+          "total": 0.9157356770833334
+        },
+        "val_d": {
+          "raw_voice_eer": 0.41666666666666663,
+          "voice_eer": 0.20833333333333337,
+          "file_eer": 0.1479166666666667,
+          "total": 0.8874479166666667
+        }
+      },
+      "mean_voice_eer": 0.171875,
+      "worst_voice_eer": 0.20833333333333337,
+      "mean_total": 0.9061328125000001,
+      "worst_total": 0.8874479166666667,
+      "runtime_seconds": 9.366683000000194,
+      "no_domain_voice_regression": false,
+      "no_domain_total_regression": false
+    },
+    {
+      "candidate": "v10_interp_060",
+      "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+      "checkpoint_sha256": "9d3554f339d6b076eaab152f9714ac3abf18902b6474403ff55bfce717da3948",
+      "checkpoint_metadata_score": null,
+      "domains": {
+        "val_a": {
+          "raw_voice_eer": 0.35416666666666663,
+          "voice_eer": 0.14583333333333337,
+          "file_eer": 0.08541666666666667,
+          "total": 0.927685546875
+        },
+        "val_b": {
+          "raw_voice_eer": 0.47916666666666663,
+          "voice_eer": 0.16666666666666663,
+          "file_eer": 0.1479166666666667,
+          "total": 0.893662109375
+        },
+        "val_c": {
+          "raw_voice_eer": 0.33333333333333337,
+          "voice_eer": 0.16666666666666663,
+          "file_eer": 0.10208333333333333,
+          "total": 0.9157356770833334
+        },
+        "val_d": {
+          "raw_voice_eer": 0.41666666666666663,
+          "voice_eer": 0.1875,
+          "file_eer": 0.1479166666666667,
+          "total": 0.8911816406249999
+        }
+      },
+      "mean_voice_eer": 0.16666666666666666,
+      "worst_voice_eer": 0.1875,
+      "mean_total": 0.9070662434895833,
+      "worst_total": 0.8911816406249999,
+      "runtime_seconds": 9.25555699999677,
+      "no_domain_voice_regression": false,
+      "no_domain_total_regression": false
+    },
+    {
+      "candidate": "v10_interp_065",
+      "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+      "checkpoint_sha256": "863ff91547dd8557b00c8485c5076d26ce08af6f3d22bc0f2641791c25c26b83",
+      "checkpoint_metadata_score": null,
+      "domains": {
+        "val_a": {
+          "raw_voice_eer": 0.35416666666666663,
+          "voice_eer": 0.14583333333333337,
+          "file_eer": 0.08541666666666667,
+          "total": 0.927685546875
+        },
+        "val_b": {
+          "raw_voice_eer": 0.45833333333333337,
+          "voice_eer": 0.16666666666666663,
+          "file_eer": 0.1479166666666667,
+          "total": 0.8936783854166668
+        },
+        "val_c": {
+          "raw_voice_eer": 0.3125,
+          "voice_eer": 0.16666666666666663,
+          "file_eer": 0.10208333333333333,
+          "total": 0.915751953125
+        },
+        "val_d": {
+          "raw_voice_eer": 0.41666666666666663,
+          "voice_eer": 0.1875,
+          "file_eer": 0.1479166666666667,
+          "total": 0.8911816406249999
+        }
+      },
+      "mean_voice_eer": 0.16666666666666666,
+      "worst_voice_eer": 0.1875,
+      "mean_total": 0.9070743815104167,
+      "worst_total": 0.8911816406249999,
+      "runtime_seconds": 9.300647700001718,
+      "no_domain_voice_regression": false,
+      "no_domain_total_regression": false
+    },
+    {
+      "candidate": "v10_interp_070",
+      "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
+      "checkpoint_sha256": "db59a0e381db822471e88ba03d7dc1f3aada1c900ef8c9551b7084177470d5f7",
+      "checkpoint_metadata_score": null,
+      "domains": {
+        "val_a": {
+          "raw_voice_eer": 0.35416666666666663,
+          "voice_eer": 0.14583333333333337,
+          "file_eer": 0.08541666666666667,
+          "total": 0.927685546875
+        },
+        "val_b": {
+          "raw_voice_eer": 0.45833333333333337,
+          "voice_eer": 0.16666666666666663,
+          "file_eer": 0.1479166666666667,
+          "total": 0.893662109375
+        },
+        "val_c": {
+          "raw_voice_eer": 0.33333333333333337,
+          "voice_eer": 0.16666666666666663,
+          "file_eer": 0.10208333333333333,
+          "total": 0.915751953125
+        },
+        "val_d": {
+          "raw_voice_eer": 0.41666666666666663,
+          "voice_eer": 0.1875,
+          "file_eer": 0.1479166666666667,
+          "total": 0.8911816406249999
+        }
+      },
+      "mean_voice_eer": 0.16666666666666666,
+      "worst_voice_eer": 0.1875,
+      "mean_total": 0.9070703124999999,
+      "worst_total": 0.8911816406249999,
+      "runtime_seconds": 9.311511900014011,
+      "no_domain_voice_regression": false,
+      "no_domain_total_regression": false
+    }
+  ],
+  "new_aasist_training": {
+    "status": "NOT RUN"
+  },
+  "ssl_backbone": {
+    "status": "NOT RUN",
+    "reason": "no licensed offline checkpoint is bundled"
+  },
+  "selected": "current_spec_cnn",
+  "decision": "KEEP_CURRENT_NO_STRICT_ROBUST_IMPROVEMENT"
+}

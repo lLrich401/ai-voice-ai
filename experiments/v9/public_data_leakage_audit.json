@@ -1,0 +1,14 @@
+{
+  "rows": 1645,
+  "files": [
+    "mlaad_tiny_manifest.csv",
+    "sonics_manifest.csv",
+    "real_music_manifest.csv",
+    "echoes_fma_paired_manifest.csv"
+  ],
+  "unique_content_hashes": 1645,
+  "cross_role_exact_hashes": [],
+  "cross_role_split_groups": [],
+  "status": "PASS",
+  "final_holdout": "NOT READ / NOT RUN"
+}
