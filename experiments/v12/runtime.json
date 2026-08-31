@@ -1,0 +1,45 @@
+{
+  "status": "MEASURED_LOCAL_SPECIALIST_PLUS_EXISTING_FULL_PIPELINE_PROJECTION",
+  "device": "xpu",
+  "files": 64,
+  "repeats": 3,
+  "shared_decode_seconds": 1.477241699991282,
+  "timings_seconds": {
+    "v7_voice": [
+      0.4838944000075571,
+      0.0922720999806188,
+      0.09112490000552498
+    ],
+    "v12_v2_voice": [
+      0.09105339998495765,
+      0.0895901000185404,
+      0.089256800012663
+    ],
+    "v7_music": [
+      0.09004199999617413,
+      0.08999680000124499,
+      0.09374620000016876
+    ],
+    "v12_m4_music": [
+      0.09134650000487454,
+      0.09073880000505596,
+      0.0908060000219848
+    ]
+  },
+  "median_seconds": {
+    "v7_voice": 0.0922720999806188,
+    "v12_v2_voice": 0.0895901000185404,
+    "v7_music": 0.09004199999617413,
+    "v12_m4_music": 0.0908060000219848
+  },
+  "projected_1200_minutes": {
+    "v7": 19.817847406247893,
+    "v12_m4_v2_student_only": 19.81724803126781
+  },
+  "model_count": {
+    "v7": 4,
+    "v12_m4_v2_student_only": 4
+  },
+  "official_server_runtime": "NOT RUN",
+  "final_holdout": "NOT RUN"
+}

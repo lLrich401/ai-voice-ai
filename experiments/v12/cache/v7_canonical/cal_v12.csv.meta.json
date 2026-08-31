@@ -1,0 +1,18 @@
+{
+  "schema_version": "v12-canonical-cache-1",
+  "pipeline_version": "dacon236749-20260831-v7-voice-robust",
+  "aggregation_version": "selected-v7-canonical-voice-max",
+  "preprocess_version": "16k-high-energy-3-primary-df-panns16k",
+  "checkpoint_sha256": {
+    "voice": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+    "music": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+    "panns": "eee61e89d4ef120bfe0e900f0fb9e4814a2597bbd1f3bf8e149868a7d508bc10",
+    "df_arena": "35a69bf6df8d96208309be6e0217ddf0dd6286649da867497a2753236009bdaf",
+    "fusion": "87d46c317398bed0a9dc87c6b451246851ba6c34683e4468a0251461f7c42402"
+  },
+  "split_sha256": "c0898ae6c5e43825e45ea4fcbffd0b3320161cb1e94b0fb94a7c1f38bcdd2ab7",
+  "rows": 500,
+  "elapsed_seconds": 362.93209509999724,
+  "device": "xpu",
+  "final_holdout": "NOT RUN"
+}

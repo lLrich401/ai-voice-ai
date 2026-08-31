@@ -1,0 +1,15 @@
+{
+  "path": "submit.zip",
+  "bytes": 935635645,
+  "mib": 892.29,
+  "sha256": "5898ad19b5c92e46d54aca529336b99f9e17838806766c654a3585051388fdcb",
+  "top_level": [
+    "model",
+    "script.py",
+    "requirements.txt"
+  ],
+  "validator": "PASS",
+  "offline_smoke_test": "PASS: 3 files, 2.5 seconds, 3 output rows",
+  "selected_policy": "KEEP_V7",
+  "final_holdout": "NOT RUN"
+}

@@ -1,0 +1,52 @@
+{
+  "candidate": "V3",
+  "configuration": {
+    "task": "voice",
+    "supervised": 0.6,
+    "retention": 0.25,
+    "candidate": 0.15,
+    "rank": 0.0,
+    "temperature": 1.0,
+    "ema": false,
+    "lr": 3e-05,
+    "file_mode": "retention"
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 0.6642191445126253,
+      "supervised": 0.6671058488827125,
+      "retention": 0.5975938006943348,
+      "candidate": 0.7637144175230288,
+      "ranking": 0.007937270052292767
+    },
+    {
+      "epoch": 2,
+      "loss": 0.6529299464880252,
+      "supervised": 0.6537234268936456,
+      "retention": 0.6035475146536734,
+      "candidate": 0.7320599555969238,
+      "ranking": 0.01121506430939132
+    },
+    {
+      "epoch": 3,
+      "loss": 0.6503239648014891,
+      "supervised": 0.6515257440361322,
+      "retention": 0.6060754189304277,
+      "candidate": 0.7192642934182111,
+      "ranking": 0.0010979802292935988
+    },
+    {
+      "epoch": 4,
+      "loss": 0.6470484920576507,
+      "supervised": 0.6455684947032555,
+      "retention": 0.6093475538141587,
+      "candidate": 0.7158032258351644,
+      "ranking": 0.0076185095251775255
+    }
+  ],
+  "checkpoint": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\model\\candidates\\v12\\v3_student.pt",
+  "checkpoint_sha256": "a8e2b54195653da5b526afdfbfbb2001bd94c5485d438153ef7e332194e14102",
+  "training_seconds": 44.15744499998982,
+  "final_holdout": "NOT RUN"
+}

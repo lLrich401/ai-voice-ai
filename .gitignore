@@ -21,6 +21,8 @@ data/raw/
 data/generated_v8/audio/
 output/
 experiments/results.csv
+# Reproducible V12 acceleration cache; keep hashes/CSV evidence, not the 0.8 GB tensor.
+experiments/v12/cache/*.npy
 # Keep small checkpoints (<100MB) - uncomment if you want LFS for them
 # *.pt
 submit.zip

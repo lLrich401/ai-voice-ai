@@ -1,0 +1,141 @@
+path,component_fake,file_fake,component_present
+data\raw\public_v9\mlaad_tiny\fake\en\Cartesia.ai (Sonic-3)\dorothy_and_wizard_oz_06_f000040.wav,0.5283865928649902,0.5339347124099731,0.09354090690612793
+data\raw\public_v9\mlaad_tiny\fake\en\Cartesia.ai (Sonic-3)\dorothy_and_wizard_oz_12_f000027.wav,0.4795149564743042,0.4802974462509155,0.09804609417915344
+data\raw\public_v9\mlaad_tiny\fake\en\Cartesia.ai (Sonic-3)\emerald_city_of_oz_09_f000109.wav,0.5437272191047668,0.5544390082359314,0.11410675197839737
+data\raw\public_v9\mlaad_tiny\fake\en\Cartesia.ai (Sonic-3)\emerald_city_of_oz_10_f000117.wav,0.6759433150291443,0.6775471568107605,0.25816166400909424
+data\raw\public_v9\mlaad_tiny\fake\en\Cartesia.ai (Sonic-3)\emerald_city_of_oz_12_f000086.wav,0.6216368675231934,0.6247210502624512,0.12272408604621887
+data\raw\public_v9\mlaad_tiny\fake\en\Cartesia.ai (Sonic-3)\emerald_city_of_oz_22_f000076.wav,0.5014849305152893,0.5082268714904785,0.07196051627397537
+data\raw\public_v9\mlaad_tiny\fake\en\Cartesia.ai (Sonic-3)\emerald_city_of_oz_29_f000057.wav,0.5903564095497131,0.5972320437431335,0.04740510880947113
+data\raw\public_v9\mlaad_tiny\fake\en\Cartesia.ai (Sonic-3)\hunters_space_02_f000038.wav,0.5085302591323853,0.5065594911575317,0.06381677091121674
+data\raw\public_v9\mlaad_tiny\fake\en\Cartesia.ai (Sonic-3)\hunters_space_12_f000054.wav,0.5558822751045227,0.5641290545463562,0.06113046407699585
+data\raw\public_v9\mlaad_tiny\fake\en\Cartesia.ai (Sonic-3)\jane_eyre_01_f000012.wav,0.4576982855796814,0.44851163029670715,0.057641949504613876
+data\raw\public_v9\mlaad_tiny\fake\en\DeepGram\dorothy_and_wizard_oz_03_f000061.wav,0.6869739294052124,0.6916191577911377,0.10836263000965118
+data\raw\public_v9\mlaad_tiny\fake\en\DeepGram\dorothy_and_wizard_oz_11_f000069.wav,0.3078252077102661,0.2937312126159668,0.10862711071968079
+data\raw\public_v9\mlaad_tiny\fake\en\DeepGram\emerald_city_of_oz_10_f000012.wav,0.28422001004219055,0.27415966987609863,0.20165516436100006
+data\raw\public_v9\mlaad_tiny\fake\en\DeepGram\emerald_city_of_oz_10_f000046.wav,0.26427626609802246,0.2511596381664276,0.16218242049217224
+data\raw\public_v9\mlaad_tiny\fake\en\DeepGram\emerald_city_of_oz_10_f000072.wav,0.3331087827682495,0.30531686544418335,0.056875478476285934
+data\raw\public_v9\mlaad_tiny\fake\en\DeepGram\emerald_city_of_oz_14_f000041.wav,0.5406098961830139,0.5499390959739685,0.12295465916395187
+data\raw\public_v9\mlaad_tiny\fake\en\DeepGram\emerald_city_of_oz_23_f000030.wav,0.30710357427597046,0.29735714197158813,0.15822874009609222
+data\raw\public_v9\mlaad_tiny\fake\en\DeepGram\emerald_city_of_oz_29_f000051.wav,0.21192951500415802,0.20293399691581726,0.27376729249954224
+data\raw\public_v9\mlaad_tiny\fake\en\DeepGram\jane_eyre_03_f000165.wav,0.7692436575889587,0.7720348238945007,0.19681620597839355
+data\raw\public_v9\mlaad_tiny\fake\en\DeepGram\jane_eyre_03_f000179.wav,0.7008801698684692,0.7049336433410645,0.15162426233291626
+data\raw\public_v9\mlaad_tiny\fake\en\Edge-TTS\emerald_city_of_oz_06_f000048.wav,0.26661452651023865,0.25712960958480835,0.17564503848552704
+data\raw\public_v9\mlaad_tiny\fake\en\Edge-TTS\emerald_city_of_oz_12_f000118.wav,0.4341437816619873,0.4316471219062805,0.06135118752717972
+data\raw\public_v9\mlaad_tiny\fake\en\Edge-TTS\emerald_city_of_oz_19_f000080.wav,0.4799153804779053,0.48191216588020325,0.05361579358577728
+data\raw\public_v9\mlaad_tiny\fake\en\Edge-TTS\emerald_city_of_oz_23_f000060.wav,0.44031286239624023,0.44087934494018555,0.09549430757761002
+data\raw\public_v9\mlaad_tiny\fake\en\Edge-TTS\hunters_space_13_f000101.wav,0.5579260587692261,0.5666154623031616,0.06665460765361786
+data\raw\public_v9\mlaad_tiny\fake\en\Edge-TTS\jane_eyre_02_f000096.wav,0.28716686367988586,0.28071117401123047,0.18089811503887177
+data\raw\public_v9\mlaad_tiny\fake\en\Edge-TTS\jane_eyre_04_f000070.wav,0.3475465178489685,0.3426254987716675,0.0942876935005188
+data\raw\public_v9\mlaad_tiny\fake\en\Edge-TTS\jane_eyre_08_f000086.wav,0.503020167350769,0.5071297883987427,0.065279521048069
+data\raw\public_v9\mlaad_tiny\fake\en\Edge-TTS\jane_eyre_12_f000050.wav,0.5230222940444946,0.5316390991210938,0.08681797981262207
+data\raw\public_v9\mlaad_tiny\fake\en\Edge-TTS\jane_eyre_12_f000061.wav,0.5177183747291565,0.516258955001831,0.045818082988262177
+"data\raw\public_v9\mlaad_tiny\fake\en\Resemble.ai (April 12th, 2025)\dorothy_and_wizard_oz_01_f000032.wav",0.5570335388183594,0.5496621131896973,0.04497545585036278
+"data\raw\public_v9\mlaad_tiny\fake\en\Resemble.ai (April 12th, 2025)\dorothy_and_wizard_oz_02_f000008.wav",0.16320887207984924,0.15587204694747925,0.3237060606479645
+"data\raw\public_v9\mlaad_tiny\fake\en\Resemble.ai (April 12th, 2025)\dorothy_and_wizard_oz_05_f000066.wav",0.5048960447311401,0.49916890263557434,0.05641784146428108
+"data\raw\public_v9\mlaad_tiny\fake\en\Resemble.ai (April 12th, 2025)\dorothy_and_wizard_oz_06_f000025.wav",0.4543529152870178,0.4544341564178467,0.07723142206668854
+"data\raw\public_v9\mlaad_tiny\fake\en\Resemble.ai (April 12th, 2025)\dorothy_and_wizard_oz_09_f000035.wav",0.536369800567627,0.5436343550682068,0.0716601014137268
+"data\raw\public_v9\mlaad_tiny\fake\en\Resemble.ai (April 12th, 2025)\emerald_city_of_oz_07_f000009.wav",0.4450467824935913,0.43680334091186523,0.08032462745904922
+"data\raw\public_v9\mlaad_tiny\fake\en\Resemble.ai (April 12th, 2025)\emerald_city_of_oz_21_f000090.wav",0.49940910935401917,0.48821499943733215,0.030273213982582092
+"data\raw\public_v9\mlaad_tiny\fake\en\Resemble.ai (April 12th, 2025)\hunters_space_07_f000104.wav",0.6372020840644836,0.6421144008636475,0.0642554983496666
+"data\raw\public_v9\mlaad_tiny\fake\en\Resemble.ai (April 12th, 2025)\hunters_space_10_f000046.wav",0.42882394790649414,0.4226377010345459,0.053236234933137894
+"data\raw\public_v9\mlaad_tiny\fake\en\Resemble.ai (April 12th, 2025)\jane_eyre_01_f000063.wav",0.5504322052001953,0.5528557896614075,0.10452071577310562
+data\raw\public_v9\mlaad_tiny\original\en\dorothy_and_wizard_oz_01_f000032.wav,0.42343923449516296,0.40715232491493225,0.05575941503047943
+data\raw\public_v9\mlaad_tiny\original\en\dorothy_and_wizard_oz_02_f000008.wav,0.4712449908256531,0.4686996340751648,0.21800369024276733
+data\raw\public_v9\mlaad_tiny\original\en\dorothy_and_wizard_oz_03_f000061.wav,0.48621970415115356,0.4914071559906006,0.12041335552930832
+data\raw\public_v9\mlaad_tiny\original\en\dorothy_and_wizard_oz_05_f000066.wav,0.421762079000473,0.41683489084243774,0.15460798144340515
+data\raw\public_v9\mlaad_tiny\original\en\dorothy_and_wizard_oz_06_f000025.wav,0.4779242277145386,0.4750768542289734,0.22972165048122406
+data\raw\public_v9\mlaad_tiny\original\en\dorothy_and_wizard_oz_06_f000040.wav,0.3198694884777069,0.31638187170028687,0.2574588656425476
+data\raw\public_v9\mlaad_tiny\original\en\dorothy_and_wizard_oz_09_f000035.wav,0.420864462852478,0.4217045307159424,0.18588519096374512
+data\raw\public_v9\mlaad_tiny\original\en\dorothy_and_wizard_oz_11_f000069.wav,0.5092024207115173,0.5089221000671387,0.14098206162452698
+data\raw\public_v9\mlaad_tiny\original\en\dorothy_and_wizard_oz_12_f000027.wav,0.5705946683883667,0.5712850689888,0.21005038917064667
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_06_f000048.wav,0.6060634851455688,0.6083300113677979,0.11311104893684387
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_07_f000009.wav,0.5418833494186401,0.5373727083206177,0.12740769982337952
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_09_f000109.wav,0.7035471796989441,0.7061227560043335,0.11291034519672394
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_10_f000012.wav,0.5764517188072205,0.585862934589386,0.1478576958179474
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_10_f000046.wav,0.5805263519287109,0.5871683955192566,0.11598093807697296
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_10_f000072.wav,0.4954315423965454,0.4810340106487274,0.04997438192367554
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_10_f000117.wav,0.5416136980056763,0.5389832258224487,0.19515329599380493
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_12_f000086.wav,0.5345398187637329,0.5421310663223267,0.12759920954704285
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_12_f000118.wav,0.5415487885475159,0.5520917773246765,0.10018908232450485
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_14_f000041.wav,0.5256567001342773,0.530457615852356,0.13960407674312592
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_19_f000080.wav,0.512865424156189,0.5186509490013123,0.10259594023227692
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_21_f000090.wav,0.4703300893306732,0.454081654548645,0.04312337189912796
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_22_f000076.wav,0.5152537226676941,0.5159024000167847,0.17375554144382477
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_23_f000030.wav,0.4851699471473694,0.4822826385498047,0.1927216798067093
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_23_f000060.wav,0.6078540086746216,0.6089068055152893,0.2144756019115448
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_29_f000051.wav,0.5286691188812256,0.5273566246032715,0.1755777895450592
+data\raw\public_v9\mlaad_tiny\original\en\emerald_city_of_oz_29_f000057.wav,0.5450613498687744,0.5534367561340332,0.12329796701669693
+data\raw\public_v9\mlaad_tiny\original\en\hunters_space_02_f000038.wav,0.27447545528411865,0.25632286071777344,0.0938015952706337
+data\raw\public_v9\mlaad_tiny\original\en\hunters_space_07_f000104.wav,0.285824716091156,0.2672851085662842,0.07233310490846634
+data\raw\public_v9\mlaad_tiny\original\en\hunters_space_10_f000046.wav,0.2094474881887436,0.19309809803962708,0.15938210487365723
+data\raw\public_v9\mlaad_tiny\original\en\hunters_space_12_f000054.wav,0.3324549198150635,0.31779608130455017,0.12256266176700592
+data\raw\public_v9\mlaad_tiny\original\en\hunters_space_13_f000101.wav,0.19160181283950806,0.17767056822776794,0.1871740221977234
+data\raw\public_v9\mlaad_tiny\original\en\jane_eyre_01_f000012.wav,0.5649181008338928,0.5575421452522278,0.1145964041352272
+data\raw\public_v9\mlaad_tiny\original\en\jane_eyre_01_f000063.wav,0.5845674872398376,0.577896237373352,0.41607528924942017
+data\raw\public_v9\mlaad_tiny\original\en\jane_eyre_02_f000096.wav,0.6233129501342773,0.6164880990982056,0.2992478609085083
+data\raw\public_v9\mlaad_tiny\original\en\jane_eyre_03_f000165.wav,0.6553763747215271,0.6500295400619507,0.38140809535980225
+data\raw\public_v9\mlaad_tiny\original\en\jane_eyre_03_f000179.wav,0.624549150466919,0.6218331456184387,0.22486239671707153
+data\raw\public_v9\mlaad_tiny\original\en\jane_eyre_04_f000070.wav,0.7132905721664429,0.7083404660224915,0.3887943625450134
+data\raw\public_v9\mlaad_tiny\original\en\jane_eyre_08_f000086.wav,0.6896724700927734,0.6860619783401489,0.25072377920150757
+data\raw\public_v9\mlaad_tiny\original\en\jane_eyre_12_f000050.wav,0.5531851053237915,0.5479520559310913,0.2790086269378662
+data\raw\public_v9\mlaad_tiny\original\en\jane_eyre_12_f000061.wav,0.6022746562957764,0.5930681824684143,0.14555543661117554
+data\raw\public_v9\echoes_fma_paired\real\fma_111819.mp3,1.373124263182035e-07,1.1056385318397588e-07,0.9999998211860657
+data\raw\public_v9\echoes_fma_paired\fake\Ad_Astra_P_C_III_diffrhythm_ATA_001.mp3,0.008702661842107773,0.007086136844009161,0.8619565963745117
+data\raw\public_v9\echoes_fma_paired\fake\Ad_Astra_P_C_III_songgen_ATA_001.mp3,0.04425919055938721,0.043721407651901245,0.9720750451087952
+data\raw\public_v9\echoes_fma_paired\real\fma_111821.mp3,1.900197048598784e-07,1.5502854466831195e-07,0.9999998211860657
+data\raw\public_v9\echoes_fma_paired\fake\Ancient_Whispers_I_P_C_III_diffrhythm_ATA_001.mp3,0.0020008357241749763,0.0018020742572844028,0.9968770146369934
+data\raw\public_v9\echoes_fma_paired\fake\Ancient_Whispers_I_P_C_III_songgen_ATA_001.mp3,0.04282579943537712,0.0419253446161747,0.9602600932121277
+data\raw\public_v9\echoes_fma_paired\real\fma_112378.mp3,4.204792276141234e-05,3.597378236008808e-05,0.9999979138374329
+data\raw\public_v9\echoes_fma_paired\fake\3_am_West_End_statusq_diffrhythm_ATA_001.mp3,0.019685493782162666,0.019051499664783478,0.961611270904541
+data\raw\public_v9\echoes_fma_paired\fake\3_am_West_End_statusq_songgen_ATA_001.mp3,0.4039051830768585,0.3943854868412018,0.13601990044116974
+data\raw\public_v9\echoes_fma_paired\real\fma_114244.mp3,0.00020682666217908263,0.000182604169822298,0.9996396899223328
+data\raw\public_v9\echoes_fma_paired\fake\2Much_Andy_Spinelli_Alex_Sánchez_House_Edit_Tentacles_diffrhythm_ATA_001.mp3,0.0035625617019832134,0.003281005658209324,0.9948989748954773
+data\raw\public_v9\echoes_fma_paired\fake\2Much_Andy_Spinelli_Alex_Sánchez_House_Edit_Tentacles_songgen_ATA_001.mp3,0.005726519040763378,0.005331981461495161,0.9976751804351807
+data\raw\public_v9\echoes_fma_paired\real\fma_118048.mp3,0.0009225636022165418,0.0008325731614604592,0.9973409175872803
+data\raw\public_v9\echoes_fma_paired\fake\Attention_Pete_Prodoehl_diffrhythm_ATA_001.mp3,7.241486400744179e-06,6.157406915008323e-06,0.999992847442627
+data\raw\public_v9\echoes_fma_paired\fake\Attention_Pete_Prodoehl_songgen_TTA_001.mp3,8.409743895754218e-05,7.196137448772788e-05,0.999636709690094
+data\raw\public_v9\echoes_fma_paired\real\fma_127294.mp3,5.546259217226179e-06,4.590436219586991e-06,0.9999947547912598
+data\raw\public_v9\echoes_fma_paired\fake\Autopsy_Oh_Yeah_the_Future_diffrhythm_ATA_001.mp3,3.9407976146321744e-05,3.3992924727499485e-05,0.9999499320983887
+data\raw\public_v9\echoes_fma_paired\fake\Autopsy_Oh_Yeah_the_Future_songgen_ATA_001.mp3,0.002921931678429246,0.0027880235575139523,0.9983782768249512
+data\raw\public_v9\echoes_fma_paired\real\fma_129963.mp3,2.4953442334663123e-05,2.0926736397086643e-05,0.9999489188194275
+data\raw\public_v9\echoes_fma_paired\fake\A_Dark_Blue_Arc_Pipe_Choir_diffrhythm_ATA_001.mp3,0.18942658603191376,0.17320701479911804,0.679873526096344
+data\raw\public_v9\echoes_fma_paired\fake\A_Dark_Blue_Arc_Pipe_Choir_songgen_ATA_001.mp3,0.26458072662353516,0.26001837849617004,0.978661298751831
+data\raw\public_v9\echoes_fma_paired\real\fma_130129.mp3,2.4974347979878075e-05,2.140696051355917e-05,0.9999698996543884
+data\raw\public_v9\echoes_fma_paired\fake\Artificial_anxiety_Michett_diffrhythm_ATA_001.mp3,0.0029808294493705034,0.0028125448152422905,0.9940428733825684
+data\raw\public_v9\echoes_fma_paired\fake\Artificial_anxiety_Michett_songgen_ATA_001.mp3,9.007663720694836e-06,7.655204171896912e-06,0.9999904632568359
+data\raw\public_v9\echoes_fma_paired\real\fma_130401.mp3,1.5727506479379372e-06,1.3016417597100371e-06,0.9999982714653015
+data\raw\public_v9\echoes_fma_paired\fake\50000_Volts_of_Democracy_mp3_Legally_Blind_diffrhythm_ATA_001.mp3,6.322630270005902e-06,5.248909474175889e-06,0.9999917149543762
+data\raw\public_v9\echoes_fma_paired\fake\50000_Volts_of_Democracy_mp3_Legally_Blind_songgen_TTA_001.mp3,0.00019014303688891232,0.00016419477469753474,0.9998939633369446
+data\raw\public_v9\echoes_fma_paired\real\fma_137049.mp3,0.0017871747259050608,0.0016227355226874352,0.9952648282051086
+data\raw\public_v9\echoes_fma_paired\fake\Autobahn_S-B-J_diffrhythm_ATA_001.mp3,0.0003002389566972852,0.00026222559972666204,0.9996084570884705
+data\raw\public_v9\echoes_fma_paired\fake\Autobahn_S-B-J_songgen_ATA_001.mp3,0.0050285570323467255,0.004498705267906189,0.949938952922821
+data\raw\public_v9\echoes_fma_paired\real\fma_138061.mp3,0.0026727793738245964,0.0024053265806287527,0.9937162399291992
+data\raw\public_v9\echoes_fma_paired\fake\Bergwald_Bergwald_Every_Now_and_Every_Then_diffrhythm_ATA_001.mp3,8.19583328848239e-06,7.039150204946054e-06,0.9999931454658508
+data\raw\public_v9\echoes_fma_paired\fake\Bergwald_Bergwald_Every_Now_and_Every_Then_songgen_TTA_001.mp3,0.00027107325149700046,0.0002380986843490973,0.9988797307014465
+data\raw\public_v9\echoes_fma_paired\real\fma_140924.mp3,7.097698873081981e-09,5.520041312934154e-09,1.0
+data\raw\public_v9\echoes_fma_paired\fake\Authenticity_Nihilore_diffrhythm_ATA_001.mp3,0.19910795986652374,0.18258708715438843,0.6772491335868835
+data\raw\public_v9\echoes_fma_paired\fake\Authenticity_Nihilore_songgen_ATA_001.mp3,2.3841392248868942e-05,2.0026189304189757e-05,0.9999964833259583
+data\raw\public_v9\echoes_fma_paired\real\fma_140926.mp3,2.313818413313129e-06,1.8753814856609097e-06,0.9999975562095642
+data\raw\public_v9\echoes_fma_paired\fake\A_Different_World_By_Night_Nihilore_diffrhythm_ATA_001.mp3,0.06356790661811829,0.05305067077279091,0.7111012935638428
+data\raw\public_v9\echoes_fma_paired\fake\A_Different_World_By_Night_Nihilore_songgen_ATA_001.mp3,0.09393329918384552,0.09098627418279648,0.9307038187980652
+data\raw\public_v9\echoes_fma_paired\real\fma_140932.mp3,1.1866818638850418e-08,9.256113209232808e-09,1.0
+data\raw\public_v9\echoes_fma_paired\fake\10000_People_Chanting_Im_an_Individual_Nihilore_diffrhythm_ATA_001.mp3,6.268244032980874e-05,5.521926868823357e-05,0.999931812286377
+data\raw\public_v9\echoes_fma_paired\fake\10000_People_Chanting_Im_an_Individual_Nihilore_songgen_ATA_001.mp3,0.0014150288188830018,0.0012662513181567192,0.9949700236320496
+data\raw\public_v9\echoes_fma_paired\real\fma_141875.mp3,0.0006129039102233946,0.0005536758690141141,0.9986476898193359
+data\raw\public_v9\echoes_fma_paired\fake\Acoustic_Unleashed_Remain_diffrhythm_ATA_001.mp3,0.00013963795208837837,0.0001222615537699312,0.9996903538703918
+data\raw\public_v9\echoes_fma_paired\fake\Acoustic_Unleashed_Remain_songgen_ATA_001.mp3,9.331210458185524e-05,8.217633876483887e-05,0.9998993277549744
+data\raw\public_v9\echoes_fma_paired\real\fma_144723.mp3,0.00038779363967478275,0.00034591337316669524,0.9995446801185608
+data\raw\public_v9\echoes_fma_paired\fake\And_Over_The_Rainbows_milky-chu_diffrhythm_ATA_001.mp3,5.19297373102745e-07,4.15749212834271e-07,0.9999993443489075
+data\raw\public_v9\echoes_fma_paired\fake\And_Over_The_Rainbows_milky-chu_songgen_ATA_001.mp3,0.007832781411707401,0.007402998395264149,0.9687901139259338
+data\raw\public_v9\echoes_fma_paired\real\fma_3956.mp3,3.1106646929401904e-05,2.75802485703025e-05,0.9999672770500183
+data\raw\public_v9\echoes_fma_paired\fake\Better_Run_Away_From_Me_Miss_Derringer_diffrhythm_ATA_001.mp3,4.787406214745715e-05,4.172253466094844e-05,0.999940812587738
+data\raw\public_v9\echoes_fma_paired\fake\Better_Run_Away_From_Me_Miss_Derringer_songgen_ATA_001.mp3,1.4224366168491542e-05,1.2028702258248813e-05,0.9999775886535645
+data\raw\public_v9\echoes_fma_paired\real\fma_4003.mp3,0.00019680587865877897,0.00017625914188101888,0.9997947216033936
+data\raw\public_v9\echoes_fma_paired\fake\Beyond_Luxury_Mors_Ontologica_diffrhythm_ATA_001.mp3,5.285247425490525e-06,4.48174341727281e-06,0.9999902844429016
+data\raw\public_v9\echoes_fma_paired\fake\Beyond_Luxury_Mors_Ontologica_songgen_ATA_001.mp3,0.08663899451494217,0.0856936052441597,0.9735144972801208
+data\raw\public_v9\echoes_fma_paired\real\fma_47071.mp3,0.00022836483549326658,0.00020993650832679123,0.9996855854988098
+data\raw\public_v9\echoes_fma_paired\fake\All_of_Us_Eric_Skiff_diffrhythm_ATA_001.mp3,1.7176167602883652e-05,1.4509912944049574e-05,0.9999642372131348
+data\raw\public_v9\echoes_fma_paired\fake\All_of_Us_Eric_Skiff_songgen_ATA_001.mp3,0.0603676438331604,0.05878860130906105,0.9077229499816895
+data\raw\public_v9\echoes_fma_paired\real\fma_74910.mp3,0.00011803066445281729,0.000101247220300138,0.9998261332511902
+data\raw\public_v9\echoes_fma_paired\fake\A_Lady_In_Red_With_A_Plan_To_Steal_Did_You_Just_Hex_Me_diffrhythm_ATA_001.mp3,4.618019829649711e-06,3.837542863038834e-06,0.9999942779541016
+data\raw\public_v9\echoes_fma_paired\fake\A_Lady_In_Red_With_A_Plan_To_Steal_Did_You_Just_Hex_Me_songgen_ATA_001.mp3,0.0006973700947128236,0.0006251533632166684,0.9981904029846191

@@ -1,0 +1,11 @@
+{
+  "status": "MEASURED_NON_FINAL_FEATURE_EXTRACTION",
+  "device": "xpu",
+  "model_seconds": {
+    "v7_voice": 7.5671490999811795,
+    "v7_music": 2.0500492001592647,
+    "v9_voice": 31.729308999958448,
+    "v9_music": 2.0227517999883275
+  },
+  "final_holdout": "NOT RUN"
+}

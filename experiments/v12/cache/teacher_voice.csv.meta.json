@@ -1,0 +1,15 @@
+{
+  "schema_version": "v12-teacher-logits-1-clean-center-crop",
+  "task": "voice",
+  "rows": 3222,
+  "split_sha256": "bf9d9f4cb2d914b5b99d6a983765c824a74ba21c0dc48b3670f68e124b524ddc",
+  "checkpoint_sha256": {
+    "v7": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+    "v9": "5697576ec5b813267cb1de9957f3d71500a7cd3b4668c98ac57b5b4a10107c40"
+  },
+  "candidate_file_head_cached": false,
+  "teachers_frozen": true,
+  "elapsed_seconds": 105.32322250001016,
+  "device": "xpu",
+  "final_holdout": "NOT RUN"
+}

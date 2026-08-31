@@ -1,0 +1,7 @@
+{
+  "command": "pytest -q",
+  "result": "100 passed",
+  "elapsed_seconds": 8.72,
+  "status": "PASS",
+  "final_holdout": "NOT RUN"
+}

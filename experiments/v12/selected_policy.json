@@ -1,0 +1,27 @@
+{
+  "decision": "KEEP_V7",
+  "reason": "The strongest joint candidate improved the precommitted robust objective and CAL_V12, but regressed mean FILE EER and had negative paired-bootstrap ADS and TOTAL medians. It therefore fails the V12 adoption rule requiring FILE EER preservation/improvement and a stable positive ADS signal.",
+  "selected_artifacts_changed": false,
+  "selected_sha256": {
+    "model/best.pt": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+    "model/music_best.pt": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+    "model/fusion_weights.json": "87d46c317398bed0a9dc87c6b451246851ba6c34683e4468a0251461f7c42402",
+    "script.py": "8abd4888f09aa00be18790e5257bf0cafc2fff5fd9e167571c880509a665119b"
+  },
+  "best_point_candidates": {
+    "music": "M4",
+    "voice": "V2",
+    "joint": "M4_music_plus_V2_voice"
+  },
+  "joint_adoption_checks": {
+    "robust_objective_improved": true,
+    "cal_old_maintained_or_improved": true,
+    "cal_v12_improved": true,
+    "expanded_unseen_mean_improved": true,
+    "file_eer_maintained_or_improved": false,
+    "bootstrap_robust_win_rate_at_least_0_65": true,
+    "bootstrap_ads_median_positive": false
+  },
+  "final_holdout": "NOT RUN",
+  "submission": "BUILT FROM UNCHANGED SELECTED V7"
+}

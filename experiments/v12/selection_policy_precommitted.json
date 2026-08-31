@@ -1,0 +1,23 @@
+{
+  "robust_total": {
+    "mean_val_total": 0.25,
+    "worst_val_total": 0.15,
+    "voice_unseen_quality": 0.15,
+    "music_unseen_quality": 0.15,
+    "cal_old": 0.15,
+    "cal_v12": 0.15
+  },
+  "calibration_robust": {
+    "cal_old_mean": 0.35,
+    "cal_v12_mean": 0.35,
+    "cal_old_worst": 0.15,
+    "cal_v12_worst": 0.15
+  },
+  "hard_gates": {
+    "maximum_file_eer_regression": 0.015,
+    "maximum_voice_unseen_eer_regression": 0.03,
+    "maximum_music_unseen_eer_regression": 0.03,
+    "maximum_worst_total_regression": 0.01,
+    "minimum_bootstrap_robust_win_rate": 0.65
+  }
+}

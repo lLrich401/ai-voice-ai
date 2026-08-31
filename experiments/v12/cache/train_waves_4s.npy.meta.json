@@ -1,0 +1,10 @@
+{
+  "schema_version": "v12-train-wave-cache-1-center-4s",
+  "rows": 3222,
+  "samples": 64000,
+  "sample_rate": 16000,
+  "split_sha256": "bf9d9f4cb2d914b5b99d6a983765c824a74ba21c0dc48b3670f68e124b524ddc",
+  "wave_sha256": "825ee65e587c45015f6cbe67ca39621b5c730d25eab72f211a8cbc2d1adcbdfb",
+  "elapsed_seconds": 123.005221600004,
+  "final_holdout": "NOT RUN"
+}

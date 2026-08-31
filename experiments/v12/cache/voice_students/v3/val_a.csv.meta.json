@@ -1,0 +1,13 @@
+{
+  "schema_version": "v12-student-head-cache-1",
+  "base_schema_version": "v12-canonical-cache-1",
+  "task": "voice",
+  "candidate": "V3",
+  "checkpoint_sha256": "a8e2b54195653da5b526afdfbfbb2001bd94c5485d438153ef7e332194e14102",
+  "canonical_cache_sha256": "aa454deb0f0da26ab02527d6285da65f3f454427f420fa8148fc6535638f37a7",
+  "split": "val_a",
+  "rows": 128,
+  "aggregation": "max",
+  "segment_policy": "high_energy-maximum-3",
+  "final_holdout": "NOT RUN"
+}

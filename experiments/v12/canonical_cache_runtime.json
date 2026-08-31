@@ -1,0 +1,36 @@
+{
+  "status": "MEASURED",
+  "results": [
+    {
+      "split": "cal_v12",
+      "rows": 500,
+      "seconds": 362.93209509999724
+    },
+    {
+      "split": "val_a",
+      "rows": 128,
+      "seconds": 69.27592889999505
+    },
+    {
+      "split": "val_b",
+      "rows": 128,
+      "seconds": 64.92514549999032
+    },
+    {
+      "split": "val_c",
+      "rows": 128,
+      "seconds": 63.43990090000443
+    },
+    {
+      "split": "val_d",
+      "rows": 128,
+      "seconds": 64.56462849999662
+    },
+    {
+      "split": "expanded_unseen",
+      "rows": 140,
+      "seconds": 87.20739640001557
+    }
+  ],
+  "final_holdout": "NOT RUN"
+}

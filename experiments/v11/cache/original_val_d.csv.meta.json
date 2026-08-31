@@ -1,0 +1,16 @@
+{
+  "schema_version": "v11-head-cache-2-recomputed-v7",
+  "pipeline_version": "dacon236749-20260831-v7-voice-robust",
+  "aggregation_version": "voice-max_music-top2_file-top2_presence-mean_high-energy-3",
+  "checkpoint_sha256": {
+    "v7_voice": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+    "v7_music": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+    "v9_voice": "5697576ec5b813267cb1de9957f3d71500a7cd3b4668c98ac57b5b4a10107c40",
+    "v9_music": "531ac6cd8f1f2b56d5c4760d7e95b146e1ea09fdc6ebd830167427d6206cf03a"
+  },
+  "split_sha256": "bb733da58874189b0cceb0a2a3671f45d4f812c92ec38b233d15e63901f31457",
+  "selector_sha256": "592f16e73bf645727eccc04a04b414b829a4312ba7b5bdce6de6be98449a6101",
+  "selected_rows_sha256": "7eef7932fc04d08cf2ecc5e2115a117e945af56a584c9b4d3d1f0a33a6af9253",
+  "rows": 128,
+  "final_holdout": "NOT RUN"
+}

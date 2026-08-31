@@ -1,0 +1,52 @@
+{
+  "candidate": "M2",
+  "configuration": {
+    "task": "music",
+    "supervised": 0.8,
+    "retention": 0.2,
+    "candidate": 0.0,
+    "rank": 0.0,
+    "temperature": 1.0,
+    "ema": false,
+    "lr": 3e-05,
+    "file_mode": "lr_0.1"
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 1.5733070630653232,
+      "supervised": 1.9370771073827557,
+      "retention": 0.11822671260611683,
+      "candidate": 1.352679680375492,
+      "ranking": 0.007960180733718123
+    },
+    {
+      "epoch": 2,
+      "loss": 1.1433986577333188,
+      "supervised": 1.3840804567524032,
+      "retention": 0.18067136757514057,
+      "candidate": 1.062177943248375,
+      "ranking": 0.005321055504621244
+    },
+    {
+      "epoch": 3,
+      "loss": 0.9318866414182326,
+      "supervised": 1.1162612438201904,
+      "retention": 0.19438816460908628,
+      "candidate": 0.8788796639909932,
+      "ranking": 0.006848126649856567
+    },
+    {
+      "epoch": 4,
+      "loss": 0.8019556239539501,
+      "supervised": 0.9543942762356178,
+      "retention": 0.19220098546322653,
+      "candidate": 0.8141625289823494,
+      "ranking": 0.0
+    }
+  ],
+  "checkpoint": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\model\\candidates\\v12\\m2_student.pt",
+  "checkpoint_sha256": "22f89f354afb1aa209b00c8deafc11533bc37cba80196a9e5147709c48399803",
+  "training_seconds": 43.414097999979276,
+  "final_holdout": "NOT RUN"
+}

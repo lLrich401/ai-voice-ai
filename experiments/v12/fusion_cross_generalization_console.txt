@@ -1,0 +1,50 @@
+{
+  "old": {
+    "weights": {
+      "w_voice_file": 0.0,
+      "w_music_file": 0.5,
+      "w_prob_or": 0.5,
+      "w_df_arena": 0.25,
+      "w_df_voice_component": 0.3,
+      "w_df_music_component": 0.0,
+      "w_panns_presence": 0.75,
+      "file_fusion_mode": "legacy"
+    },
+    "old": 0.8864977311472675,
+    "v12": 0.5903356093362999,
+    "val_mean": 0.90535400390625,
+    "val_worst": 0.8831608072916666
+  },
+  "v12": {
+    "weights": {
+      "w_voice_file": 0.0,
+      "w_music_file": 0.5,
+      "w_prob_or": 0.5,
+      "w_df_arena": 0.5,
+      "w_df_voice_component": 0.3,
+      "w_df_music_component": 0.0,
+      "w_panns_presence": 0.75,
+      "file_fusion_mode": "legacy"
+    },
+    "old": 0.8707982232248492,
+    "v12": 0.5932656093363,
+    "val_mean": 0.90465087890625,
+    "val_worst": 0.8906608072916665
+  },
+  "both": {
+    "weights": {
+      "w_voice_file": 0.0,
+      "w_music_file": 0.5,
+      "w_prob_or": 0.5,
+      "w_df_arena": 0.25,
+      "w_df_voice_component": 0.35,
+      "w_df_music_component": 0.0,
+      "w_panns_presence": 0.75,
+      "file_fusion_mode": "legacy"
+    },
+    "old": 0.8864977311472675,
+    "v12": 0.5912956093363,
+    "val_mean": 0.9041821289062499,
+    "val_worst": 0.8794108072916667
+  }
+}

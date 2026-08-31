@@ -1,0 +1,26 @@
+{
+  "dataset_version": "DATASET_V12_20260901_2",
+  "manifest_sha256": "dbf8be6849bc0263546b295d249f73735eb85f207251bec003342a550b71f771",
+  "split_sha256": {
+    "cal_old.csv": "0748fb5d545f3b79842109094c931a31b98ed203d2b817bece7f1490039864a4",
+    "cal_v12.csv": "c0898ae6c5e43825e45ea4fcbffd0b3320161cb1e94b0fb94a7c1f38bcdd2ab7",
+    "cal_v12_base_reserve.csv": "678d71f2facdbb9205191b7098720b5e9e1d7890696868defe2145f89a7348fe",
+    "manifest.csv": "dbf8be6849bc0263546b295d249f73735eb85f207251bec003342a550b71f771",
+    "train.csv": "bf9d9f4cb2d914b5b99d6a983765c824a74ba21c0dc48b3670f68e124b524ddc",
+    "used_training_files_v12.csv": "c2c0d5d7e4b37297b2208adb48f16f565bfe2de879433156f3045c99bf90ea52",
+    "val_a.csv": "adc770662c59bb9691028efb9c0ef6902c3254d9445a23ccb31941237f9d1791",
+    "val_b.csv": "750f99a2557aea2e9bdbe4243a1646c2cce89a1a9431530616d9eb7dba7c681d",
+    "val_c.csv": "f3888e5b9b705a9b3829e34746c5d3c2e5f61cc86b52d1ebab9d1f9b94127e6f",
+    "val_d.csv": "baa07c606f243fa78a8c7be347646d9674a6faad953a5ff9ee928a73013ec0d3"
+  },
+  "training_commit": "07960b2d7d8771c95ed8aed609050ad9d9ce00db",
+  "selected_v7_sha256": {
+    "model/best.pt": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+    "model/music_best.pt": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+    "model/fusion_weights.json": "87d46c317398bed0a9dc87c6b451246851ba6c34683e4468a0251461f7c42402",
+    "script.py": "8abd4888f09aa00be18790e5257bf0cafc2fff5fd9e167571c880509a665119b"
+  },
+  "data_root": "C:\\Users\\lLrich\\ai_voice_data_v12",
+  "final_holdout": "NOT READ / NOT RUN",
+  "selection_policy_sha256": "ef060820003958da8c02752c7dc4639bc95f004c2557ff9191569558f698f6b2"
+}

@@ -1,0 +1,17 @@
+{
+  "status": "RECORDED_CORRECTIVE_AMENDMENT",
+  "reason": "CAL_V12 upstream_label RR/RF/FR/FF was incorrectly copied into the audio renderer mix_mode field. The renderer requires simultaneous/sequential/partial; these rows were designed as simultaneous mixes.",
+  "change": "CAL_V12 mix_mode RR/RF/FR/FF -> simultaneous; upstream_label remains RR/RF/FR/FF",
+  "training_audio_changed": false,
+  "training_split_changed": false,
+  "old_training_split_sha256": "bf9d9f4cb2d914b5b99d6a983765c824a74ba21c0dc48b3670f68e124b524ddc",
+  "new_training_split_sha256": "bf9d9f4cb2d914b5b99d6a983765c824a74ba21c0dc48b3670f68e124b524ddc",
+  "old_cal_v12_sha256": "9c50eaccc1cde4f0dba43864c95d19879797146fe7c6c937a322ff115c6f6532",
+  "new_cal_v12_sha256": "c0898ae6c5e43825e45ea4fcbffd0b3320161cb1e94b0fb94a7c1f38bcdd2ab7",
+  "old_manifest_sha256": "8d8e299131b5bbf009f1bc50f32b4bbe768d50d6da7bab2806decfd4c73306f9",
+  "new_manifest_sha256": "dbf8be6849bc0263546b295d249f73735eb85f207251bec003342a550b71f771",
+  "affected_training_candidates": ["M1", "M2", "M3", "M4", "M5"],
+  "candidate_model_weights_invalidated": false,
+  "note": "The five music candidates used the unchanged train.csv and unchanged cached training waveforms. Only the previously non-renderable calibration manifest was corrected before any CAL_V12 evaluation.",
+  "final_holdout": "NOT RUN"
+}

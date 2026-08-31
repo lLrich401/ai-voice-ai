@@ -1,0 +1,13 @@
+{
+  "schema_version": "v12-student-head-cache-1",
+  "base_schema_version": "v12-canonical-cache-1",
+  "task": "music",
+  "candidate": "M4",
+  "checkpoint_sha256": "033030fb1511a33bef89e4ab807a0752b60d50131102d2bf17f55da601af16c8",
+  "canonical_cache_sha256": "f11cc4a981eefcdb421f0a05603d4ecabaf7b391562ddfca7c17685b66cffa35",
+  "split": "val_c",
+  "rows": 128,
+  "aggregation": "topk_mean",
+  "segment_policy": "high_energy-maximum-3",
+  "final_holdout": "NOT RUN"
+}

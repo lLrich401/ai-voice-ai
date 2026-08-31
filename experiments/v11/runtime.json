@@ -1,0 +1,64 @@
+{
+  "status": "MEASURED_INCREMENTAL_CPU_PLUS_EXISTING_BASELINE_PROJECTION",
+  "final_holdout": "NOT RUN",
+  "device": "cpu",
+  "samples": 64,
+  "repeats": 3,
+  "shared_decode_and_segment_seconds": 1.6699037000071257,
+  "model_run_seconds": {
+    "v7_voice": [
+      0.3918058999988716,
+      0.352347899985034,
+      0.3488006999832578
+    ],
+    "v7_music": [
+      0.3839941999758594,
+      0.3426151000021491,
+      0.2987243999959901
+    ],
+    "v9_voice": [
+      52.69127939999453,
+      53.03494069998851,
+      53.59630089998245
+    ],
+    "v9_music": [
+      0.35574710002401844,
+      0.2949085999862291,
+      0.2928347999986727
+    ]
+  },
+  "model_median_seconds": {
+    "v7_voice": 0.352347899985034,
+    "v7_music": 0.3426151000021491,
+    "v9_voice": 53.03494069998851,
+    "v9_music": 0.2949085999862291
+  },
+  "baseline_source": "experiments/v7/runtime.json batch_8",
+  "projections": {
+    "baseline_v7": {
+      "projected_1200_minutes": 19.817847406247893,
+      "incremental_minutes": 0.0,
+      "under_60_minutes": true,
+      "under_35_minutes": true
+    },
+    "music_ensemble": {
+      "projected_1200_minutes": 19.91000634374359,
+      "incremental_minutes": 0.09215893749569659,
+      "under_60_minutes": true,
+      "under_35_minutes": true
+    },
+    "voice_ensemble": {
+      "projected_1200_minutes": 36.3912663749943,
+      "incremental_minutes": 16.57341896874641,
+      "under_60_minutes": true,
+      "under_35_minutes": false
+    },
+    "joint_ensemble": {
+      "projected_1200_minutes": 36.48342531249,
+      "incremental_minutes": 16.665577906242106,
+      "under_60_minutes": true,
+      "under_35_minutes": false
+    }
+  },
+  "note": "Projection adds measured CPU specialist overhead to the historical full-pipeline baseline; it is not official DACON server runtime."
+}

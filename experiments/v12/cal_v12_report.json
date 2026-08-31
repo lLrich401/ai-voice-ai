@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "final_holdout": "NOT READ / NOT RUN",
+  "rows": 500,
+  "class_balance": {
+    "FF": 125,
+    "FR": 125,
+    "RF": 125,
+    "RR": 125
+  },
+  "fold_balance": {
+    "cal_v12_a": 167,
+    "cal_v12_b": 167,
+    "cal_v12_c": 166
+  },
+  "voice_generators": [
+    "MLAAD::Chatterbox",
+    "MLAAD::FireRedTTS-2.0",
+    "MLAAD::FishTTS",
+    "MLAAD::Higgs-Audio-V2",
+    "MLAAD::Microsoft VibeVoice 1.5B",
+    "MLAAD::MiniCPM-o-2.6",
+    "MLAAD::OpenVoiceV2",
+    "MLAAD::Qwen2.5-Omni",
+    "MLAAD::RVC",
+    "MLAAD::f5-tts",
+    "MLAAD::suno_bark",
+    "MLAAD_original"
+  ],
+  "music_generators": [
+    "Echoes::FMA_original",
+    "Echoes::acestep",
+    "Echoes::audioldm",
+    "Echoes::brev",
+    "Echoes::elevenlabs",
+    "Echoes::mubert",
+    "Echoes::musicgen",
+    "Echoes::producer",
+    "Echoes::stableaudio",
+    "Echoes::suno",
+    "Echoes::udio",
+    "SONICS::chirp-v2-xxl-alpha"
+  ],
+  "real_sources": [
+    "echoes_fma_paired",
+    "guitarset_mic",
+    "mlaad_tiny_matched",
+    "mtg_jamendo_cc"
+  ],
+  "reserved_base_rows": 308,
+  "v12_training_rows": 3222,
+  "external_data_root": "C:\\Users\\lLrich\\ai_voice_data_v12",
+  "used_training_audio_files": 2822,
+  "overlap": {
+    "train": {
+      "speaker": 0,
+      "original_id": 0,
+      "split_group_id": 0,
+      "base_audio_id": 0,
+      "near_duplicate": 0
+    },
+    "validation": {
+      "speaker": 0,
+      "original_id": 0,
+      "split_group_id": 0,
+      "base_audio_id": 0,
+      "near_duplicate": 0
+    },
+    "expanded_unseen": {
+      "speaker": 0,
+      "original_id": 0,
+      "split_group_id": 0,
+      "base_audio_id": 0,
+      "near_duplicate": 0
+    },
+    "final_holdout": "NOT READ / NOT RUN; inherited V9 public-data isolation audit"
+  }
+}
