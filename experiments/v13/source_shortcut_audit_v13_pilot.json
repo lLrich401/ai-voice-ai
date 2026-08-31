@@ -1,0 +1,72 @@
+{
+  "status": "FAIL_SOURCE_SHORTCUT",
+  "threshold": 0.75,
+  "manifest": "data/splits_v13/train_approved.csv",
+  "rows": 1080,
+  "features_file": "experiments/v13/source_shortcut_audit_v13_pilot_features.csv",
+  "class_balance": {
+    "0": 820,
+    "1": 260
+  },
+  "source_balance": {
+    "librispeech_dev": 500,
+    "guitarset_mic": 240,
+    "sonics_official": 180,
+    "mlaad_tiny_matched": 160
+  },
+  "metadata_only": {
+    "auc": 0.9823616322701689,
+    "folds": 5,
+    "classifier": "L2 logistic regression",
+    "features": [
+      "source",
+      "dataset",
+      "extension",
+      "augment",
+      "is_mix"
+    ]
+  },
+  "acoustic_only": {
+    "auc": 0.9657692307692307,
+    "folds": 5,
+    "classifier": "L2 logistic regression",
+    "features": [
+      "sample_rate",
+      "duration",
+      "bytes_per_second",
+      "rms",
+      "silence_ratio",
+      "clipping_ratio",
+      "zcr",
+      "spectral_centroid",
+      "spectral_rolloff",
+      "spectral_flatness",
+      "high_frequency_ratio"
+    ]
+  },
+  "combined": {
+    "auc": 0.9900984990619137,
+    "folds": 5,
+    "classifier": "L2 logistic regression",
+    "features": [
+      "sample_rate",
+      "duration",
+      "bytes_per_second",
+      "rms",
+      "silence_ratio",
+      "clipping_ratio",
+      "zcr",
+      "spectral_centroid",
+      "spectral_rolloff",
+      "spectral_flatness",
+      "high_frequency_ratio",
+      "source",
+      "dataset",
+      "extension",
+      "augment",
+      "is_mix"
+    ]
+  },
+  "interpretation": "AUC above threshold means label is recoverable from dataset/channel fingerprints; the dataset must not be treated as a forensic-generalization success.",
+  "final_holdout": "NOT READ / NOT RUN"
+}

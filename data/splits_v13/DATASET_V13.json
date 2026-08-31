@@ -1,0 +1,88 @@
+{
+  "dataset_version": "DATASET_V13_PILOT_20260901_2",
+  "status": "PILOT_READY_WITH_GAPS",
+  "data_root": "C:\\Users\\lLrich\\ai_voice_data_v13",
+  "manifest_sha256": "5e060f87fc854a568dcb4e6feddf312c10bf47b9aac6410adbe538fd1f6c072e",
+  "roles": {
+    "cal_v13": {
+      "rows": 550,
+      "sha256": "9d80a53831e5401ddc3389ff5b229f67a9ced025addf24a81d574866dd3ca095",
+      "approved": 550
+    },
+    "train": {
+      "rows": 1080,
+      "sha256": "4fc90a582f3b1e5ae1e47641c157468e63798bd43395688109234840e5594aac",
+      "approved": 1080
+    },
+    "val_generator_disjoint": {
+      "rows": 220,
+      "sha256": "5f35821f8169628e282d6a64435e04841693389e15bb2442f63b7f54ea09a40c",
+      "approved": 220
+    },
+    "val_source_disjoint_review": {
+      "rows": 1785,
+      "sha256": "c7879adf147a537d8e0d3d3b64b22c0c008512772e4d31dbbe6dc00e31ec9f09",
+      "approved": 0
+    }
+  },
+  "sealed_final": {
+    "path": "data/splits_v13/final_holdout_v13.csv",
+    "rows": 795,
+    "sha256": "5c98716199ae3ca771d44a11554d3f64a3a513cf98250b9f3810e4bfd38c1122",
+    "status": "SEALED_NOT_FOR_DEVELOPMENT"
+  },
+  "overlap_audit": {
+    "train_vs_val_generator": {
+      "source": 3,
+      "split_group_id": 0,
+      "original_id": 0,
+      "content_group": 0,
+      "near_duplicate_group": 0,
+      "sha256": 0,
+      "fake_generator_family": 0
+    },
+    "train_vs_val_source": {
+      "source": 0,
+      "split_group_id": 0,
+      "original_id": 0,
+      "content_group": 0,
+      "near_duplicate_group": 0,
+      "sha256": 0,
+      "fake_generator_family": 0
+    },
+    "train_vs_cal": {
+      "source": 3,
+      "split_group_id": 0,
+      "original_id": 0,
+      "content_group": 0,
+      "near_duplicate_group": 0,
+      "sha256": 0,
+      "fake_generator_family": 0
+    },
+    "train_vs_final": {
+      "source": 0,
+      "split_group_id": 0,
+      "original_id": 0,
+      "content_group": 0,
+      "near_duplicate_group": 0,
+      "sha256": 0,
+      "fake_generator_family": 0
+    },
+    "all_dev_vs_final": {
+      "source": 0,
+      "split_group_id": 0,
+      "original_id": 0,
+      "content_group": 0,
+      "near_duplicate_group": 0,
+      "sha256": 0,
+      "fake_generator_family": 0
+    }
+  },
+  "known_gaps": [
+    "approved source-disjoint development validation is not metric-complete",
+    "music training lacks a second content-matched real/fake source after Echoes is sealed",
+    "voice and music row counts remain far below V13 scaling targets",
+    "REVIEW_REQUIRED rows are excluded from approved split files"
+  ],
+  "final_holdout": "CREATED AND SEALED; METRICS NOT RUN"
+}

@@ -1,0 +1,79 @@
+{
+  "status": "FAIL_SOURCE_SHORTCUT",
+  "threshold": 0.75,
+  "manifest": "data/splits_v12/train.csv",
+  "rows": 1200,
+  "features_file": "experiments/v13/source_shortcut_audit_features.csv",
+  "class_balance": {
+    "0": 638,
+    "1": 562
+  },
+  "source_balance": {
+    "split_internal_mix": 159,
+    "asvspoof2019": 158,
+    "mlaad_tiny_matched": 150,
+    "wavefake_ajay": 127,
+    "echoes_fma_paired": 104,
+    "gtzan_real_v2": 101,
+    "librispeech_dev": 82,
+    "mtg_jamendo_cc": 82,
+    "guitarset_mic": 81,
+    "sonics_official": 80,
+    "fake_music_generated": 76
+  },
+  "metadata_only": {
+    "auc": 0.8683357690291057,
+    "folds": 5,
+    "classifier": "L2 logistic regression",
+    "features": [
+      "source",
+      "dataset",
+      "extension",
+      "augment",
+      "is_mix"
+    ]
+  },
+  "acoustic_only": {
+    "auc": 0.7248017046151787,
+    "folds": 5,
+    "classifier": "L2 logistic regression",
+    "features": [
+      "sample_rate",
+      "duration",
+      "bytes_per_second",
+      "rms",
+      "silence_ratio",
+      "clipping_ratio",
+      "zcr",
+      "spectral_centroid",
+      "spectral_rolloff",
+      "spectral_flatness",
+      "high_frequency_ratio"
+    ]
+  },
+  "combined": {
+    "auc": 0.88374200961635,
+    "folds": 5,
+    "classifier": "L2 logistic regression",
+    "features": [
+      "sample_rate",
+      "duration",
+      "bytes_per_second",
+      "rms",
+      "silence_ratio",
+      "clipping_ratio",
+      "zcr",
+      "spectral_centroid",
+      "spectral_rolloff",
+      "spectral_flatness",
+      "high_frequency_ratio",
+      "source",
+      "dataset",
+      "extension",
+      "augment",
+      "is_mix"
+    ]
+  },
+  "interpretation": "AUC above threshold means label is recoverable from dataset/channel fingerprints; the dataset must not be treated as a forensic-generalization success.",
+  "final_holdout": "NOT READ / NOT RUN"
+}

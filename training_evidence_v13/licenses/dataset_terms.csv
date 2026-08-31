@@ -1,0 +1,6 @@
+source,source_url,license,competition_use_status
+librispeech_dev,https://www.openslr.org/12,CC BY 4.0,APPROVED
+mlaad_tiny_matched,https://huggingface.co/datasets/mueller91/MLAAD-tiny,CC BY-NC 4.0,APPROVED
+mlaad_tiny_matched,https://huggingface.co/datasets/mueller91/MLAAD-tiny,M-AILABS original corpus license (see MLAAD LICENSE),APPROVED
+sonics_official,https://github.com/awsaf49/sonics,CC BY-NC 4.0,APPROVED
+guitarset_mic,https://zenodo.org/records/3371780,CC BY 4.0,APPROVED

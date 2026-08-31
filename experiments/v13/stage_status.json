@@ -1,0 +1,31 @@
+{
+  "version": "V13_RADICAL_REDESIGN_20260901",
+  "current_stage": 3,
+  "decision": "KEEP_TEST5",
+  "stages": {
+    "0_submission_freeze": "PASS",
+    "1_existing_error_audit": "PASS_WITH_COVERAGE_LIMITS",
+    "2_dataset_v13_pilot": "PASS_WITH_GAPS",
+    "3_source_shortcut_audit": "FAIL",
+    "4_voice_architecture": "NOT RUN",
+    "5_music_architecture": "NOT RUN",
+    "6_dedicated_file_architecture": "NOT RUN",
+    "7_scale_sources": "NOT RUN",
+    "8_full_training": "NOT RUN",
+    "9_cross_domain_validation": "NOT RUN",
+    "10_cal_v13_fusion": "NOT RUN",
+    "11_distillation_runtime": "NOT RUN",
+    "12_bootstrap": "NOT RUN",
+    "13_candidate_lock": "NOT RUN",
+    "14_final_holdout_v13": "SEALED_NOT_RUN",
+    "15_submission_build": "CURRENT_TEST5_REVALIDATED; V13 NOT BUILT"
+  },
+  "blocking_evidence": {
+    "metadata_auc": 0.9823616322701689,
+    "acoustic_auc": 0.9657692307692307,
+    "combined_auc": 0.9900984990619137,
+    "maximum_allowed_auc": 0.75
+  },
+  "selected_artifacts_mutated": false,
+  "final_holdout_v13_used_for_development_or_scored": false
+}

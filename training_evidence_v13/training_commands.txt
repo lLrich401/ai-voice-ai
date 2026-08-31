@@ -1,0 +1,3 @@
+# V13 training intentionally NOT RUN: source-shortcut gate failed.
+python scripts/prepare_dataset_v13.py
+python tools/audit_source_shortcut_v13.py --manifest data/splits_v13/train_approved.csv --limit 0

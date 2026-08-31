@@ -1,0 +1,15 @@
+{
+  "version": "DATASET_V13_PILOT_20260901_2",
+  "data_root_environment": "AI_VOICE_DATA_ROOT",
+  "default_local_root": "C:/Users/lLrich/ai_voice_data_v13",
+  "pilot_rows_per_source_or_generator": "100-300 where available",
+  "required_manifest_fields": [
+    "path", "sha256", "source", "source_url", "license", "generator",
+    "generator_version", "language", "speaker", "track", "content_group",
+    "split_group", "augmentation", "seed"
+  ],
+  "channel_policy": "Apply channel transforms with label-independent probabilities.",
+  "source_shortcut_gate_auc": 0.75,
+  "scale_policy": "Do not scale a source until generator/source-disjoint validation improves.",
+  "final_holdout": "SEALED_NOT_FOR_DEVELOPMENT"
+}

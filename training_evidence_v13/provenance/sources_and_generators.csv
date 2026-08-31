@@ -1,0 +1,15 @@
+source,source_url,generator,generator_version
+librispeech_dev,https://www.openslr.org/12,LibriSpeech,dev-clean; historical local snapshot
+mlaad_tiny_matched,https://huggingface.co/datasets/mueller91/MLAAD-tiny,MLAAD::Chatterbox,9143e5ea709575ebab6bec52840a1043aada7bb1
+mlaad_tiny_matched,https://huggingface.co/datasets/mueller91/MLAAD-tiny,MLAAD::FireRedTTS-2.0,9143e5ea709575ebab6bec52840a1043aada7bb1
+mlaad_tiny_matched,https://huggingface.co/datasets/mueller91/MLAAD-tiny,MLAAD::FishTTS,9143e5ea709575ebab6bec52840a1043aada7bb1
+mlaad_tiny_matched,https://huggingface.co/datasets/mueller91/MLAAD-tiny,MLAAD::Higgs-Audio-V2,9143e5ea709575ebab6bec52840a1043aada7bb1
+mlaad_tiny_matched,https://huggingface.co/datasets/mueller91/MLAAD-tiny,MLAAD::Microsoft VibeVoice 1.5B,9143e5ea709575ebab6bec52840a1043aada7bb1
+mlaad_tiny_matched,https://huggingface.co/datasets/mueller91/MLAAD-tiny,MLAAD_original,9143e5ea709575ebab6bec52840a1043aada7bb1
+mlaad_tiny_matched,https://huggingface.co/datasets/mueller91/MLAAD-tiny,MLAAD::Cartesia.ai (Sonic-3),9143e5ea709575ebab6bec52840a1043aada7bb1
+mlaad_tiny_matched,https://huggingface.co/datasets/mueller91/MLAAD-tiny,MLAAD::DeepGram,9143e5ea709575ebab6bec52840a1043aada7bb1
+mlaad_tiny_matched,https://huggingface.co/datasets/mueller91/MLAAD-tiny,MLAAD::Edge-TTS,9143e5ea709575ebab6bec52840a1043aada7bb1
+sonics_official,https://github.com/awsaf49/sonics,SONICS::chirp-v2-xxl-alpha,official part_01 + metadata snapshot 2026-08-31
+sonics_official,https://github.com/awsaf49/sonics,SONICS::chirp-v3,official part_01 + metadata snapshot 2026-08-31
+sonics_official,https://github.com/awsaf49/sonics,SONICS::chirp-v3.5,official part_01 + metadata snapshot 2026-08-31
+guitarset_mic,https://zenodo.org/records/3371780,guitarset_mic::real,Zenodo record 3371780

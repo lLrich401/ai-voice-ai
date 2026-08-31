@@ -1,0 +1,506 @@
+{
+  "status": "FROZEN_PRE_V13_SELECTED",
+  "competition": "DACON 236749 Audio Deepfake Detection",
+  "actual_public_baseline": {
+    "submission": "TEST5",
+    "total": 0.6684394603,
+    "ads": 0.6386349206,
+    "cps": 0.9366803175,
+    "runtime": "30m52s",
+    "source": "user-reported public leaderboard result"
+  },
+  "git": {
+    "commit": "2530f9ef0978b82fc019dbb1380026a01c09081f",
+    "branch": "test4"
+  },
+  "frozen_zip": {
+    "path": "archive/pre_v13_selected/submit.zip",
+    "bytes": 935635645,
+    "sha256": "5898ad19b5c92e46d54aca529336b99f9e17838806766c654a3585051388fdcb",
+    "top_level": [
+      "model",
+      "requirements.txt",
+      "script.py"
+    ],
+    "member_count": 30
+  },
+  "selected_artifacts": {
+    "script.py": {
+      "bytes": 41560,
+      "sha256": "8abd4888f09aa00be18790e5257bf0cafc2fff5fd9e167571c880509a665119b"
+    },
+    "requirements.txt": {
+      "bytes": 470,
+      "sha256": "45ba713cfc2674474144d10c3441775121956fa51e142c3bbedbfa142aaba308"
+    },
+    "model/best.pt": {
+      "bytes": 980663,
+      "sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6"
+    },
+    "model/music_best.pt": {
+      "bytes": 979701,
+      "sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1"
+    },
+    "model/fusion_weights.json": {
+      "bytes": 12419,
+      "sha256": "87d46c317398bed0a9dc87c6b451246851ba6c34683e4468a0251461f7c42402"
+    },
+    "model/df_arena/df_arena_1b_int8.onnx": {
+      "bytes": 1367897899,
+      "sha256": "35a69bf6df8d96208309be6e0217ddf0dd6286649da867497a2753236009bdaf"
+    },
+    "model/panns/Cnn14_16k_mAP=0.438.pth": {
+      "bytes": 324226335,
+      "sha256": "eee61e89d4ef120bfe0e900f0fb9e4814a2597bbd1f3bf8e149868a7d508bc10"
+    }
+  },
+  "runtime_source": {
+    "model/runtime/src/__init__.py": {
+      "bytes": 14,
+      "sha256": "b95dc82ca1648e9c54677c391d2f62e5dc672fe80620c141cd3f7a9523844d73"
+    },
+    "model/runtime/src/augment.py": {
+      "bytes": 13815,
+      "sha256": "4e68e0abc42709d36fcc18d88ced27536d0406027cef982bd4195a8ab43de372"
+    },
+    "model/runtime/src/dataset.py": {
+      "bytes": 45656,
+      "sha256": "88451564d27863f997861004358276f7ad9d0f05705e01662b1e5235dcd42263"
+    },
+    "model/runtime/src/distillation.py": {
+      "bytes": 9566,
+      "sha256": "f4725a17ad79a97030fc677c645330ba783f7b04a0747af9caa169909b1df43a"
+    },
+    "model/runtime/src/ensemble.py": {
+      "bytes": 6503,
+      "sha256": "3f8a754d7d616501613523ff05476f7cdb83142cc3bee64d9ffae26f24b317d9"
+    },
+    "model/runtime/src/inference.py": {
+      "bytes": 6046,
+      "sha256": "b9a8135b6fc59ad5bde4f655e8232b5fa1e54414c5f45d86f7d82ff1122649ac"
+    },
+    "model/runtime/src/metrics.py": {
+      "bytes": 4444,
+      "sha256": "7180dcdd0a4f282358336e6d77a69d44b9e39b72dd6f7dadb02e2f24916ff8ba"
+    },
+    "model/runtime/src/models/__init__.py": {
+      "bytes": 917,
+      "sha256": "2e6da5ec7ccb472e9107eb587ba89fda616b859b195830addcf8f42429d60aee"
+    },
+    "model/runtime/src/models/aasist.py": {
+      "bytes": 4773,
+      "sha256": "ceccd170e06fe36839a05f7a03d104a813e316a911990c3df16a41be0d99c2c2"
+    },
+    "model/runtime/src/models/beats_backbone.py": {
+      "bytes": 3657,
+      "sha256": "8f010cdfae78f421ccd80663bd4cd046a170c6f5db37e0745ae2367c4e6bfada"
+    },
+    "model/runtime/src/models/demucs_wrapper.py": {
+      "bytes": 9200,
+      "sha256": "5320274ac90cee10a0c500f3efbc7a349e4292482157a695192c453ecd282c4a"
+    },
+    "model/runtime/src/models/multitask.py": {
+      "bytes": 257,
+      "sha256": "185eb63d035f9de3ab4ba29b7040cb7faa93b620055ac174dc462d7cff3aec9b"
+    },
+    "model/runtime/src/models/panns.py": {
+      "bytes": 8636,
+      "sha256": "6802635fc79192727be5cd98938289e1d864fa0f2c2debf434d023f74c57cd40"
+    },
+    "model/runtime/src/models/ssl_backbone.py": {
+      "bytes": 283,
+      "sha256": "5cb8825215615da0cf1ce1316758d41a80fb107da9d914a10114175e085dc8e6"
+    },
+    "model/runtime/src/preprocess.py": {
+      "bytes": 5660,
+      "sha256": "0a9f6933f2f82bbac95f4080568e5e943a7ca150959cef84e02ef8a9977f6c2e"
+    },
+    "model/runtime/src/train.py": {
+      "bytes": 28413,
+      "sha256": "87a0ca965ceb052880818f067f37faadea976831da41295644ab1c0ffe12eda1"
+    }
+  },
+  "fusion_configuration": {
+    "w_voice_file": 0.0,
+    "w_music_file": 0.5,
+    "w_prob_or": 0.5,
+    "w_df_arena": 0.25,
+    "w_df_voice_component": 0.3,
+    "w_df_music_component": 0.0,
+    "w_panns_presence": 0.75,
+    "file_fusion_mode": "legacy",
+    "df_gate_policy": "off",
+    "df_gate_calibration_fraction": 1.0,
+    "metric_version": "dacon236749-official-noninterpolated-v1",
+    "pipeline_version": "dacon236749-20260831-v7-voice-robust",
+    "voice_checkpoint_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+    "music_checkpoint_sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+    "panns_sha256": "eee61e89d4ef120bfe0e900f0fb9e4814a2597bbd1f3bf8e149868a7d508bc10",
+    "df_model_version": "pranjal-pravesh/df_arena_1b:int8-onnx-64600",
+    "df_arena_class_0_is_fake": true,
+    "adaptive_df_enabled": false,
+    "adaptive_df_low": 0.0,
+    "adaptive_df_high": 1.0,
+    "adaptive_df_aggregation": "mean",
+    "adaptive_df_minimum_duration": 12.0,
+    "adaptive_df_trigger_mode": "primary",
+    "adaptive_df_component_low": 0.3,
+    "adaptive_df_component_high": 0.7,
+    "adaptive_df_disagreement": 0.3,
+    "specialist_max_segments": 3,
+    "panns_max_segments": 3,
+    "voice_fake_aggregation": "max",
+    "voice_segment_policy": "high_energy",
+    "calibration_robust_objective": 0.8883663603678957,
+    "calibration_samples": 656,
+    "calibration_metrics_by_fold": {
+      "cal_a": {
+        "file_eer": 0.14285714285714288,
+        "voice_eer": 0.24640760979558793,
+        "music_eer": 0.0,
+        "voice_auc": 0.9002347417840375,
+        "music_auc": 0.9631661442006269,
+        "ads": 0.879289906612311,
+        "cps": 0.9317004429923321,
+        "score": 0.8845309602503132,
+        "total": 0.8845309602503132
+      },
+      "cal_b": {
+        "file_eer": 0.12666255313314134,
+        "voice_eer": 0.19683598794662074,
+        "music_eer": 0.011667345000678363,
+        "voice_auc": 0.8764447987245915,
+        "music_auc": 0.9864606562599555,
+        "ads": 0.8938013223439016,
+        "cps": 0.9314527274922735,
+        "score": 0.8975664628587389,
+        "total": 0.8975664628587389
+      },
+      "cal_c": {
+        "file_eer": 0.1486842105263158,
+        "voice_eer": 0.20479962721342032,
+        "music_eer": 0.011680988184747602,
+        "voice_auc": 0.9151138716356109,
+        "music_auc": 0.9820577516119987,
+        "ads": 0.8811936728387337,
+        "cps": 0.9485858116238048,
+        "score": 0.8879328867172409,
+        "total": 0.8879328867172409
+      }
+    },
+    "file_fusion_mode_comparison": {
+      "legacy": {
+        "robust_objective": 0.8883663603678957,
+        "metrics_by_fold": {
+          "cal_a": {
+            "file_eer": 0.14285714285714288,
+            "voice_eer": 0.24640760979558793,
+            "music_eer": 0.0,
+            "voice_auc": 0.9002347417840375,
+            "music_auc": 0.9631661442006269,
+            "ads": 0.879289906612311,
+            "cps": 0.9317004429923321,
+            "score": 0.8845309602503132,
+            "total": 0.8845309602503132
+          },
+          "cal_b": {
+            "file_eer": 0.12666255313314134,
+            "voice_eer": 0.19683598794662074,
+            "music_eer": 0.011667345000678363,
+            "voice_auc": 0.8764447987245915,
+            "music_auc": 0.9864606562599555,
+            "ads": 0.8938013223439016,
+            "cps": 0.9314527274922735,
+            "score": 0.8975664628587389,
+            "total": 0.8975664628587389
+          },
+          "cal_c": {
+            "file_eer": 0.1486842105263158,
+            "voice_eer": 0.20479962721342032,
+            "music_eer": 0.011680988184747602,
+            "voice_auc": 0.9151138716356109,
+            "music_auc": 0.9820577516119987,
+            "ads": 0.8811936728387337,
+            "cps": 0.9485858116238048,
+            "score": 0.8879328867172409,
+            "total": 0.8879328867172409
+          }
+        },
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "legacy"
+        }
+      },
+      "presence_weighted": {
+        "robust_objective": 0.8801322925409443,
+        "metrics_by_fold": {
+          "cal_a": {
+            "file_eer": 0.15793650793650793,
+            "voice_eer": 0.24640760979558793,
+            "music_eer": 0.0,
+            "voice_auc": 0.9002347417840375,
+            "music_auc": 0.9631661442006269,
+            "ads": 0.8717502240726285,
+            "cps": 0.9317004429923321,
+            "score": 0.8777452459645989,
+            "total": 0.8777452459645989
+          },
+          "cal_b": {
+            "file_eer": 0.13506101741395862,
+            "voice_eer": 0.19683598794662074,
+            "music_eer": 0.011667345000678363,
+            "voice_auc": 0.8764447987245915,
+            "music_auc": 0.9864606562599555,
+            "ads": 0.8896020902034931,
+            "cps": 0.9314527274922735,
+            "score": 0.8937871539323712,
+            "total": 0.8937871539323712
+          },
+          "cal_c": {
+            "file_eer": 0.17697368421052634,
+            "voice_eer": 0.20479962721342032,
+            "music_eer": 0.011680988184747602,
+            "voice_auc": 0.9151138716356109,
+            "music_auc": 0.9820577516119987,
+            "ads": 0.8670489359966285,
+            "cps": 0.9485858116238048,
+            "score": 0.8752026235593462,
+            "total": 0.8752026235593462
+          }
+        },
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "presence_weighted"
+        }
+      },
+      "presence_component_or": {
+        "robust_objective": 0.879466654257659,
+        "metrics_by_fold": {
+          "cal_a": {
+            "file_eer": 0.14285714285714288,
+            "voice_eer": 0.24640760979558793,
+            "music_eer": 0.0,
+            "voice_auc": 0.9002347417840375,
+            "music_auc": 0.9631661442006269,
+            "ads": 0.879289906612311,
+            "cps": 0.9317004429923321,
+            "score": 0.8845309602503132,
+            "total": 0.8845309602503132
+          },
+          "cal_b": {
+            "file_eer": 0.14695598519127934,
+            "voice_eer": 0.19683598794662074,
+            "music_eer": 0.011667345000678363,
+            "voice_auc": 0.8764447987245915,
+            "music_auc": 0.9864606562599555,
+            "ads": 0.8836546063148327,
+            "cps": 0.9314527274922735,
+            "score": 0.8884344184325769,
+            "total": 0.8884344184325769
+          },
+          "cal_c": {
+            "file_eer": 0.181140350877193,
+            "voice_eer": 0.20479962721342032,
+            "music_eer": 0.011680988184747602,
+            "voice_auc": 0.9151138716356109,
+            "music_auc": 0.9820577516119987,
+            "ads": 0.8649656026632953,
+            "cps": 0.9485858116238048,
+            "score": 0.8733276235593463,
+            "total": 0.8733276235593463
+          }
+        },
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.0,
+          "w_prob_or": 1.0,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "presence_component_or"
+        }
+      }
+    },
+    "coordinate_search_trace": [
+      {
+        "pass": 1,
+        "coordinate": "detector",
+        "objective": 0.8883663603678957,
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "legacy"
+        }
+      },
+      {
+        "pass": 1,
+        "coordinate": "w_df_arena",
+        "objective": 0.8883663603678957,
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "legacy"
+        }
+      },
+      {
+        "pass": 1,
+        "coordinate": "w_df_voice_component",
+        "objective": 0.8883663603678957,
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "legacy"
+        }
+      },
+      {
+        "pass": 1,
+        "coordinate": "w_df_music_component",
+        "objective": 0.8883663603678957,
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "legacy"
+        }
+      },
+      {
+        "pass": 1,
+        "coordinate": "w_panns_presence",
+        "objective": 0.8883663603678957,
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "legacy"
+        }
+      },
+      {
+        "pass": 2,
+        "coordinate": "detector",
+        "objective": 0.8883663603678957,
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "legacy"
+        }
+      },
+      {
+        "pass": 2,
+        "coordinate": "w_df_arena",
+        "objective": 0.8883663603678957,
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "legacy"
+        }
+      },
+      {
+        "pass": 2,
+        "coordinate": "w_df_voice_component",
+        "objective": 0.8883663603678957,
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "legacy"
+        }
+      },
+      {
+        "pass": 2,
+        "coordinate": "w_df_music_component",
+        "objective": 0.8883663603678957,
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "legacy"
+        }
+      },
+      {
+        "pass": 2,
+        "coordinate": "w_panns_presence",
+        "objective": 0.8883663603678957,
+        "weights": {
+          "w_voice_file": 0.0,
+          "w_music_file": 0.5,
+          "w_prob_or": 0.5,
+          "w_df_arena": 0.25,
+          "w_df_voice_component": 0.3,
+          "w_df_music_component": 0.0,
+          "w_panns_presence": 0.75,
+          "file_fusion_mode": "legacy"
+        }
+      }
+    ],
+    "calibration_cache_metadata": {
+      "voice_checkpoint_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+      "music_checkpoint_sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+      "df_model_sha256": "a3b5746088fa57529d1291cca40c05077997ccf33574074f3c6e28712e96420b",
+      "df_model_version": "pranjal-pravesh/df_arena_1b:int8-onnx-64600",
+      "panns_sha256": "eee61e89d4ef120bfe0e900f0fb9e4814a2597bbd1f3bf8e149868a7d508bc10",
+      "split_csv_sha256": {
+        "fusion_calibration.csv": "0748fb5d545f3b79842109094c931a31b98ed203d2b817bece7f1490039864a4"
+      },
+      "pipeline_version": "dacon236749-20260831-v7-voice-robust",
+      "calibration_script_version": "robust-folds-df-gate-panns16k-v4",
+      "feature_extractor_version": "canonical-inference-panns16k-voice-max-v4",
+      "baseline_ref": "1b5553200d08dcf4f7867e7ecfc8cc93a5d62d5f"
+    }
+  },
+  "restore": "Copy archive/pre_v13_selected/submit.zip to submit.zip and extract only when selected working-tree artifacts must be restored byte-for-byte.",
+  "final_holdout": "NOT READ / NOT RUN"
+}

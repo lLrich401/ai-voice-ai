@@ -1,0 +1,27 @@
+{
+  "version": "v13-selection-policy-1",
+  "locked_before_model_training": true,
+  "robust_objective": {
+    "mean_domain_score": 0.3,
+    "unseen_generator_score": 0.25,
+    "worst_domain": 0.2,
+    "channel_robustness": 0.15,
+    "partial_mixed_score": 0.1
+  },
+  "adoption_gates": {
+    "source_shortcut_auc_max": 0.75,
+    "cps_drop_max": 0.01,
+    "runtime_minutes_max": 60,
+    "paired_bootstrap_replicates_min": 1000,
+    "requires_unseen_generator_improvement": true,
+    "requires_source_disjoint_improvement": true,
+    "requires_file_eer_improvement": true,
+    "requires_positive_bootstrap_evidence": true,
+    "requires_submission_validation": true
+  },
+  "final_holdout_v13": {
+    "development_access": "FORBIDDEN",
+    "maximum_evaluations_after_candidate_lock": 1
+  },
+  "failure_decision": "KEEP_TEST5"
+}
