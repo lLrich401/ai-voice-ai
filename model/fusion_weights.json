@@ -1,11 +1,12 @@
 {
   "w_voice_file": 0.25,
-  "w_music_file": 0.0,
-  "w_prob_or": 0.75,
-  "w_df_arena": 0.0,
+  "w_music_file": 0.75,
+  "w_prob_or": 0.0,
+  "w_df_arena": 0.25,
   "w_df_voice_component": 0.3,
   "w_df_music_component": 0.2,
   "w_panns_presence": 0.25,
+  "file_fusion_mode": "presence_weighted",
   "metric_version": "dacon236749-official-noninterpolated-v1",
   "pipeline_version": "dacon236749-20260831-v5",
   "voice_checkpoint_sha256": "f7cbd54c3cd462fa2b1a1401da5c0f6063f251cef67223df95cdca4816408183",
@@ -21,41 +22,41 @@
   "df_gate_calibration_fraction": 0.6401326699834162,
   "specialist_max_segments": 3,
   "panns_max_segments": 3,
-  "calibration_robust_objective": 0.874658689209338,
+  "calibration_robust_objective": 0.8757855921126718,
   "calibration_samples": 603,
   "calibration_metrics_by_fold": {
     "cal_a": {
-      "file_eer": 0.14039408866995076,
+      "file_eer": 0.15321645899739206,
       "voice_eer": 0.2930486142662426,
       "music_eer": 0.0,
       "voice_auc": 0.8679084073820915,
       "music_auc": 0.9699812382739211,
-      "ads": 0.8711932328117762,
+      "ads": 0.8647820476480554,
       "cps": 0.9189448228280064,
-      "score": 0.8759683918133992,
-      "total": 0.8759683918133992
+      "score": 0.8701983251660506,
+      "total": 0.8701983251660506
     },
     "cal_b": {
-      "file_eer": 0.14579710144927535,
+      "file_eer": 0.13550724637681155,
       "voice_eer": 0.18785103785103785,
       "music_eer": 0.03948051948051949,
       "voice_auc": 0.8974447513812154,
       "music_auc": 0.9683994823123382,
-      "ads": 0.877687085860999,
+      "ads": 0.8828320133972308,
       "cps": 0.9329221168467767,
-      "score": 0.8832105889595768,
-      "total": 0.8832105889595768
+      "score": 0.8878410237421854,
+      "total": 0.8878410237421854
     },
     "cal_c": {
-      "file_eer": 0.18290909090909094,
+      "file_eer": 0.16922727272727273,
       "voice_eer": 0.17521647861453687,
       "music_eer": 0.03851851851851855,
       "voice_auc": 0.90646578782172,
       "music_auc": 0.9853801169590644,
-      "ads": 0.8619466032669916,
+      "ads": 0.8687875123579007,
       "cps": 0.9459229523903923,
-      "score": 0.8703442381793317,
-      "total": 0.8703442381793317
+      "score": 0.8765010563611499,
+      "total": 0.8765010563611499
     }
   },
   "calibration_cache_metadata": {

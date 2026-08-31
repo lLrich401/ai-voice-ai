@@ -17,8 +17,28 @@ $archive = Join-Path $workspace $OutputName
 # The contest rejects an extra top-level source directory. Bundle importable
 # source under the permitted model/ directory instead.
 New-Item -ItemType Directory -Force -Path $runtime | Out-Null
+if (Test-Path -LiteralPath $runtimeSource) {
+    $resolvedRuntime = [IO.Path]::GetFullPath($runtime)
+    $resolvedSource = [IO.Path]::GetFullPath($runtimeSource)
+    if (-not $resolvedSource.StartsWith($resolvedRuntime + [IO.Path]::DirectorySeparatorChar)) {
+        throw "Refusing to replace runtime source outside model/runtime: $resolvedSource"
+    }
+    Remove-Item -LiteralPath $resolvedSource -Recurse -Force
+}
 New-Item -ItemType Directory -Force -Path $runtimeSource | Out-Null
 Copy-Item -Path (Join-Path $source '*') -Destination $runtimeSource -Recurse -Force -Exclude '__pycache__', '*.pyc'
+
+# Submission imports model/runtime/src first. Prove the fresh copy is byte-for-byte
+# identical before creating the archive.
+Get-ChildItem -LiteralPath $source -Recurse -File -Filter '*.py' | ForEach-Object {
+    $relative = $_.FullName.Substring($source.Length).TrimStart('\', '/')
+    $copied = Join-Path $runtimeSource $relative
+    if (-not (Test-Path -LiteralPath $copied)) { throw "Runtime copy missing: $relative" }
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName).Hash -ne
+        (Get-FileHash -Algorithm SHA256 -LiteralPath $copied).Hash) {
+        throw "Runtime copy hash mismatch: $relative"
+    }
+}
 
 Push-Location $workspace
 try {

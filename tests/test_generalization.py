@@ -1,4 +1,5 @@
 import pathlib
+import hashlib
 
 import numpy as np
 import pandas as pd
@@ -85,3 +86,13 @@ def test_actual_panns_checkpoint_has_near_complete_coverage():
     assert model.load_stats["key_coverage"] >= 0.98
     assert model.load_stats["element_coverage"] >= 0.98
     assert model.load_stats["missing_core"] == []
+
+
+def test_runtime_source_hashes_match_root_source():
+    root = pathlib.Path(__file__).resolve().parents[1]
+    source = root / "src"
+    runtime = root / "model/runtime/src"
+    for path in source.rglob("*.py"):
+        copied = runtime / path.relative_to(source)
+        assert copied.exists(), f"runtime copy missing: {path.relative_to(source)}"
+        assert hashlib.sha256(path.read_bytes()).digest() == hashlib.sha256(copied.read_bytes()).digest()

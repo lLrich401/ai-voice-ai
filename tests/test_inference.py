@@ -62,6 +62,47 @@ def test_skipped_df_is_neutral_for_component_fusion():
     assert result[2] == pytest.approx(0.2)
 
 
+def test_presence_aware_file_risk_does_not_gate_component_outputs():
+    common = dict(file_fake_df=0.5, voice_fake_model=0.9, music_fake_model=0.8,
+                  file_voice=0.7, file_music=0.6, voice_present_model=0.0,
+                  music_present_model=1.0, voice_present_panns=0.0,
+                  music_present_panns=1.0)
+    legacy = script.fuse_prediction_features(
+        **common, fusion_weights={"file_fusion_mode":"legacy", "w_voice_file":0.5,
+                                  "w_music_file":0.0, "w_prob_or":0.5,
+                                  "w_df_arena":0.0, "w_panns_presence":0.5})
+    aware = script.fuse_prediction_features(
+        **common, fusion_weights={"file_fusion_mode":"presence_weighted",
+                                  "w_voice_file":0.5, "w_music_file":0.0,
+                                  "w_prob_or":0.5, "w_df_arena":0.0,
+                                  "w_panns_presence":0.5})
+    assert aware[1] == pytest.approx(legacy[1]) == pytest.approx(0.9)
+    assert aware[2] == pytest.approx(legacy[2]) == pytest.approx(0.8)
+    assert aware[0] < legacy[0]
+
+
+@pytest.mark.parametrize("absent", ["voice", "music"])
+def test_absent_component_cannot_affect_presence_aware_file_risk(absent):
+    values = dict(file_fake_df=0.5, voice_fake_model=0.2, music_fake_model=0.3,
+                  file_voice=0.4, file_music=0.5, voice_present_model=1.0,
+                  music_present_model=1.0, voice_present_panns=1.0,
+                  music_present_panns=1.0)
+    if absent == "voice":
+        values.update(voice_present_model=0.0, voice_present_panns=0.0)
+        varied = ("voice_fake_model", "file_voice")
+    else:
+        values.update(music_present_model=0.0, music_present_panns=0.0)
+        varied = ("music_fake_model", "file_music")
+    weights = {"file_fusion_mode":"presence_weighted", "w_voice_file":0.25,
+               "w_music_file":0.25, "w_prob_or":0.5, "w_df_arena":0.0,
+               "w_panns_presence":0.5}
+    first = script.fuse_prediction_features(**values, fusion_weights=weights)[0]
+    values[varied[0]] = 0.99
+    values[varied[1]] = 0.99
+    second = script.fuse_prediction_features(**values, fusion_weights=weights)[0]
+    assert second == pytest.approx(first)
+
+
 def test_adaptive_df_second_crop_is_distant_and_conditioned():
     wave = np.zeros(20 * 16000, dtype=np.float32)
     wave[0:64600] = 0.5

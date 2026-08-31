@@ -310,6 +310,30 @@ def main():
                         if best is None or candidate[:2] > best[:2]:
                             best = candidate
     _, _, selected_weights, _, _ = best
+    # FILE-only fusion candidates. Component and presence calibration remains
+    # fixed so this comparison cannot improve conditional EER by side effect.
+    file_mode_results = {}
+    best_file_mode = None
+    for mode in ("legacy", "presence_weighted", "presence_component_or"):
+        mode_best = None
+        for wv, wm, wo in detector_weights:
+            for wdf in (0.0, 0.25, 0.5, 0.75, 1.0):
+                trial = dict(selected_weights)
+                trial.update({"w_voice_file": wv, "w_music_file": wm,
+                              "w_prob_or": wo, "w_df_arena": wdf,
+                              "file_fusion_mode": mode})
+                objective, metrics = robust_score(cache, trial, adaptive_candidates[0])
+                candidate = (objective, -abs(wdf - 0.5), trial, metrics)
+                if mode_best is None or candidate[:2] > mode_best[:2]:
+                    mode_best = candidate
+        mode_objective, _, mode_weights, mode_metrics = mode_best
+        file_mode_results[mode] = {"robust_objective": mode_objective,
+                                   "metrics_by_fold": mode_metrics,
+                                   "weights": mode_weights}
+        candidate = (mode_objective, mode_weights, mode_metrics)
+        if best_file_mode is None or candidate[0] > best_file_mode[0]:
+            best_file_mode = candidate
+    _, selected_weights, _ = best_file_mode
     best_adaptive = None
     for adaptive in adaptive_candidates:
         objective, metrics = robust_score(cache, selected_weights, adaptive)
@@ -338,6 +362,7 @@ def main():
         "calibration_robust_objective": objective,
         "calibration_samples": int(len(cache)),
         "calibration_metrics_by_fold": metrics,
+        "file_fusion_mode_comparison": file_mode_results,
         "calibration_cache_metadata": expected_metadata,
     })
     out = ROOT / "model/fusion_weights.json"

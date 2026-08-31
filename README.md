@@ -60,10 +60,11 @@ artifacts are mandatory and checkpoints load strictly/offline.
 
 Ten CPU epochs were run per specialist. The selected checkpoints are voice
 epoch 5 and music epoch 9. Three-fold robust calibration used all 603 samples.
-The speed-selected voice-presence DF gate has robust objective 0.87466 versus
-0.87623 for ungated primary-crop DF, while invoking DF for 64.0% of calibration
-files. Its one-shot final-holdout score is 0.90487 (local data, not a DACON
-leaderboard claim). On 64 local CPU files the same gate reduced DF calls from
+The speed-selected voice-presence DF gate plus presence-aware FILE fusion has
+robust objective 0.87579 versus 0.87466 for gated legacy FILE fusion, while
+invoking DF for 64.0% of calibration files. Its one-shot final-holdout score is
+0.92910 (ADS 0.92712; local data, not a DACON leaderboard claim). On 64 local
+CPU files the same gate reduced DF calls from
 64 to 41 and projected 1,200-file runtime from 9.68 to 7.45 minutes, a 23.0%
 reduction. The official L4 benchmark and a new DACON score are **NOT RUN**.
 

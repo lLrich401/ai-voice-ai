@@ -424,7 +424,24 @@ def fuse_prediction_features(file_fake_df, voice_fake_model, music_fake_model,
     wm=fusion_weights.get("w_music_file",0.3)
     wo=fusion_weights.get("w_prob_or",0.2)
     prob_or=1-(1-voice_fake)*(1-music_fake)
-    detector_fused=wv*file_voice + wm*file_music + wo*prob_or
+    file_fusion_mode=str(fusion_weights.get("file_fusion_mode","legacy"))
+    if file_fusion_mode in ("presence_weighted","presence_component_or"):
+        # Presence changes FILE risk only. The official component EERs are
+        # conditional, so VOICE_FAKE_PROB/MUSIC_FAKE_PROB themselves must keep
+        # their ungated rankings.
+        voice_risk=voice_present*voice_fake
+        music_risk=music_present*music_fake
+        component_or=1-(1-voice_risk)*(1-music_risk)
+        if file_fusion_mode=="presence_component_or":
+            detector_fused=component_or
+        else:
+            voice_file_risk=voice_present*file_voice
+            music_file_risk=music_present*file_music
+            detector_fused=wv*voice_file_risk + wm*music_file_risk + wo*component_or
+    elif file_fusion_mode=="legacy":
+        detector_fused=wv*file_voice + wm*file_music + wo*prob_or
+    else:
+        raise ValueError(f"unsupported file_fusion_mode={file_fusion_mode}")
     w_df=fusion_weights.get("w_df_arena",0.5)
     file_final=float(np.clip(w_df*file_fake_df+(1.0-w_df)*detector_fused,OUTPUT_EPS,1.0-OUTPUT_EPS))
     return [file_final, float(np.clip(voice_fake,OUTPUT_EPS,1.0-OUTPUT_EPS)), float(np.clip(music_fake,OUTPUT_EPS,1.0-OUTPUT_EPS)), float(np.clip(voice_present,OUTPUT_EPS,1.0-OUTPUT_EPS)), float(np.clip(music_present,OUTPUT_EPS,1.0-OUTPUT_EPS))]

@@ -40,9 +40,10 @@ source/domain shortcut risk, not proof of unseen-generator performance.
 
 The selected primary-crop DF gate runs DF only when the voice specialist's
 presence probability is at least 0.8. Robust CAL-A/B/C objective (`0.7 * mean +
-0.3 * worst`) is **0.87466**, versus **0.87623** without the gate, using all
-603 calibration rows. The gate invokes DF for 64.0% of calibration rows; fold
-totals are 0.87597, 0.88321 and 0.87034.
+0.3 * worst`) with presence-aware FILE fusion is **0.87579**, using all 603
+calibration rows. FILE fusion candidates were selected by official TOTAL:
+legacy 0.87466, presence-weighted 0.87579, component-OR 0.87572. Fold totals
+for the selected mode are 0.87020, 0.88784 and 0.87650.
 
 ## One-shot final holdout ablation
 
@@ -53,8 +54,12 @@ totals are 0.87597, 0.88321 and 0.87034.
 | C separate DF component weights | 0.14079 | 0.14247 | 0.00000 | 0.90914 | 0.98485 | 0.90111 | 0.94699 | 0.90570 |
 | D calibrated adaptive DF | 0.14079 | 0.15365 | 0.00000 | 0.90914 | 0.98485 | 0.89888 | 0.94699 | 0.90369 |
 | E speed-selected DF gate | 0.14264 | 0.14247 | 0.00000 | 0.90914 | 0.98485 | 0.90019 | 0.94699 | 0.90487 |
+| F presence-aware FILE fusion | 0.08878 | 0.14247 | 0.00000 | 0.90914 | 0.98485 | 0.92712 | 0.94699 | 0.92910 |
 
 FINAL_HOLDOUT was not used to change the selected calibration weights.
+The AASIST-vs-SpecCNN training run was started under identical settings but did
+not finish its first CPU epoch in roughly ten minutes and was stopped; AASIST
+comparison is **NOT RUN** and SpecCNN remains selected.
 
 ## Runtime and package
 
@@ -66,4 +71,6 @@ projections, not official L4 measurements; decoding and evaluator overhead may
 differ on the competition server.
 
 The final archive is validated by fresh extraction and default offline
-execution. Exact archive size and hash are recorded at build handoff.
+execution. The build deletes the prior runtime copy, recopies root `src/`, and
+checks every Python file hash before archiving. Exact archive size and hash are
+recorded at build handoff.
