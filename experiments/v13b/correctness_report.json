@@ -18,18 +18,29 @@
   },
   "tests": {
     "scope": "full repository pytest",
-    "result": "146 passed",
-    "seconds": 8.20
+    "result": "172 passed",
+    "seconds": 42.52
   },
   "efficiency": {
     "segment_scans_before": 3,
     "segment_scans_after": 1,
     "segment_input_parity": true,
-    "segment_planning_before_seconds": 0.010961099993437529,
-    "segment_planning_after_seconds": 0.00334100000327453,
-    "segment_planning_speedup": 3.280784191168663,
-    "decode_executor": "persistent executor adopted; end-to-end runtime NOT RUN",
-    "df_gpu_overlap": "NOT RUN",
+    "segment_planning_before_seconds": 0.027427900000475347,
+    "segment_planning_after_seconds": 0.009145599993644282,
+    "segment_planning_speedup": 2.9990268565798104,
+    "decode_executor": "per-batch executor retained; persistent executor rejected after no measured end-to-end gain",
+    "df_gpu_overlap": "EXPERIMENTAL_OPT_IN_IMPLEMENTED_BUT_SELECTED_DISABLED; OFFICIAL_L4_RUNTIME_NOT_RUN",
+    "df_gpu_overlap_activation": "REQUIRES explicit gpu_overlap_enabled=true plus CUDA + DF always-on + adaptive disabled",
+    "df_cpu_path": "SEQUENTIAL_UNCHANGED",
+    "df_overlap_default_parity": "PASS_8_DIRECT_FILES",
+    "df_overlap_default_prediction_max_abs_diff": 2.9802322387695312e-08,
+    "df_batch16_seconds_per_file": 0.7697061750000103,
+    "df_batch64_seconds_per_file": 0.7280127968751913,
+    "df_batch64_not_adopted_reason": "L4 flattened specialist/PANNs crop memory gate not measured",
+    "end_to_end_runtime": "MEASURED_LOCAL_128_DIRECT_FILES_PASS",
+    "prediction_max_abs_diff": 5.463759100710064e-08,
+    "projected_1200_file_minutes": 31.932512624998708,
+    "relative_speedup_128_files": 0.9962918382506232,
     "official_runtime_after": "NOT RUN"
   },
   "selected_submission": {
@@ -41,8 +52,8 @@
     "frozen_zip_sha256": "5898ad19b5c92e46d54aca529336b99f9e17838806766c654a3585051388fdcb",
     "working_tree_candidate_archive": "NOT BUILT: dataset/model adoption gates failed"
   },
-  "model_training": "NOT RUN",
-  "robust_validation": "NOT RUN",
+  "model_training": "M1_DUAL_BRANCH_AND_M2_FROZEN_PANNS_PROBES_REJECTED; M3_ARTIFACTNET_SCREEN_PASS_BUT_PRODUCTION_GATES_FAILED",
+  "robust_validation": "GENERATOR_DISJOINT_PLUS_VIRTUAL_PARTIAL_MIXED_ONLY; SOURCE_DISJOINT NOT MEASURED",
   "bootstrap": "NOT RUN",
   "final_holdout_v13b": "NOT CREATED / NOT READ / NOT RUN"
 }

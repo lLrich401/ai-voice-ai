@@ -1,0 +1,116 @@
+{
+  "status": "MEASURED_GENERATOR_DISJOINT_NOT_ADOPTABLE",
+  "candidate": "M2",
+  "representation": "official_panns_16k_frozen_embedding_v1",
+  "checkpoint": "model/candidates/v13b/m2_music_panns_frozen_probe.pt",
+  "checkpoint_sha256": "470c6d91a7d9c9a9218bd2f23411aa97543a437fdb54b93a7c34f6fa160391e8",
+  "device": "cpu",
+  "training_rows": 546,
+  "training_seconds": 59.597166599996854,
+  "epochs": 8,
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 0.8337042462694776
+    },
+    {
+      "epoch": 2,
+      "loss": 0.7563930765722261
+    },
+    {
+      "epoch": 3,
+      "loss": 0.6977695597287936
+    },
+    {
+      "epoch": 4,
+      "loss": 0.6600360631287753
+    },
+    {
+      "epoch": 5,
+      "loss": 0.6127297921385957
+    },
+    {
+      "epoch": 6,
+      "loss": 0.5862486155041845
+    },
+    {
+      "epoch": 7,
+      "loss": 0.5405875448778872
+    },
+    {
+      "epoch": 8,
+      "loss": 0.5726173653816565
+    }
+  ],
+  "generator_disjoint": {
+    "music_eer": 0.3125,
+    "standalone_file_eer": 0.2727272727272727,
+    "rows": 132
+  },
+  "partial_mixed": {
+    "scope": "MEASURED_GENERATOR_DISJOINT_ROOTS_WITH_DETERMINISTIC_VIRTUAL_RENDERING",
+    "partial": {
+      "rows": 64,
+      "file_eer": 0.40625,
+      "by_ratio": {
+        "0.02": 0.5,
+        "0.05": 0.5,
+        "0.1": 0.5,
+        "0.2": 0.5,
+        "0.3": 0.5,
+        "0.5": 0.5,
+        "0.7": 0.5,
+        "1.0": 0.5
+      }
+    },
+    "mixed": {
+      "rows": 48,
+      "file_eer_rr_vs_fake_states": 0.4861111111111111,
+      "states": {
+        "FF": {
+          "rows": 12,
+          "mean_file_score": 0.7528485928972563,
+          "threshold_0_5_error_rate": 0.0,
+          "metric_note": "single-class state; EER unavailable"
+        },
+        "FR": {
+          "rows": 12,
+          "mean_file_score": 0.7528485928972563,
+          "threshold_0_5_error_rate": 0.0,
+          "metric_note": "single-class state; EER unavailable"
+        },
+        "RF": {
+          "rows": 12,
+          "mean_file_score": 0.7528485928972563,
+          "threshold_0_5_error_rate": 0.0,
+          "metric_note": "single-class state; EER unavailable"
+        },
+        "RR": {
+          "rows": 12,
+          "mean_file_score": 0.7528485928972563,
+          "threshold_0_5_error_rate": 1.0,
+          "metric_note": "single-class state; EER unavailable"
+        }
+      }
+    }
+  },
+  "ads_contributions": {
+    "delta_file": 0.07575757575757575,
+    "delta_music": 0.0,
+    "delta_voice": 0.0,
+    "voice_note": "not changed by this Music-only exploratory probe"
+  },
+  "screening": {
+    "baseline_music_eer": 0.3125,
+    "candidate_music_eer": 0.3125,
+    "clear_threshold": 0.28,
+    "strong_threshold": 0.25,
+    "promising_threshold": 0.2,
+    "signal": "INSUFFICIENT"
+  },
+  "evaluation_seconds": 46.55937740000081,
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN",
+  "selected_artifacts_mutated": false,
+  "decision": "KEEP_TEST5"
+}

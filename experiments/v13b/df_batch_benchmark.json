@@ -1,0 +1,32 @@
+{
+  "status": "MEASURED_LOCAL",
+  "threads": 16,
+  "files": 64,
+  "results": [
+    {
+      "batch": 4,
+      "total_seconds": 60.87061260000337,
+      "seconds_per_file": 0.9511033218750526
+    },
+    {
+      "batch": 8,
+      "total_seconds": 58.30201610000222,
+      "seconds_per_file": 0.9109690015625347
+    },
+    {
+      "batch": 16,
+      "total_seconds": 49.26119520000066,
+      "seconds_per_file": 0.7697061750000103
+    },
+    {
+      "batch": 32,
+      "total_seconds": 48.195792599988636,
+      "seconds_per_file": 0.7530592593748224
+    },
+    {
+      "batch": 64,
+      "total_seconds": 46.59281900001224,
+      "seconds_per_file": 0.7280127968751913
+    }
+  ]
+}

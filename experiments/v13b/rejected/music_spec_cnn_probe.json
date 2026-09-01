@@ -1,0 +1,14 @@
+{
+  "candidate": "music_spec_cnn_probe.pt",
+  "checkpoint_sha256": "7013dea2abde9ce2cc65da060c76026c517fdb020f2d058afd512916dea6f8f8",
+  "representation": "same TEST5 SpecCNN conservative fine-tune",
+  "validation": "generator-disjoint 132 rows",
+  "baseline_music_eer": 0.3125,
+  "candidate_music_eer": 0.3125,
+  "delta_music_eer": 0.0,
+  "delta_ads_music": 0.0,
+  "decision": "REJECT_NO_IMPROVEMENT",
+  "repeat_policy": "Do not repeat with only LR or epoch changes.",
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN"
+}

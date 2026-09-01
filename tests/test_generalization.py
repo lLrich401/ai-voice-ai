@@ -97,6 +97,26 @@ def test_validate_multisegment_includes_mix_rows(monkeypatch):
     assert metrics["score"] == pytest.approx(0.5)
 
 
+def test_multisegment_validation_fail_closed(monkeypatch):
+    frame = pd.DataFrame([{
+        "path": "missing.wav", "file_fake": 0, "voice_fake": 0,
+        "music_fake": 0, "voice_present": 1, "music_present": 0,
+    }])
+    monkeypatch.setattr(
+        "src.dataset.load_manifest_row_wave",
+        lambda *args, **kwargs: (_ for _ in ()).throw(OSError("fixture decode failed")),
+    )
+
+    class ConstantModel(torch.nn.Module):
+        def forward(self, wave):
+            return {name: torch.zeros(len(wave), device=wave.device)
+                    for name in ("file_fake", "voice_fake", "music_fake",
+                                 "voice_present", "music_present")}
+
+    with pytest.raises(RuntimeError, match="canonical multisegment load failed"):
+        validate_multisegment(ConstantModel(), frame, torch.device("cpu"))
+
+
 def test_specialist_sampler_targets_component_mix_other_proportions():
     frame = pd.DataFrame({
         "path": ["voice.wav"] * 4 + ["MIX::v|m"] * 2 + ["music.wav"] * 4,

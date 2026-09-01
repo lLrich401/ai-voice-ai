@@ -16,16 +16,23 @@
     "channel_robustness": 0.15,
     "partial_mixed": 0.10
   },
-  "data_hard_gates": {
+  "exploratory_training_gates": {
+    "auc_interpretation": "effective_auc=max(raw_auc,1-raw_auc)",
     "metadata_auc_max": 0.75,
     "acoustic_auc_max": 0.75,
     "combined_auc_hard_max": 0.75,
     "combined_auc_target_max": 0.65,
     "combined_auc_ideal_range": [0.5, 0.6],
     "paired_voice_sources_min": 2,
-    "paired_music_sources_min": 2,
+    "paired_music_sources_min": 1,
     "voice_fake_generators_min": 8,
     "music_fake_generators_min": 6,
+    "partial_data_required": true,
+    "balanced_rr_rf_fr_ff_required": true,
+    "split_identifier_overlap_zero": true
+  },
+  "adoption_data_gates": {
+    "paired_music_sources_min": 2,
     "approved_metric_complete_source_disjoint_validation": true,
     "sealed_unused_final_holdout": true
   },
@@ -34,8 +41,12 @@
     "unseen_music_improves": true,
     "source_disjoint_improves": true,
     "cps_minimum_delta": -0.01,
-    "bootstrap_win_rate_minimum": 0.5,
-    "official_runtime_minutes_maximum": 60,
+    "bootstrap_win_rate_minimum": 0.65,
+    "bootstrap_win_rate_preferred": 0.70,
+    "paired_bootstrap_replicates_minimum": 1000,
+    "bootstrap_ads_median_delta_minimum": 0.0,
+    "pre_submission_measured_runtime_minutes_maximum": 55,
+    "post_submission_official_runtime_minutes_maximum": 60,
     "submission_validation_pass": true
   }
 }

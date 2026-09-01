@@ -1,0 +1,67 @@
+{
+  "status": "MEASURED_GENERATOR_DISJOINT_EXPLORATORY_NOT_ADOPTABLE",
+  "rows": 132,
+  "device": "cpu",
+  "canonical_test5_file_eer": 0.12121212121212122,
+  "m2_candidate_file_eer": 0.2727272727272727,
+  "fusion_grid": [
+    {
+      "candidate_weight": 0.0,
+      "file_eer": 0.12121212121212122
+    },
+    {
+      "candidate_weight": 0.25,
+      "file_eer": 0.09090909090909093
+    },
+    {
+      "candidate_weight": 0.5,
+      "file_eer": 0.10606060606060608
+    },
+    {
+      "candidate_weight": 0.75,
+      "file_eer": 0.196969696969697
+    },
+    {
+      "candidate_weight": 1.0,
+      "file_eer": 0.2727272727272727
+    }
+  ],
+  "best_same_split_exploratory_fusion": {
+    "candidate_weight": 0.25,
+    "file_eer": 0.09090909090909093
+  },
+  "same_split_selection_warning": "not independent calibration; cannot be adopted",
+  "correlation": {
+    "pearson": 0.31762660475500637,
+    "spearman": 0.2776893656765091
+  },
+  "error_overlap": {
+    "both_correct": 83,
+    "both_wrong": 3,
+    "only_canonical_wrong": 13,
+    "only_candidate_wrong": 33,
+    "classification_note": "each detector thresholded at its own closest empirical EER point"
+  },
+  "ads_contributions": {
+    "candidate_file_vs_canonical": -0.07575757575757575,
+    "best_fusion_file_vs_canonical": 0.015151515151515145,
+    "music": 0.0,
+    "voice": 0.0
+  },
+  "runtime": {
+    "canonical_total_seconds": 241.73109390001628,
+    "canonical_seconds_per_file": 1.8312961659092142,
+    "candidate_total_seconds": 20.772639600007096,
+    "candidate_seconds_per_file": 0.15736848181823557,
+    "candidate_added_1200_file_minutes_projected": 3.1473696363647115
+  },
+  "dependencies": {
+    "split_sha256": "5ddb4dc350916983dcb4691741be71b9c24e8ea9441b0214dfedc89d42bdcdbe",
+    "candidate_sha256": "470c6d91a7d9c9a9218bd2f23411aa97543a437fdb54b93a7c34f6fa160391e8",
+    "fusion_sha256": "87d46c317398bed0a9dc87c6b451246851ba6c34683e4468a0251461f7c42402"
+  },
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN",
+  "decision": "KEEP_TEST5",
+  "scores_file": "experiments/v13b/m2_file_complementarity_scores.csv"
+}

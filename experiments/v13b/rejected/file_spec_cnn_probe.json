@@ -1,0 +1,14 @@
+{
+  "candidate": "file_spec_cnn_probe.pt",
+  "checkpoint_sha256": "1604e3d84cb45728c124b19f6e6c11aa2c322cf710ed6c2fd711b6b43a9c9c5b",
+  "representation": "same SpecCNN multitask FILE head",
+  "validation": "generator-disjoint 132 rows",
+  "baseline_standalone_file_eer": 0.4242424242424242,
+  "candidate_standalone_file_eer": 0.43939393939393945,
+  "delta_file_eer": 0.015151515151515249,
+  "delta_ads_file": -0.0075757575757576245,
+  "decision": "REJECT_REGRESSION",
+  "repeat_policy": "Do not repeat the same multitask SpecCNN representation.",
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN"
+}

@@ -31,6 +31,7 @@ telephone simulations respectively.
 | DF-Arena 1B INT8 | https://huggingface.co/pranjal-pravesh/df_arena_1b | Model card declares MIT | Offline inference, original waveform, 64,600 samples |
 | PANNs CNN14 16 kHz (`Cnn14_16k_mAP=0.438.pth`) | https://github.com/qiuqiangkong/audioset_tagging_cnn and https://zenodo.org/records/3987831 | Preserve repository/checkpoint notices | Official 16 kHz AudioSet frontend: 512 FFT, 160 hop, 64 mel, 50–8000 Hz |
 | HTDemucs | https://github.com/facebookresearch/demucs | MIT repository; weights may have separate provenance | Optional; not installed or evaluated locally |
+| ArtifactNet v9.4 ONNX candidate | https://huggingface.co/intrect/artifactnet/tree/7c9b753a9d006b48e4bfaf85bf0157e135f4aad4 | CC BY-NC 4.0, research/non-commercial only; upstream patent notice says no patent license is granted | **Candidate evaluation only, not selected or bundled.** Generator-disjoint Music EER improved, but numerical stability, runtime, source-disjoint evidence, and competition-use approval gates failed |
 
 The root MIT license covers only repository-authored code/documentation. It
 does not cover datasets, pretrained weights, derived checkpoints, or generated

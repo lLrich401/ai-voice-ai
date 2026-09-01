@@ -1,0 +1,13 @@
+{
+  "candidate": "M1",
+  "checkpoint_sha256": "d6321f7407c8c39c56d398cb6f58511ca8080936550009fcaf0227f6e6c35d1f",
+  "representation": "log_mel_plus_stft_constant_q_dual_branch_v1",
+  "training": "2 epoch cheap probe",
+  "baseline_generator_disjoint_music_eer": 0.3125,
+  "candidate_generator_disjoint_music_eer": 0.375,
+  "delta_ads_music": -0.01875,
+  "decision": "REJECT_REGRESSION",
+  "repeat_policy": "No LR-only or epoch-only repeat.",
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN"
+}

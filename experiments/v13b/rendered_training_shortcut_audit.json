@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "scope": "deterministic rendered TRAIN observations only; supplemental safety evidence",
+  "observation": "center 4 seconds for every row",
+  "rows": 546,
+  "group_cv": "StratifiedGroupKFold(base_audio_id)",
+  "features": [
+    "duration",
+    "peak",
+    "rms",
+    "silence_ratio",
+    "zcr",
+    "spectral_centroid",
+    "high_frequency_ratio"
+  ],
+  "raw_auc": {
+    "all": 0.5513975092288346,
+    "paired_core": 0.6353459153265859,
+    "partial_fake_vs_control": 0.4033203125,
+    "mixed_rr_vs_fake_states": 0.5381944444444445
+  },
+  "effective_auc": {
+    "all": 0.5513975092288346,
+    "paired_core": 0.6353459153265859,
+    "partial_fake_vs_control": 0.5966796875,
+    "mixed_rr_vs_fake_states": 0.5381944444444445
+  },
+  "distance_from_random": {
+    "all": 0.05139750922883457,
+    "paired_core": 0.1353459153265859,
+    "partial_fake_vs_control": 0.0966796875,
+    "mixed_rr_vs_fake_states": 0.03819444444444453
+  },
+  "auc": {
+    "all": 0.5513975092288346,
+    "paired_core": 0.6353459153265859,
+    "partial_fake_vs_control": 0.4033203125,
+    "mixed_rr_vs_fake_states": 0.5381944444444445
+  },
+  "worst_effective_auc": 0.6353459153265859,
+  "hard_reference": 0.75,
+  "symmetric_interpretation": "effective_auc = max(raw_auc, 1 - raw_auc)",
+  "transition_location_by_label": {
+    "0": {
+      "nan": 217,
+      "middle": 12,
+      "start": 12,
+      "end": 8
+    },
+    "1": {
+      "nan": 265,
+      "middle": 12,
+      "start": 12,
+      "end": 8
+    }
+  },
+  "renderer_policy": "partial positive/control share identical splice/crossfade function; all mixed states share one renderer",
+  "features_file": "experiments/v13b/rendered_training_shortcut_audit_features.csv",
+  "fingerprints_file": "experiments/v13b/rendered_training_shortcut_audit_fingerprints.csv",
+  "final_holdout": "NOT READ / NOT RUN"
+}

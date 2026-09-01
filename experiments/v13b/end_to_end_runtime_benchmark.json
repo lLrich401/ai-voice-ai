@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "scope": "MEASURED_LOCAL generator-disjoint direct subset; linear projection is PROJECTED",
+  "device": "cpu",
+  "files": 128,
+  "batch": 4,
+  "checkpoints": [
+    64,
+    128
+  ],
+  "predefined_prediction_tolerance": 1e-06,
+  "decode_strategy": "per-batch executor; persistent executor rejected after no measured gain",
+  "prediction_max_abs_diff": 5.463759100710064e-08,
+  "prediction_parity": true,
+  "scales": {
+    "64": {
+      "frozen_test5": {
+        "total_seconds": 104.72074829999474,
+        "seconds_per_file": 1.6362616921874178,
+        "median_batch_seconds_per_file": 1.6767391624998709,
+        "files_per_second": 0.6111491852279212,
+        "projected_1200_file_minutes": 32.725233843748356
+      },
+      "current_x1": {
+        "total_seconds": 92.38085560000036,
+        "seconds_per_file": 1.4434508687500056,
+        "median_batch_seconds_per_file": 1.3985415374991135,
+        "files_per_second": 0.6927842309353947,
+        "projected_1200_file_minutes": 28.869017375000112
+      },
+      "relative_speedup": 1.1335762980311077
+    },
+    "128": {
+      "frozen_test5": {
+        "total_seconds": 203.61025089997565,
+        "seconds_per_file": 1.5907050851560598,
+        "median_batch_seconds_per_file": 1.6539695624996966,
+        "files_per_second": 0.6286520419980255,
+        "projected_1200_file_minutes": 31.814101703121196
+      },
+      "current_x1": {
+        "total_seconds": 204.36808079999173,
+        "seconds_per_file": 1.5966256312499354,
+        "median_batch_seconds_per_file": 1.6334836875030305,
+        "files_per_second": 0.6263208985422208,
+        "projected_1200_file_minutes": 31.932512624998708
+      },
+      "relative_speedup": 0.9962918382506232
+    }
+  },
+  "frozen_test5": {
+    "total_seconds": 203.61025089997565,
+    "seconds_per_file": 1.5907050851560598,
+    "median_batch_seconds_per_file": 1.6539695624996966,
+    "files_per_second": 0.6286520419980255,
+    "projected_1200_file_minutes": 31.814101703121196
+  },
+  "current_x1": {
+    "total_seconds": 204.36808079999173,
+    "seconds_per_file": 1.5966256312499354,
+    "median_batch_seconds_per_file": 1.6334836875030305,
+    "files_per_second": 0.6263208985422208,
+    "projected_1200_file_minutes": 31.932512624998708
+  },
+  "official_test5_runtime": "30m52s USER_REPORTED_PUBLIC",
+  "official_x1_runtime": "NOT RUN",
+  "final_holdout": "NOT READ / NOT RUN"
+}

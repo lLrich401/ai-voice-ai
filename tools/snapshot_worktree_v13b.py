@@ -12,6 +12,7 @@ import subprocess
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "experiments/v13b/worktree_snapshot.json"
+DEVELOPMENT_BASE_COMMIT = "e8434b9c368ee5de3368d8b0b04559cf19c3ffaa"
 
 
 def git(*args: str) -> str:
@@ -37,6 +38,8 @@ def main() -> None:
         if " -> " in relative:
             relative = relative.split(" -> ", 1)[1]
         path = ROOT / relative
+        if path.resolve() == OUTPUT.resolve():
+            continue
         entries.append({
             "status": status,
             "path": pathlib.PurePath(relative).as_posix(),
@@ -46,17 +49,18 @@ def main() -> None:
     report = {
         "schema_version": 1,
         "timestamp": dt.datetime.now().astimezone().isoformat(),
-        "git_head": git("rev-parse", "HEAD"),
+        "development_base_commit": DEVELOPMENT_BASE_COMMIT,
+        "current_git_commit": git("rev-parse", "HEAD"),
         "branch": git("branch", "--show-current"),
         "modified_files": [item for item in entries if item["status"] != "??"],
         "untracked_files": [item for item in entries if item["status"] == "??"],
         "entry_count": len(entries),
-        "note": "Snapshot taken before V13B correctness/ancestry changes; no reset, clean, or stash used.",
+        "note": "Current x1 worktree inventory; output file excludes itself. No reset, clean, or stash used.",
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"output": str(OUTPUT), "entries": len(entries),
-                      "head": report["git_head"]}, indent=2))
+                      "head": report["current_git_commit"]}, indent=2))
 
 
 if __name__ == "__main__":

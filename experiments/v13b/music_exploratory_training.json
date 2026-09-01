@@ -1,0 +1,32 @@
+{
+  "status": "EXPLORATORY_TRAINED_NOT_ADOPTABLE",
+  "task": "music",
+  "device": "cpu",
+  "candidate": "model/candidates/v13b/music_spec_cnn_probe.pt",
+  "candidate_sha256": "7013dea2abde9ce2cc65da060c76026c517fdb020f2d058afd512916dea6f8f8",
+  "training_rows": 546,
+  "validation_rows": 132,
+  "epochs": 1,
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 3.6825787706034525
+    }
+  ],
+  "training_seconds": 72.721781500004,
+  "generator_disjoint_metrics": {
+    "file_eer": 0.43939393939393945,
+    "voice_eer": 0.5800000000000001,
+    "music_eer": 0.3125,
+    "voice_auc": 0.0109375,
+    "music_auc": 0.9918750000000001,
+    "ads": 0.5705530303030303,
+    "cps": 0.50140625,
+    "score": 0.5636383522727273,
+    "total": 0.5636383522727273
+  },
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN",
+  "selected_artifacts_mutated": false,
+  "decision": "KEEP_TEST5"
+}

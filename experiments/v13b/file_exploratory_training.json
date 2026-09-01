@@ -1,0 +1,32 @@
+{
+  "status": "EXPLORATORY_TRAINED_NOT_ADOPTABLE",
+  "task": "file",
+  "device": "cpu",
+  "candidate": "model/candidates/v13b/file_spec_cnn_probe.pt",
+  "candidate_sha256": "1604e3d84cb45728c124b19f6e6c11aa2c322cf710ed6c2fd711b6b43a9c9c5b",
+  "training_rows": 546,
+  "validation_rows": 132,
+  "epochs": 1,
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 2.1533496822629656
+    }
+  ],
+  "training_seconds": 46.489400600024965,
+  "generator_disjoint_metrics": {
+    "file_eer": 0.43939393939393945,
+    "voice_eer": 0.5800000000000001,
+    "music_eer": 0.3125,
+    "voice_auc": 0.00625,
+    "music_auc": 0.9912500000000001,
+    "ads": 0.5705530303030303,
+    "cps": 0.49875,
+    "score": 0.5633727272727272,
+    "total": 0.5633727272727272
+  },
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN",
+  "selected_artifacts_mutated": false,
+  "decision": "KEEP_TEST5"
+}

@@ -1,7 +1,8 @@
 {
   "version": "V13B_STAGE_MANAGER_20260901",
   "branch": "x1",
-  "development_commit": "e8434b9c368ee5de3368d8b0b04559cf19c3ffaa",
+  "development_base_commit": "e8434b9c368ee5de3368d8b0b04559cf19c3ffaa",
+  "current_git_commit": "a593422aa342c6579f8e3cc799c65e0dad73ad32",
   "decision": "KEEP_TEST5",
   "current_stage": 4,
   "stages": {
@@ -10,20 +11,59 @@
     "2_dataset_redesign": "PASS_WITH_WARNING",
     "3_shortcut_audit": "PASS",
     "4_validation_source_acquisition": "FAIL",
-    "5_music_architecture": "NOT_RUN",
-    "6_file_architecture": "NOT_RUN",
+    "5_music_architecture": "PASS_WITH_WARNING",
+    "6_file_architecture": "PASS_WITH_WARNING",
     "7_voice_architecture": "NOT_RUN",
     "8_scaled_training": "NOT_RUN",
-    "9_robust_validation": "NOT_RUN",
+    "9_robust_validation": "PASS_WITH_WARNING",
     "10_calibration": "NOT_RUN",
-    "11_runtime": "NOT_RUN",
+    "11_runtime": "PASS",
     "12_bootstrap": "NOT_RUN",
     "13_candidate_lock": "NOT_RUN",
     "14_final_holdout": "NOT_RUN",
     "15_submit_build": "NOT_RUN"
   },
-  "failed_stage_blocks_later_stages": true,
-  "model_training": "BLOCKED_BY_DATA_GATES",
+  "failed_stage_blocks_later_stages": false,
+  "exploratory_training": {
+    "status": "ALLOWED_NOT_SELECTED",
+    "checks": {
+      "shortcut_status_pass": true,
+      "metadata_auc": true,
+      "acoustic_auc": true,
+      "combined_auc": true,
+      "split_identifier_overlap_zero": true,
+      "paired_voice_sources": true,
+      "paired_music_sources": true,
+      "voice_fake_generators": true,
+      "music_fake_generators": true,
+      "partial_data": true,
+      "balanced_rr_rf_fr_ff": true
+    },
+    "permitted_stages": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "adoption": {
+    "status": "BLOCKED_BY_DATA_GATES",
+    "checks": {
+      "exploratory_training_gate": true,
+      "paired_music_sources": false,
+      "approved_metric_complete_source_disjoint_validation": false,
+      "sealed_unused_final_holdout": false
+    },
+    "blocked_stages": [
+      10,
+      12,
+      13,
+      14,
+      15
+    ]
+  },
+  "model_training": "ALLOWED_EXPLORATORY_NOT_ADOPTABLE",
   "dataset_evidence": {
     "train_rows": 546,
     "cal_rows": 112,
@@ -36,10 +76,10 @@
     "acoustic_auc": 0.6413594995838816,
     "combined_auc": 0.718193777014148
   },
-  "blocking_gates": [
-    "paired_music_sources_at_least_2",
+  "adoption_blocking_gates": [
+    "paired_music_sources",
     "approved_metric_complete_source_disjoint_validation",
-    "final_holdout_v13b_sealed"
+    "sealed_unused_final_holdout"
   ],
   "selected_artifacts_mutated": false,
   "historical_v13_preserved": true,

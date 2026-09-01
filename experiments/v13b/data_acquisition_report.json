@@ -34,5 +34,15 @@
     "artifactbench_v1_1": "REVIEW_REQUIRED: attractive 22-generator unseen-music benchmark, but its real arm includes YouTube retrieval and historical FMA/SONICS sources; use only after row-rights and global-history filtering"
   },
   "decision": "Do not manufacture the second paired music source by relabeling DSP transformations as AI fake.",
-  "next_acquisition": "Obtain a row-license-resolved paired music corpus with at least 10 independent content groups, then reserve a distinct unused source for FINAL_HOLDOUT_V13B."
+  "next_acquisition": "Obtain a row-license-resolved paired music corpus with at least 10 independent content groups, then reserve a distinct unused source for FINAL_HOLDOUT_V13B.",
+  "latest_official_source_review": {
+    "reviewed_at": "2026-09-01",
+    "musebench": "Collection is CC BY-SA 3.0, but Jamendo rows retain heterogeneous per-track licenses and multiple generator weights/outputs are NC or otherwise restricted; no row was auto-approved or downloaded.",
+    "haim": "Dataset card declares CC BY-NC 4.0 and some platform content is URL-only; no independent row-complete paired pilot was approved.",
+    "artifactbench": "CC BY-NC 4.0 evaluation benchmark with several real arms distributed as IDs/links and known historical-source overlap; retained as REVIEW_REQUIRED validation candidate.",
+    "fakemusiccaps": "Rechecked 2026-09-01: the repository describes caption-conditioned generated tracks, but the real MusicCaps source rights and content-paired real counterpart are not row-complete. Retained as REVIEW_REQUIRED and not downloaded/approved.",
+    "downloaded_rows": 0,
+    "approved_rows": 0,
+    "decision": "NOT ACQUIRED"
+  }
 }

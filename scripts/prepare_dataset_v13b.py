@@ -139,14 +139,27 @@ def apply_explicit_approval(frame: pd.DataFrame, source: str, registry: dict) ->
     return result
 
 
-def paired_by_generator(frame: pd.DataFrame, train_count: int, val_count: int) -> pd.DataFrame:
+def explicit_generator_roles(source: str, frame: pd.DataFrame, split_config: dict) -> dict[str, str]:
+    if source not in split_config.get("sources", {}):
+        raise RuntimeError(f"generator split config missing source: {source}")
+    config = split_config["sources"][source]
+    roles: dict[str, str] = {}
+    for key, role in (("train", "train"), ("generator_val", "val_generator_disjoint"),
+                      ("cal", "cal_v13b")):
+        for family in config.get(key, []):
+            if family in roles:
+                raise RuntimeError(f"generator appears in multiple roles: {family}")
+            roles[family] = role
+    observed = set(frame.loc[frame.file_fake.eq(1), "generator_family"].astype(str))
+    unknown = sorted(observed - set(roles))
+    if unknown:
+        raise RuntimeError(f"unknown generators require explicit review: {unknown}")
+    return roles
+
+
+def paired_by_generator(frame: pd.DataFrame, source: str, split_config: dict) -> pd.DataFrame:
     fake = frame[frame.file_fake.eq(1)].copy()
-    families = sorted(fake.generator_family.unique())
-    if len(families) <= train_count + val_count:
-        raise RuntimeError(f"not enough generator families: {families}")
-    family_role = {family: ("train" if index < train_count else
-                            "val_generator_disjoint" if index < train_count + val_count else
-                            "cal_v13b") for index, family in enumerate(families)}
+    family_role = explicit_generator_roles(source, frame, split_config)
     roles = []
     real_by_group = {group: values.iloc[0] for group, values in
                      frame[frame.file_fake.eq(0)].groupby("content_group")}
@@ -163,12 +176,9 @@ def paired_by_generator(frame: pd.DataFrame, train_count: int, val_count: int) -
         ["v13b_role", "content_group", "file_fake", "generator_family"])
 
 
-def echoes_pairs(frame: pd.DataFrame) -> pd.DataFrame:
+def echoes_pairs(frame: pd.DataFrame, split_config: dict) -> pd.DataFrame:
     fake = frame[frame.file_fake.eq(1)].copy()
-    families = sorted(fake.generator_family.unique())
-    family_role = {family: ("train" if index < 8 else
-                            "val_generator_disjoint" if index < 10 else "cal_v13b")
-                   for index, family in enumerate(families)}
+    family_role = explicit_generator_roles("echoes_fma_paired", frame, split_config)
     rows = []
     for group, values in frame.groupby("content_group"):
         real = values[values.file_fake.eq(0)]
@@ -313,6 +323,8 @@ def main() -> None:
         (data_root / directory).mkdir(parents=True, exist_ok=True)
 
     registry = json.loads((ROOT / "configs/v13b/source_registry.json").read_text(encoding="utf-8"))
+    split_config = json.loads(
+        (ROOT / "configs/v13b/generator_split.json").read_text(encoding="utf-8"))
     public = enrich(pd.read_csv(ROOT / "data/splits_v9_candidate/manifest.csv"))
     mlaad = apply_explicit_approval(
         public[public.source.eq("mlaad_tiny_matched")], "mlaad_tiny_matched", registry)
@@ -326,9 +338,9 @@ def main() -> None:
         public[public.source.eq("echoes_fma_paired")], "echoes_fma_paired", registry)
 
     selected = pd.concat([
-        paired_by_generator(mlaad, train_count=10, val_count=3),
-        paired_by_generator(dfadd, train_count=3, val_count=1),
-        echoes_pairs(echoes),
+        paired_by_generator(mlaad, "mlaad_tiny_matched", split_config),
+        paired_by_generator(dfadd, "dfadd_vctk_paired", split_config),
+        echoes_pairs(echoes, split_config),
     ], ignore_index=True, sort=False)
     if not selected.competition_use_status.eq("APPROVED").all():
         raise RuntimeError("V13B production core contains non-APPROVED rows")

@@ -1,0 +1,66 @@
+{
+  "status": "EXPLORATORY_MEASURED_NOT_ADOPTABLE",
+  "device": "cpu",
+  "validation": "generator-disjoint only",
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN",
+  "results": [
+    {
+      "name": "TEST5_MUSIC_SPECCNN",
+      "checkpoint": "model/music_best.pt",
+      "checkpoint_sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+      "checkpoint_epoch": 9,
+      "status": "MEASURED_GENERATOR_DISJOINT_ONLY_NOT_ADOPTABLE",
+      "metrics": {
+        "file_eer": 0.4242424242424242,
+        "voice_eer": 0.54,
+        "music_eer": 0.3125,
+        "voice_auc": 0.0109375,
+        "music_auc": 0.9921875,
+        "ads": 0.5861287878787879,
+        "cps": 0.5015625,
+        "score": 0.5776721590909091,
+        "total": 0.5776721590909091
+      },
+      "runtime_seconds": 1.9891664999886416,
+      "rows": 132,
+      "segment_policy": "submission high_energy adaptive 1/2/3",
+      "aggregation": "model/fusion_weights.json canonical head aggregation"
+    },
+    {
+      "name": "V13B_MUSIC_CANDIDATE",
+      "checkpoint": "model/candidates/v13b/music_spec_cnn_probe.pt",
+      "checkpoint_sha256": "7013dea2abde9ce2cc65da060c76026c517fdb020f2d058afd512916dea6f8f8",
+      "checkpoint_epoch": 0,
+      "status": "MEASURED_GENERATOR_DISJOINT_ONLY_NOT_ADOPTABLE",
+      "metrics": {
+        "file_eer": 0.43939393939393945,
+        "voice_eer": 0.5800000000000001,
+        "music_eer": 0.3125,
+        "voice_auc": 0.0109375,
+        "music_auc": 0.9918750000000001,
+        "ads": 0.5705530303030303,
+        "cps": 0.50140625,
+        "score": 0.5636383522727273,
+        "total": 0.5636383522727273
+      },
+      "runtime_seconds": 1.6955869999947026,
+      "rows": 132,
+      "segment_policy": "submission high_energy adaptive 1/2/3",
+      "aggregation": "model/fusion_weights.json canonical head aggregation"
+    }
+  ],
+  "comparison": {
+    "task": "music",
+    "file_eer_baseline": 0.4242424242424242,
+    "file_eer_candidate": 0.43939393939393945,
+    "music_eer_baseline": 0.3125,
+    "music_eer_candidate": 0.3125,
+    "delta_music_eer": 0.0,
+    "estimated_ads_contribution_music": 0.0,
+    "standalone_file_delta": 0.015151515151515249,
+    "standalone_file_warning": "not a direct replacement for selected DF-Arena/fusion FILE output",
+    "exploratory_improved": false
+  },
+  "decision": "KEEP_TEST5_REGARDLESS_OF_EXPLORATORY_RESULT"
+}

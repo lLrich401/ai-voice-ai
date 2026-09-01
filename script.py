@@ -613,19 +613,49 @@ def infer_wave_features_batch(voice_model, music_model, df_sess, panns_model,
                 select_aux_segments(music,TARGET_SR,SEG_SEC),specialist_max_segments))
             segment_groups_o.append(limit_aux_segments(
                 select_aux_segments(wave,TARGET_SR,SEG_SEC),panns_max_segments))
-    v_out,v_bounds=_run_torch_segments(
-        voice_model,segment_groups_v,device,use_amp=True,detector_name="voice")
-    m_out,m_bounds=_run_torch_segments(
-        music_model,segment_groups_m,device,use_amp=True,detector_name="music")
-    p_out,p_bounds=_run_torch_segments(
-        panns_model,segment_groups_o,device,use_amp=False,outputs_are_logits=False,
-        detector_name="panns")
     gate_threshold=(df_config or {}).get("gate_voice_presence_threshold")
-    df_indices=select_df_indices(v_out,v_bounds,gate_threshold)
+    # The selected policy runs one DF crop for every file and never requests
+    # an adaptive second crop.  On the evaluator, that CPU-only INT8 graph is
+    # independent from the three CUDA models, so overlap the two devices.  Do
+    # not enable this path for a presence gate or adaptive policy because both
+    # need specialist outputs before DF selection.
+    overlap_df=(bool((df_config or {}).get("gpu_overlap_enabled",False)) and
+                str(device)=="cuda" and gate_threshold is None and
+                (df_config or {}).get("enabled") is False)
+    df_executor=df_future=None
+    if overlap_df:
+        if not hasattr(infer_wave_features_batch,"_logged_df_overlap"):
+            print("runtime_overlap=cpu_df_arena+cuda_specialists enabled")
+            infer_wave_features_batch._logged_df_overlap=True
+        from concurrent.futures import ThreadPoolExecutor
+        df_executor=ThreadPoolExecutor(max_workers=1,thread_name_prefix="df-arena")
+        df_future=df_executor.submit(
+            df_arena_predict_batch,df_sess,waves,TARGET_SR,DF_SEG_SEC,
+            df_config,True)
+    try:
+        v_out,v_bounds=_run_torch_segments(
+            voice_model,segment_groups_v,device,use_amp=True,detector_name="voice")
+        m_out,m_bounds=_run_torch_segments(
+            music_model,segment_groups_m,device,use_amp=True,detector_name="music")
+        p_out,p_bounds=_run_torch_segments(
+            panns_model,segment_groups_o,device,use_amp=False,outputs_are_logits=False,
+            detector_name="panns")
+        df_indices=select_df_indices(v_out,v_bounds,gate_threshold)
+        if df_future is not None:
+            selected_probs,selected_details=df_future.result()
+            if len(selected_probs)!=len(waves) or len(selected_details)!=len(waves):
+                raise RuntimeError("overlapped DF-Arena result length mismatch")
+    finally:
+        if df_executor is not None:
+            df_executor.shutdown(wait=True)
     df_probs=[0.5]*len(waves)
     df_details=[{"primary":0.5,"second":None,"primary_start":None,
                  "second_start":None,"used_second":False} for _ in waves]
-    if df_indices:
+    if df_future is not None:
+        for index,(probability,detail) in enumerate(zip(selected_probs,selected_details)):
+            df_probs[index]=probability
+            df_details[index]=detail
+    elif df_indices:
         selected_config=dict(df_config or {})
         selected_config["external_voice_fake"]=[
             aggregate_predictions(v_out["voice_fake"][v_bounds[index][0]:v_bounds[index][1]],"topk_mean",2)
@@ -674,7 +704,7 @@ def fuse_feature_record(feature, fusion_weights):
         row_weights)
 
 def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_weights,
-                      audio_paths, device, use_demucs=False, decode_executor=None):
+                      audio_paths, device, use_demucs=False):
     """Inference for a small group of files with batched GPU model calls."""
     separator=get_separator(device=device, use_demucs=use_demucs)
     separator_type="htdemucs" if getattr(separator,"use_demucs",False) else "identity"
@@ -686,11 +716,8 @@ def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_wei
     # six CPU cores.  Load the next inference batch concurrently, then reserve
     # all six cores for DF-Arena's sequential INT8 graph.
     workers=min(6,len(audio_paths))
-    if decode_executor is None:
-        from concurrent.futures import ThreadPoolExecutor
-        with ThreadPoolExecutor(max_workers=workers) as pool:
-            loaded=list(pool.map(lambda path:load_audio(str(path)),audio_paths))
-    else:
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=workers) as decode_executor:
         loaded=list(decode_executor.map(lambda path:load_audio(str(path)),audio_paths))
     for index,(audio_path,(wave,sr)) in enumerate(zip(audio_paths,loaded)):
         records.append((index,audio_path,wave))
@@ -698,6 +725,9 @@ def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_wei
         return results
     df_config={
         "enabled":bool(fusion_weights.get("adaptive_df_enabled",True)),
+        # Experimental only. The selected config omits/keeps this false until
+        # an actual CUDA evaluator-like benchmark passes prediction/runtime gates.
+        "gpu_overlap_enabled":bool(fusion_weights.get("df_gpu_overlap_enabled",False)),
         "low":float(fusion_weights.get("adaptive_df_low",0.25)),
         "high":float(fusion_weights.get("adaptive_df_high",0.75)),
         "aggregation":str(fusion_weights.get("adaptive_df_aggregation","mean")),
@@ -845,13 +875,11 @@ def main():
     start=time.time()
     batch_starts=range(0,len(audio_files),args.batch_files)
     iterator=tqdm.tqdm(batch_starts,total=(len(audio_files)+args.batch_files-1)//args.batch_files,unit="batch") if len(audio_files)>10 else batch_starts
-    from concurrent.futures import ThreadPoolExecutor
-    with ThreadPoolExecutor(max_workers=min(6,args.batch_files)) as decode_executor:
-        for start_index in iterator:
-            results.extend(infer_files_batch(
-                voice_model,music_model,df_sess,panns_model,fusion_weights,
-                audio_files[start_index:start_index+args.batch_files],device,
-                use_demucs=args.use_demucs,decode_executor=decode_executor))
+    for start_index in iterator:
+        results.extend(infer_files_batch(
+            voice_model,music_model,df_sess,panns_model,fusion_weights,
+            audio_files[start_index:start_index+args.batch_files],device,
+            use_demucs=args.use_demucs))
     elapsed=time.time()-start
     print(f"inference {len(results)} files in {elapsed:.1f}s ({elapsed/len(results):.2f}s/file)" if len(results)>0 else "no files")
     # Exact mapping only (no substring)

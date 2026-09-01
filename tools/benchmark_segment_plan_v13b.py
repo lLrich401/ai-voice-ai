@@ -63,7 +63,7 @@ def main() -> None:
         "before_seconds": before,
         "after_seconds": after,
         "speedup": before / after,
-        "decode_executor": "persistent executor implemented; end-to-end benchmark pending",
+        "decode_executor": "per-batch executor retained; persistent executor rejected by measured end-to-end benchmark",
         "df_gpu_overlap": "NOT RUN: no eligible CUDA benchmark in this run",
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)

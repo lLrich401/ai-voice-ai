@@ -6,9 +6,9 @@
   "segment_scans_before_per_file": 3,
   "segment_scans_after_per_file": 1,
   "prediction_input_parity": true,
-  "before_seconds": 0.010961099993437529,
-  "after_seconds": 0.00334100000327453,
-  "speedup": 3.280784191168663,
-  "decode_executor": "persistent executor implemented; end-to-end benchmark pending",
+  "before_seconds": 0.027427900000475347,
+  "after_seconds": 0.009145599993644282,
+  "speedup": 2.9990268565798104,
+  "decode_executor": "per-batch executor retained; persistent executor rejected by measured end-to-end benchmark",
   "df_gpu_overlap": "NOT RUN: no eligible CUDA benchmark in this run"
 }

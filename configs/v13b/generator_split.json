@@ -1,0 +1,48 @@
+{
+  "version": "V13B_GENERATOR_SPLIT_FROZEN_20260901",
+  "policy": "Generator roles are explicit and immutable; unknown generators fail closed.",
+  "sources": {
+    "mlaad_tiny_matched": {
+      "component": "voice",
+      "train": [
+        "MLAAD::Cartesia.ai (Sonic-3)",
+        "MLAAD::Chatterbox",
+        "MLAAD::DeepGram",
+        "MLAAD::Edge-TTS",
+        "MLAAD::FireRedTTS-2.0",
+        "MLAAD::FishTTS",
+        "MLAAD::Higgs-Audio-V2",
+        "MLAAD::Microsoft VibeVoice 1.5B",
+        "MLAAD::MiniCPM-o-2.6",
+        "MLAAD::OpenVoiceV2"
+      ],
+      "generator_val": [
+        "MLAAD::Qwen2.5-Omni",
+        "MLAAD::RVC",
+        "MLAAD::Resemble.ai (April 12th, 2025)"
+      ],
+      "cal": ["MLAAD::f5-tts", "MLAAD::suno_bark", "MLAAD::zonosTTS-v0.1"]
+    },
+    "dfadd_vctk_paired": {
+      "component": "voice",
+      "train": ["DFADD::GradTTS", "DFADD::NaturalSpeech2", "DFADD::StyleTTS2"],
+      "generator_val": ["DFADD::matcha"],
+      "cal": ["DFADD::pflow"]
+    },
+    "echoes_fma_paired": {
+      "component": "music",
+      "train": [
+        "Echoes::acestep",
+        "Echoes::audioldm",
+        "Echoes::brev",
+        "Echoes::diffrhythm",
+        "Echoes::elevenlabs",
+        "Echoes::mubert",
+        "Echoes::musicgen",
+        "Echoes::producer"
+      ],
+      "generator_val": ["Echoes::songgen", "Echoes::stableaudio"],
+      "cal": ["Echoes::suno", "Echoes::udio"]
+    }
+  }
+}

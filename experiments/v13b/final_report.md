@@ -1,105 +1,131 @@
-# V13B Stage Report
+# V13B Representation Research Report
 
 ## CURRENT SELECTED
 
-branch: `x1`
-development base commit: `e8434b9c368ee5de3368d8b0b04559cf19c3ffaa` (V13B work committed on descendant branch `x1`)
-selected frozen submission: `TEST5`
-TEST5 ADS: `0.6386349206` (OFFICIAL/USER-REPORTED)
-TEST5 CPS: `0.9366803175` (OFFICIAL/USER-REPORTED)
-TEST5 TOTAL: `0.6684394603` (OFFICIAL/USER-REPORTED)
-runtime: `30m52s` (OFFICIAL/USER-REPORTED)
+- Selected submission: `TEST5` (unchanged)
+- ADS: `0.6386349206` (`USER_REPORTED_PUBLIC`)
+- CPS: `0.9366803175` (`USER_REPORTED_PUBLIC`)
+- TOTAL: `0.6684394603` (`USER_REPORTED_PUBLIC`)
+- Runtime: `30m52s` (`USER_REPORTED_PUBLIC`)
+- Frozen ZIP SHA256: `5898ad19b5c92e46d54aca529336b99f9e17838806766c654a3585051388fdcb`
 
-## DATASET STATUS
+## CURRENT COMMIT
 
-version: `DATASET_V13B_PILOT_20260901_1`
-status: `DATASET NOT READY / MODEL NOT RUN`
-train rows: `546` (386 paired core + 64 partial/control + 96 mixed)
-cal rows: `112`
-generator val: `132`
-source-disjoint val: `NOT CREATED`
-final holdout: `NOT CREATED / NOT SEALED / NOT RUN`
-paired voice: `2` independent sources (`MLAAD`, `DFADD/VCTK`)
-paired music: `1` independent source (`Echoes/FMA`)
-partial: `64` rows across 2/5/10/20/30/50/70/100% occupancy, half real controls
-mixed: `96` rows; RR/RF/FR/FF = `24/24/24/24`
+- Branch: `x1`
+- development_base_commit: `e8434b9c368ee5de3368d8b0b04559cf19c3ffaa`
+- current_git_commit: `a593422aa342c6579f8e3cc799c65e0dad73ad32`
 
-## SOURCE SHORTCUT
+## DATA
 
-metadata AUC: `0.5816531987`
-acoustic AUC: `0.6413594996`
-combined AUC: `0.7181937770`
-decision: direct paired-core shortcut hard gate `PASS`; whole V13B remains blocked by structural data gates
-source prediction from shallow acoustics: `0.7610101010` balanced accuracy (chance `0.3333`)
-largest remaining label fingerprints: duration, ZCR, RMS, spectral centroid, silence, HF ratio
+- Train: `546` rows; calibration: `112`; generator-disjoint validation: `132`
+- Paired voice sources: `2`; paired Music sources: `1`
+- Second approved paired Music source: `NOT ACQUIRED`
+- Metric-complete source-disjoint validation: `NOT ACQUIRED / NOT MEASURED`
+- Globally unused final: `NOT ACQUIRED / NOT SEALED / NOT RUN`
+- MuseBench, HAIM and ArtifactBench were rechecked from their official dataset cards. Heterogeneous per-track rights, NC terms, URL-only real arms, or historical-source overlap remain; no row was auto-approved or downloaded.
 
-## DATA QUALITY
+## SHORTCUT EFFECTIVE AUC
 
-exact duplicate SHA rows: `0`
-near-duplicate/content pairs: `315`; every pair contains real and fake in one role
-TRAIN/VAL/CAL split identifier leakage: `0` for content, split group, near-duplicate, processed SHA, and source SHA
-license unresolved: second paired music source, future completely unused final source, and all REVIEW_REQUIRED candidates
-canonical policy: label-independent 16 kHz mono PCM16 with the same peak ceiling; original and processed SHA retained
+The symmetric definition is `effective AUC = max(raw AUC, 1 - raw AUC)` and `distance = abs(raw AUC - 0.5)`.
 
-## CURRENT BOTTLENECK
+| Audit | Raw AUC | Effective AUC | Distance from random |
+|---|---:|---:|---:|
+| Direct metadata | 0.581653 | 0.581653 | 0.081653 |
+| Direct acoustic | 0.641359 | 0.641359 | 0.141359 |
+| Direct combined | 0.718194 | 0.718194 | 0.218194 |
+| Rendered all | 0.551398 | 0.551398 | 0.051398 |
+| Rendered paired | 0.635346 | 0.635346 | 0.135346 |
+| Rendered partial | 0.403320 | 0.596680 | 0.096680 |
+| Rendered mixed | 0.538194 | 0.538194 | 0.038194 |
 
-1. A second independent, row-license-resolved paired music domain is missing.
-2. Without it, an approved metric-complete source-disjoint validation set cannot be isolated.
-3. A globally unused source for sealed FINAL_HOLDOUT_V13B has not been acquired.
+Decision: `PASS <= 0.75`. The earlier interpretation of partial raw AUC `0.4033` as inherently better than random was corrected.
 
-## BEST MUSIC
+## MUSIC ARCHITECTURE TABLE
 
-architecture: `NOT RUN`
-music EER: `NOT MEASURED`
-unseen music EER: `NOT MEASURED`
+| Candidate | Representation | Generator-disjoint Music EER | Source-disjoint Music EER | Delta ADS Music | Runtime |
+|---|---|---:|---|---:|---|
+| M0 | TEST5 Music SpecCNN | 0.312500 | NOT MEASURED | 0.000000 | 1.99 s / 132 rows, specialist-only MEASURED |
+| M1 | Log-mel + STFT constant-Q dual branch | 0.375000 | NOT MEASURED | -0.018750 | train 122.07 s; eval 8.73 s MEASURED |
+| M2 | Official PANNs 16 kHz frozen embedding + small head | 0.312500 | NOT MEASURED | 0.000000 | train/embedding 59.60 s; eval 46.56 s MEASURED |
+| M3 | ArtifactNet v9.4 forensic residual ONNX | 0.125000 median / 0.187500 one-crop, DIAGNOSTIC | NOT MEASURED | +0.056250 median / +0.037500 one-crop, DIAGNOSTIC | +54.31 min median / +18.29 min one-crop if all 1200, PROJECTED |
 
-## BEST FILE
+- M1: `REJECT_REGRESSION`
+- M2 Music: `REJECT_NO_IMPROVEMENT`
+- Neither reached the clear screening threshold `EER <= 0.28`; no partial unfreeze or full fine-tune was run.
+- The failed SpecCNN, M1 and M2 Music evidence is preserved under `experiments/v13b/rejected/`.
+- M3 showed a strong diagnostic representation signal, but failed production screening: 1/95 segments produced NaN and was explicitly skipped only in diagnostic mode. The default evaluator fails closed. Its source-disjoint score is unavailable, CC-BY-NC/patent competition approval is unconfirmed, and its CPU runtime is outside the all-file budget. It was not copied into selected artifacts or `submit.zip`.
 
-architecture: `NOT RUN`
-file EER: `NOT MEASURED`
-partial file EER: `NOT MEASURED`
-unseen file EER: `NOT MEASURED`
+## FILE ARCHITECTURE TABLE
 
-## BEST VOICE
+| Candidate | FILE EER | Partial FILE EER | Error correlation vs DF/Fusion | Estimated runtime |
+|---|---:|---:|---:|---|
+| F0 canonical TEST5 | 0.121212 | NOT MEASURED | 1.000 baseline | current 128-file projection 31.93 min |
+| F2 M2 frozen PANNs head | 0.272727 | 0.406250 | Pearson 0.317627 / Spearman 0.277689 | +3.15 min / 1200 PROJECTED |
+| F0 + 25% F2 | 0.090909 | NOT MEASURED | complementary blend | +3.15 min / 1200 PROJECTED |
 
-architecture: `NOT RUN`
-voice EER: `NOT MEASURED`
-worst voice EER: `NOT MEASURED`
+All FILE values above are `MEASURED_GENERATOR_DISJOINT`. The 25% blend was inspected on the same split and is therefore exploratory, not independent calibration and not adoptable. Its apparent FILE contribution is `+0.015152 ADS`; F2 alone contributes `-0.075758 ADS` versus canonical F0.
 
-## FINAL CANDIDATE
+Error overlap at each detector's empirical EER threshold:
 
-FILE EER: `NOT RUN`
-VOICE EER: `NOT RUN`
-MUSIC EER: `NOT RUN`
-ADS: `NOT RUN`
-CPS: `NOT RUN`
-TOTAL: `NOT RUN`
+- Both correct: `83`
+- Both wrong: `3`
+- Only canonical wrong: `13`
+- Only F2 wrong: `33`
 
-## BOOTSTRAP
+## PARTIAL / MIXED MODEL DIAGNOSTIC
 
-win rate: `NOT RUN`
-ADS p05: `NOT RUN`
-ADS median: `NOT RUN`
-ADS p95: `NOT RUN`
+Using generator-disjoint roots with deterministic virtual rendering:
+
+- M1 partial FILE EER: `0.625000`; mixed RR-vs-fake FILE EER: `0.500000`
+- M2/F2 partial FILE EER: `0.406250`; mixed RR-vs-fake FILE EER: `0.486111`
+- Per-state EER is unavailable because RR/RF/FR/FF states are individually single-class; threshold-0.5 error and mean score are retained in the candidate JSON.
+- These are synthetic stress diagnostics, not source-disjoint evidence.
+
+## ADS CONTRIBUTIONS
+
+- M1 Music: `-0.018750`
+- M2 Music: `0.000000`
+- F2 alone versus canonical FILE: `-0.075758`
+- Same-split F0+F2 exploratory blend: `+0.015152`
+- Voice: `0.000000` because Voice was not changed or evaluated in this iteration
 
 ## RUNTIME
 
-projected: `NOT PROJECTED for V13B`
-submission-like: `NOT RUN for V13B`; selected TEST5 official runtime is `30m52s`
+| Files | Frozen TEST5 sec/file | Current x1 sec/file | Current median batch sec/file | Relative speedup | Current 1200-file projection |
+|---:|---:|---:|---:|---:|---:|
+| 64 | 1.636262 | 1.443451 | 1.398542 | 1.1336x | 28.87 min |
+| 128 | 1.590705 | 1.596626 | 1.633484 | 0.9963x | 31.93 min |
 
-## FINAL HOLDOUT
+- Prediction max absolute difference: `5.46e-08` (`PASS <= 1e-6`)
+- The 128-file result shows speed parity, not a reliable x1 speedup.
+- Official TEST5 runtime remains `30m52s`; official x1 runtime is `NOT RUN`.
+- Persistent executor remains rejected.
+- DF-Arena batch-only throughput improved from `0.7697` sec/file at batch 16 to `0.7280` at batch 64 locally, but the submission batch stays 16 because flattening up to 192 PANNs/specialist crops at batch 64 has not passed the L4 memory gate.
+- A CUDA-only overlap experiment is implemented behind explicit `gpu_overlap_enabled=true`, but the selected config leaves it disabled. CPU execution and default CUDA execution remain sequential. Unit/regression behavior is measured; official L4 wall-clock improvement is `NOT RUN`, so the experiment is not applied.
+- Default-path end-to-end parity against frozen TEST5 on 8 direct files is `2.98e-08` (`PASS <= 1e-6`). Its tiny-sample wall clock is not used to claim a speed change.
 
-status: `NOT CREATED / NOT SEALED`
-result: `NOT RUN`
+## CPS
 
-## SUBMISSION
+- TEST5: `0.9366803175` (`USER_REPORTED_PUBLIC`)
+- Candidate production CPS: `NOT RUN`
+- PANNs presence/fusion selected artifacts: `UNCHANGED`
 
-decision: `KEEP_TEST5`
-zip: frozen `archive/pre_v13_selected/submit.zip`
-sha256: `5898ad19b5c92e46d54aca529336b99f9e17838806766c654a3585051388fdcb`
-validator: frozen TEST5 `PASS`; V13B `NOT RUN`
-offline smoke: frozen TEST5 `PASS`; V13B `NOT RUN`
+## BOOTSTRAP
 
-## NEXT BEST ACTION
+`NOT RUN`. No candidate has passed source-disjoint validation or adoption data gates.
 
-Acquire a second paired music corpus with at least 10 content groups and explicit row-level competition permission. Do not relabel ordinary codec/DSP transformations as AI fake. After that, reserve a completely unused source for FINAL_HOLDOUT_V13B, rerun the same frozen shortcut policy, and only then start the three-candidate Music architecture pilot.
+## FINAL
+
+`NOT ACQUIRED / NOT SEALED / NOT READ / NOT RUN`.
+
+## NEXT BOTTLENECK
+
+`MUSIC source diversity and deployable representation transfer` is now the single next bottleneck. M3 proves that a forensic-residual representation can reduce generator-disjoint Music EER (`0.3125 → 0.125`), but the selected lightweight model cannot yet capture that gain and M3 itself fails stability/runtime/license/source-disjoint gates. Public per-component EER is unavailable, so this is not presented as an official leaderboard decomposition.
+
+## DECISION
+
+`KEEP_TEST5`
+
+M1 and M2 did not improve Music. M3 demonstrated a large non-final generator-disjoint gain but was correctly held out of production. F2 showed low error correlation and a same-split blend signal. Adoption remains blocked by the missing second approved paired Music source, source-disjoint validation, sealed globally unused final, independent fusion calibration, bootstrap, runtime, numerical-stability, and license gates.
+
+Full repository regression: `172 passed in 42.52s`.

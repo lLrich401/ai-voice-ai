@@ -1,0 +1,90 @@
+{
+  "status": "DIAGNOSTIC_GENERATOR_DISJOINT_NONFINITE_SKIPPED",
+  "validation": "data/splits_v13b/val_generator_disjoint.csv; music_present==1",
+  "rows": 32,
+  "class_counts": {
+    "0": 16,
+    "1": 16
+  },
+  "generators": {
+    "Echoes::FMA_original": 16,
+    "Echoes::songgen": 10,
+    "Echoes::stableaudio": 6
+  },
+  "model": {
+    "name": "ArtifactNet v9.4 full ONNX",
+    "upstream_revision": "7c9b753a9d006b48e4bfaf85bf0157e135f4aad4",
+    "onnx_sha256": "a923b53899fbb01fcf4436cc5e1837628516de6044c9f238b31b4b02ed601a19",
+    "external_data_sha256": "d3f291b4f531e22e5c17dff8b3888050033d301c7b7f3cb24bf4741cdaabbc05",
+    "license": "CC-BY-NC-4.0; research/non-commercial only; upstream patent notice applies",
+    "input": "44.1 kHz mono, 4 seconds, batch=1",
+    "output": "P(AI)",
+    "candidate_frontend": "immutable raw source; linear peak ceiling 0.25 for ONNX numerical stability"
+  },
+  "baseline_music_eer": 0.3125,
+  "artifactnet_music_eer": {
+    "median": 0.125,
+    "mean": 0.1875,
+    "max": 0.1875,
+    "top2_mean": 0.125,
+    "highest_energy_one_crop": 0.1875
+  },
+  "primary_predeclared_aggregation": "median (upstream song-level recommendation)",
+  "fast_policy": {
+    "name": "highest_energy_one_crop",
+    "music_eer": 0.1875,
+    "projected_added_minutes_if_run_on_all_1200": 18.29456153684173,
+    "note": "same evaluation split diagnostic; requires independent confirmation"
+  },
+  "estimated_music_ads_delta_vs_test5": 0.056249999999999994,
+  "same_split_exploratory_blend": [
+    {
+      "artifactnet_weight": 0.0,
+      "music_eer": 0.3125
+    },
+    {
+      "artifactnet_weight": 0.25,
+      "music_eer": 0.125
+    },
+    {
+      "artifactnet_weight": 0.5,
+      "music_eer": 0.125
+    },
+    {
+      "artifactnet_weight": 0.75,
+      "music_eer": 0.125
+    },
+    {
+      "artifactnet_weight": 1.0,
+      "music_eer": 0.125
+    }
+  ],
+  "same_split_selection_warning": "blend weights and alternative aggregations are diagnostic only, not adoptable calibration",
+  "nonfinite_policy": "DIAGNOSTIC_SKIP_EXPLICITLY_ENABLED; DEFAULT EVALUATOR FAILS CLOSED",
+  "correlation": {
+    "pearson": 0.2705099713566608,
+    "spearman": 0.4857038123167155
+  },
+  "runtime": {
+    "device_baseline": "cpu",
+    "segments": 94,
+    "gain_adjusted_segments": 91,
+    "invalid_segments_skipped": 1,
+    "all_invalid_files_neutral_fallback": 0,
+    "test5_seconds": 0.760371699987445,
+    "artifactnet_seconds": 86.89916729999823,
+    "artifactnet_seconds_per_music_file": 2.7155989781249446,
+    "projected_added_minutes_if_run_on_all_1200": 54.31197956249889
+  },
+  "gates": {
+    "strong_generator_disjoint_threshold": 0.28,
+    "excellent_generator_disjoint_threshold": 0.25,
+    "strong_pass": true,
+    "source_disjoint": "NOT MEASURED",
+    "license_competition_approval": "NOT CONFIRMED",
+    "numerical_stability": "FAIL"
+  },
+  "decision": "REJECT_PRODUCTION_NONFINITE",
+  "final_holdout": "NOT RUN",
+  "scores_file": "experiments/v13b/artifactnet_generator_disjoint_scores.csv"
+}

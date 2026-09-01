@@ -6,7 +6,13 @@ import pytest
 
 from src.distillation import source_balanced_weights
 from tools.v13_guards import assert_final_holdout_v13b_forbidden
-from scripts.prepare_dataset_v13b import apply_explicit_approval, enrich
+from scripts.prepare_dataset_v13b import (
+    apply_explicit_approval, enrich, explicit_generator_roles,
+)
+from scripts.manage_v13b_stages import evaluate_gates
+from scripts.complete_v13b_gates import (
+    validate_final, validate_paired_music, validate_source_disjoint,
+)
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -177,19 +183,162 @@ def test_v13b_source_generator_class_sampler():
         assert (weights >= 0).all()
 
 
-def test_v13b_model_training_blocked_when_any_data_gate_fails():
-    report = json.loads((SPLITS / "DATASET_V13B.json").read_text())
-    failed = [name for name, passed in report["structural_gates"].items() if not passed]
-    if failed:
-        assert report["status"] == "DATASET_NOT_READY"
-        assert report["model_training"] == "BLOCKED_BY_DATA_GATES"
+def test_exploratory_training_allowed_before_adoption_gates():
+    dataset = json.loads((SPLITS / "DATASET_V13B.json").read_text())
+    shortcut = json.loads((ROOT / "experiments/v13b/source_shortcut_audit.json").read_text())
+    policy = json.loads((ROOT / "configs/v13b/selection_policy.json").read_text())
+    gates = evaluate_gates(dataset, shortcut, policy)
+    assert gates["exploratory_allowed"]
+    assert not gates["adoption_eligible"]
 
 
-def test_v13b_stage_manager_blocks_after_failed_data_stage():
+def test_shortcut_gate_is_symmetric_around_random():
+    dataset = json.loads((SPLITS / "DATASET_V13B.json").read_text())
+    shortcut = json.loads((ROOT / "experiments/v13b/source_shortcut_audit.json").read_text())
+    policy = json.loads((ROOT / "configs/v13b/selection_policy.json").read_text())
+    inverted = json.loads(json.dumps(shortcut))
+    for section in ("metadata_only", "acoustic_only", "combined"):
+        inverted[section]["auc"] = 1.0 - shortcut[section]["auc"]
+    assert evaluate_gates(dataset, shortcut, policy) == evaluate_gates(dataset, inverted, policy)
+
+
+def test_adoption_still_blocked_without_source_disjoint():
     status = json.loads((ROOT / "experiments/v13b/stage_status.json").read_text())
     assert set(status["stages"].values()) <= {"PASS", "PASS_WITH_WARNING", "FAIL", "NOT_RUN"}
-    if status["stages"]["4_validation_source_acquisition"] == "FAIL":
-        assert status["model_training"] == "BLOCKED_BY_DATA_GATES"
-        for index in range(5, 16):
-            key = next(name for name in status["stages"] if name.startswith(f"{index}_"))
-            assert status["stages"][key] == "NOT_RUN"
+    assert status["exploratory_training"]["status"] == "ALLOWED_NOT_SELECTED"
+    assert status["adoption"]["status"] == "BLOCKED_BY_DATA_GATES"
+    assert not status["adoption"]["checks"][
+        "approved_metric_complete_source_disjoint_validation"]
+
+
+def test_bootstrap_gate_at_least_0_65():
+    policy = json.loads((ROOT / "configs/v13b/selection_policy.json").read_text())
+    adoption = policy["adoption_gates"]
+    assert adoption["bootstrap_win_rate_minimum"] >= 0.65
+    assert adoption["paired_bootstrap_replicates_minimum"] >= 1000
+    assert adoption["bootstrap_ads_median_delta_minimum"] >= 0.0
+
+
+def test_pre_submission_runtime_gate():
+    policy = json.loads((ROOT / "configs/v13b/selection_policy.json").read_text())
+    adoption = policy["adoption_gates"]
+    assert adoption["pre_submission_measured_runtime_minutes_maximum"] <= 55
+    assert adoption["post_submission_official_runtime_minutes_maximum"] <= 60
+
+
+def test_generator_split_config_stable():
+    config = json.loads((ROOT / "configs/v13b/generator_split.json").read_text())
+    for source, entry in config["sources"].items():
+        roles = [*entry["train"], *entry["generator_val"], *entry["cal"]]
+        assert len(roles) == len(set(roles)), source
+        fake = pd.DataFrame({"file_fake": [1] * len(roles), "generator_family": roles})
+        first = explicit_generator_roles(source, fake, config)
+        second = explicit_generator_roles(source, fake.sample(frac=1, random_state=7), config)
+        assert first == second
+
+
+def test_unknown_generator_not_auto_assigned():
+    config = json.loads((ROOT / "configs/v13b/generator_split.json").read_text())
+    fake = pd.DataFrame({"file_fake": [1], "generator_family": ["new::unreviewed"]})
+    with pytest.raises(RuntimeError, match="unknown generators require explicit review"):
+        explicit_generator_roles("mlaad_tiny_matched", fake, config)
+
+
+def test_rendered_partial_control_same_pipeline():
+    partial = read("partial_train.csv")
+    positive = partial.query("data_role == 'partial_fake'").sort_values("content_group")
+    control = partial.query("data_role == 'partial_real_control'").sort_values("content_group")
+    for column in ("partial_fake_ratio", "partial_fake_position", "partial_crossfade_sec"):
+        assert positive[column].reset_index(drop=True).equals(control[column].reset_index(drop=True))
+    source = (ROOT / "src/dataset.py").read_text(encoding="utf-8")
+    assert source.count("wave=render_partial_fake_wave(") == 1
+
+
+def test_rendered_mix_shortcut_audit():
+    report = json.loads((ROOT / "experiments/v13b/rendered_training_shortcut_audit.json").read_text())
+    assert report["status"] == "PASS"
+    for key, raw in report["raw_auc"].items():
+        assert report["effective_auc"][key] == pytest.approx(max(raw, 1.0 - raw))
+        assert report["distance_from_random"][key] == pytest.approx(abs(raw - 0.5))
+    assert report["effective_auc"]["partial_fake_vs_control"] <= 0.75
+    assert report["effective_auc"]["mixed_rr_vs_fake_states"] <= 0.75
+    assert report["final_holdout"] == "NOT READ / NOT RUN"
+
+
+def _approved_rows(source: str) -> pd.DataFrame:
+    labels = [(0, 0, 0, 0, 0), (0, 0, 0, 1, 0), (1, 1, 0, 1, 0),
+              (0, 0, 0, 0, 1), (1, 0, 1, 0, 1)]
+    rows = []
+    for index, (file_fake, voice_fake, music_fake, voice_present, music_present) in enumerate(labels):
+        rows.append({
+            "path": f"{source}_{index}.wav", "source": source, "dataset": source,
+            "file_fake": file_fake, "voice_fake": voice_fake, "music_fake": music_fake,
+            "voice_present": voice_present, "music_present": music_present,
+            "content_group": f"{source}_content_{index}",
+            "split_group_id": f"{source}_split_{index}",
+            "near_duplicate_group": f"{source}_near_{index}",
+            "base_audio_id": f"{source}_base_{index}",
+            "audio_sha256": f"{source}_sha_{index}",
+            "source_audio_sha256": f"{source}_source_sha_{index}",
+            "generator_family": f"{source}_generator_{index}" if file_fake else "REAL",
+            "voice_generator_family": f"{source}_voice_gen" if voice_fake else "ABSENT",
+            "music_generator_family": f"{source}_music_gen" if music_fake else "ABSENT",
+            "competition_use_status": "APPROVED", "source_url": "https://example.invalid",
+            "license": "test", "approval_basis": "test fixture",
+            "license_source": "https://example.invalid/license",
+            "license_snapshot_sha256": "a" * 64, "reviewed_at": "2026-09-01",
+        })
+    return pd.DataFrame(rows)
+
+
+def test_second_music_source_must_be_independent():
+    existing = read("train.csv")
+    source = str(existing.loc[existing.music_present.eq(1), "source"].iloc[0])
+    music_pair = _approved_rows(source).query("voice_present == 0 and music_present == 1")
+    candidate = pd.concat([music_pair.assign(
+        content_group=f"music_{index}") for index in range(10)], ignore_index=True)
+    with pytest.raises(RuntimeError, match="not independent"):
+        validate_paired_music(candidate, existing)
+
+
+def test_source_disjoint_metric_complete():
+    candidate = _approved_rows("unused_source")
+    result = validate_source_disjoint(candidate, _approved_rows("development_source"))
+    assert result["status"] == "PASS"
+    assert all(result["metric_complete"].values())
+
+
+def test_source_disjoint_train_overlap_zero():
+    candidate = _approved_rows("development_source")
+    with pytest.raises(RuntimeError, match="overlap detected"):
+        validate_source_disjoint(candidate, _approved_rows("development_source"))
+
+
+def test_final_global_history_source_disjoint():
+    candidate = _approved_rows("mlaad_tiny_matched")
+    with pytest.raises(RuntimeError, match="overlaps global project history"):
+        validate_final(candidate)
+
+
+def test_final_global_history_generator_disjoint():
+    historical = read("train.csv").query("file_fake == 1").iloc[0]
+    candidate = _approved_rows("globally_unused_fixture_source")
+    if int(historical.voice_fake) == 1:
+        candidate.loc[candidate.voice_fake.eq(1), "voice_generator_family"] = historical.voice_generator_family
+    else:
+        candidate.loc[candidate.music_fake.eq(1), "music_generator_family"] = historical.music_generator_family
+    with pytest.raises(RuntimeError, match="overlaps global project history"):
+        validate_final(candidate)
+
+
+def test_final_not_written_into_git_training_splits():
+    assert not (SPLITS / "final_holdout_v13b.csv").exists()
+    source = (ROOT / "scripts/complete_v13b_gates.py").read_text(encoding="utf-8")
+    assert 'pathlib.Path(args.data_root).resolve() / "splits/final_holdout_v13b.csv"' in source
+
+
+def test_end_to_end_runtime_prediction_parity():
+    report = json.loads((ROOT / "experiments/v13b/end_to_end_runtime_benchmark.json").read_text())
+    assert report["status"] == "PASS"
+    assert report["prediction_parity"]
+    assert report["prediction_max_abs_diff"] <= report["predefined_prediction_tolerance"]

@@ -1,40 +1,113 @@
 {
   "schema_version": 1,
-  "timestamp": "2026-09-01T10:46:23.536522+09:00",
-  "git_head": "e8434b9c368ee5de3368d8b0b04559cf19c3ffaa",
-  "branch": "test6",
+  "timestamp": "2026-09-01T12:48:14.299704+09:00",
+  "development_base_commit": "e8434b9c368ee5de3368d8b0b04559cf19c3ffaa",
+  "current_git_commit": "a593422aa342c6579f8e3cc799c65e0dad73ad32",
+  "branch": "x1",
   "modified_files": [
     {
       "status": " M",
-      "path": "experiments/latest_results.json",
-      "bytes": 3126,
-      "sha256": "d040f611f6cbf462de9467ce1c980e918965376b39fdf24e15ad720f97d880a0"
+      "path": "configs/v13b/selection_policy.json",
+      "bytes": 1627,
+      "sha256": "99ec08477e1829a8dce6c78eff04e5623ccf7cc5fb187affd304b007b41defe0"
     },
     {
       "status": " M",
-      "path": "tools/v13_guards.py",
-      "bytes": 1651,
-      "sha256": "a83d899332ab167b60bf8bc698f5d212a5c71c82d6285dd170d7092536b2af8d"
+      "path": "experiments/latest_results.json",
+      "bytes": 4674,
+      "sha256": "5220eafebfed34833ce459bbd04aa630575acde19d1d391497b8c11053e15bb9"
+    },
+    {
+      "status": " M",
+      "path": "experiments/v13b/correctness_report.json",
+      "bytes": 2148,
+      "sha256": "1069b87fece16d9fe6b852b676e41fb9ebb450147217304c9a35f7b3b3649d3f"
+    },
+    {
+      "status": " M",
+      "path": "experiments/v13b/data_acquisition_report.json",
+      "bytes": 2686,
+      "sha256": "60f74ea9ea8867bb3e517573a677d1b6c10f2414ce3da73376f0b6dd360cd811"
+    },
+    {
+      "status": " M",
+      "path": "experiments/v13b/final_report.md",
+      "bytes": 5950,
+      "sha256": "70892a72126ac4d9ee7eb42055a8beae3dce1b2d249a885afc60b91431efd217"
+    },
+    {
+      "status": " M",
+      "path": "experiments/v13b/segment_plan_benchmark.json",
+      "bytes": 576,
+      "sha256": "0c8a46dac7b49565be8c2f6dfeaff0810be3aa58c98140091ee728d33008dd7b"
+    },
+    {
+      "status": " M",
+      "path": "experiments/v13b/stage_status.json",
+      "bytes": 2583,
+      "sha256": "0e0722ece6cbf4aba898889f3ebccb8985de34d0470a81f9a2d26bf030c16a4c"
+    },
+    {
+      "status": " M",
+      "path": "model/runtime/src/train.py",
+      "bytes": 28290,
+      "sha256": "8da7b13d601cf9d4f6858177dd2ccd72bfadf38d3c72b96afcf75ced141ceed0"
+    },
+    {
+      "status": " M",
+      "path": "script.py",
+      "bytes": 44023,
+      "sha256": "d02be6db89922aa5c2334b8fe53ed9d80b1b96aa26ced399aa989bdbf21fc2e6"
+    },
+    {
+      "status": " M",
+      "path": "scripts/manage_v13b_stages.py",
+      "bytes": 10917,
+      "sha256": "bcf5736c665bb9c4e27ae8acec0f3979c884bad491f633b3ec878fc1faa1c205"
+    },
+    {
+      "status": " M",
+      "path": "scripts/prepare_dataset_v13b.py",
+      "bytes": 22767,
+      "sha256": "36724ef8376f88ea62e250272bebe0e4e12add6b0cbb5936c2fe5a5b1bf26c3e"
+    },
+    {
+      "status": " M",
+      "path": "src/train.py",
+      "bytes": 28290,
+      "sha256": "8da7b13d601cf9d4f6858177dd2ccd72bfadf38d3c72b96afcf75ced141ceed0"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_generalization.py",
+      "bytes": 9601,
+      "sha256": "df09b29e606c2ab580ad9a70e9726ec4c6b625b4e00aac749490ee3b85027867"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_v13b.py",
+      "bytes": 16082,
+      "sha256": "b71f83c390a587961334bf7d8ea65990b4d87120aaab21675052d0a653938b2d"
+    },
+    {
+      "status": " M",
+      "path": "tools/benchmark_segment_plan_v13b.py",
+      "bytes": 2738,
+      "sha256": "3d34ace6c766306eb5c9d18540dc9de9e529e5eee76a1bdc8f91ecf992d4eeaa"
+    },
+    {
+      "status": " M",
+      "path": "tools/snapshot_worktree_v13b.py",
+      "bytes": 2421,
+      "sha256": "e43a917ed06dfddf3b9a3a81feafe5b4a0f184eb0c338ff052c002ac9bda1739"
     }
   ],
   "untracked_files": [
     {
       "status": "??",
-      "path": "SUBMISSION_READINESS.md",
-      "bytes": 1334,
-      "sha256": "b8c5306223b5022a1e8431c1d346b713cf57ae8c594cf07dfe5c01d1cb85c8c3"
-    },
-    {
-      "status": "??",
-      "path": "configs/v13b/selection_policy.json",
-      "bytes": 1033,
-      "sha256": "af8f839705e6b34c4c0d519c1c4986967f190dac4698fcb19251da653beea294"
-    },
-    {
-      "status": "??",
-      "path": "configs/v13b/source_registry.json",
-      "bytes": 2438,
-      "sha256": "01c460add75c69c6f4f29e9746556dae5651a1befc2da63a28780b18877e3370"
+      "path": "configs/v13b/generator_split.json",
+      "bytes": 1419,
+      "sha256": "bb013af7045afd26a8f15a5d5538d03972856cbc035ea4d7ab37bad8ed4ffdc0"
     },
     {
       "status": "??",
@@ -86,48 +159,6 @@
     },
     {
       "status": "??",
-      "path": "data/splits_v13b/DATASET_V13B.json",
-      "bytes": 4710,
-      "sha256": "0457e1f3551e70082e40445cd43d8950380a218745b908fd7af2b32c70d4f597"
-    },
-    {
-      "status": "??",
-      "path": "data/splits_v13b/cal_v13b.csv",
-      "bytes": 109600,
-      "sha256": "4bd581bfbf0297f4793f5a00b3483fcdce2a8c6c6edf286f7fd6ac28af461ca8"
-    },
-    {
-      "status": "??",
-      "path": "data/splits_v13b/manifest.csv",
-      "bytes": 845783,
-      "sha256": "388f70084263d731b41caec2747db81516fc3290d9434d84a31aabc5cc1e3310"
-    },
-    {
-      "status": "??",
-      "path": "data/splits_v13b/mixed_train.csv",
-      "bytes": 126579,
-      "sha256": "38395bf10d21be1a05b41f42699b9f3fe5dd7b598dd15d45c9e985a0dad16670"
-    },
-    {
-      "status": "??",
-      "path": "data/splits_v13b/partial_train.csv",
-      "bytes": 83889,
-      "sha256": "1bd3f0a1b13ef4b783dbadb24487dfdb4047a2973215c3917ec8a14fa4b6fbc2"
-    },
-    {
-      "status": "??",
-      "path": "data/splits_v13b/train.csv",
-      "bytes": 599145,
-      "sha256": "f32df1f70c4edd2bdc7908afbc794c23fb70bdeb4c9051c1ade71b1115e51e65"
-    },
-    {
-      "status": "??",
-      "path": "data/splits_v13b/val_generator_disjoint.csv",
-      "bytes": 135366,
-      "sha256": "0f98078c778227ab124c20a67041c6ad041b345289639deb219c7cff88a58986"
-    },
-    {
-      "status": "??",
       "path": "data/test_dummy/test_0.wav",
       "bytes": 128044,
       "sha256": "2f01a607d4fc211ab86685d08e028cc7461778fbced689c0c8f43d59c9f79981"
@@ -146,33 +177,111 @@
     },
     {
       "status": "??",
-      "path": "experiments/v13b/data_acquisition_report.json",
-      "bytes": 1977,
-      "sha256": "aa637d5613226e033a165f68f319a0f31de66322a69a7c9f5efb0a8087c35a36"
+      "path": "experiments/v13b/end_to_end_runtime_benchmark.json",
+      "bytes": 2473,
+      "sha256": "d752433bd6cc2075878fd44a13cbd3aaf0e85bd9eceebab89cdd8e4a94129223"
     },
     {
       "status": "??",
-      "path": "experiments/v13b/final_report.md",
-      "bytes": 3585,
-      "sha256": "6525581c42a9350411b44a3a899ba5e5d870bfb65b56aa9e2de40ec720d57ef8"
+      "path": "experiments/v13b/file_exploratory_evaluation.json",
+      "bytes": 2454,
+      "sha256": "e8e21dfe24028ee016fd5216942327febd15c266dd6b41bf16caaea69b0130bc"
     },
     {
       "status": "??",
-      "path": "experiments/v13b/source_shortcut_audit.json",
-      "bytes": 5265,
-      "sha256": "346e756caa371d709c60cdaa0ac119ad87eb0dc08032d444e33fc9d35590b1fe"
+      "path": "experiments/v13b/file_exploratory_training.json",
+      "bytes": 915,
+      "sha256": "8dcdaf07f84283c04550542267cc3ab18cc82ae5a14167faf5399bb2fee72695"
     },
     {
       "status": "??",
-      "path": "experiments/v13b/source_shortcut_audit_features.csv",
-      "bytes": 164843,
-      "sha256": "f8edc4fc0acc059c223bba6f61b7fbb62e5821c8b18a611663f3c01957254daf"
+      "path": "experiments/v13b/gate_completion_report.json",
+      "bytes": 137,
+      "sha256": "bc742f149bb3e44e4b36f07f5a6caf0e38d2b5853ffbf4543202abd352180c2d"
     },
     {
       "status": "??",
-      "path": "experiments/v13b/stage_status.json",
-      "bytes": 1538,
-      "sha256": "8ab502022d158baf2673e845970f1ef8b873b32607149d26551a84d9d83fa2c7"
+      "path": "experiments/v13b/m1_music_representation_probe.json",
+      "bytes": 2635,
+      "sha256": "945ae451399181df7591e84d6a0b5a62bf043dfedce1161d0e8f29979145a376"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/m2_file_complementarity.json",
+      "bytes": 2166,
+      "sha256": "61363adf2aeaed97d148cf179fcbb7849d0eca03c378d6ccf7c38d35a03ba252"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/m2_file_complementarity_scores.csv",
+      "bytes": 14071,
+      "sha256": "eb127c5ca6526457973696026f7e00259012e390914d2b90545aa7f3fdd78dc6"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/m2_music_representation_probe.json",
+      "bytes": 3053,
+      "sha256": "9a77d1badcd54fff66c0735e6160c93ae3e378a4d9464c40c5bdb67552a81b9e"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/music_exploratory_evaluation.json",
+      "bytes": 2463,
+      "sha256": "06c01cbe29469eadbf76557a75a8ae42b2785d2d92fc5ab41e324f2cfb852e21"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/music_exploratory_training.json",
+      "bytes": 919,
+      "sha256": "9fc5bf80dfde277470895eb0620c150cfb3d8a7403cd6acac464ac0a0604e784"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/rejected/file_spec_cnn_probe.json",
+      "bytes": 615,
+      "sha256": "fa6b64ea7c172b8aa41dd39244e56c1c9cc09ac4b7c0628bd5b3bacec7201e8a"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/rejected/m1_music_logmel_cqt_probe.json",
+      "bytes": 509,
+      "sha256": "0b6df95e08fa443f5707d928508ccb077a2d228e2eddaffa74576186a1cc7893"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/rejected/m2_music_panns_frozen_probe.json",
+      "bytes": 593,
+      "sha256": "77dad62e0bdfea4edfbbf110252866ba054878429882cdc1a7f3d62797f45bf3"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/rejected/music_spec_cnn_probe.json",
+      "bytes": 538,
+      "sha256": "9ff66f6ce7e43426bd7a355763c04e9041d840af36b4a50718fc586c09ad44d6"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/rendered_training_shortcut_audit.json",
+      "bytes": 1908,
+      "sha256": "f2c1e694b2abad075a75c8c3a54dc801e283d8a150659055bdc196862c0e1f5e"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/rendered_training_shortcut_audit_features.csv",
+      "bytes": 91507,
+      "sha256": "ae388407213f6d86f39d289ae5c82658fffcc85dc14dfbbdba4c5aa96ac2cdfb"
+    },
+    {
+      "status": "??",
+      "path": "experiments/v13b/rendered_training_shortcut_audit_fingerprints.csv",
+      "bytes": 2558,
+      "sha256": "4a445fc5c1850f656bc6a71311e9e8fcda177dc85de5b1ba4276c94f1f543f1a"
+    },
+    {
+      "status": "??",
+      "path": "model/runtime/src/models/music_forensic.py",
+      "bytes": 5155,
+      "sha256": "fb3b7925e7981d1a7eb36ac279bd83457e42fbec2c7fcb53170e4134b46af791"
     },
     {
       "status": "??",
@@ -182,9 +291,9 @@
     },
     {
       "status": "??",
-      "path": "scripts/acquire_dfadd_pairs_v13b.py",
-      "bytes": 10411,
-      "sha256": "f0bd705e3361920b387e538de9448866801ff9dbdc249f6fbeb8f7c5d28b4089"
+      "path": "scripts/benchmark_v13b_runtime.py",
+      "bytes": 6353,
+      "sha256": "e4e0192ff077e825aa784eb33fbb5c56397d6ecc98838b9e3a15490193be08b7"
     },
     {
       "status": "??",
@@ -194,33 +303,51 @@
     },
     {
       "status": "??",
-      "path": "scripts/manage_v13b_stages.py",
-      "bytes": 3412,
-      "sha256": "b17e9579b2f78fc4105aaa430b09170cd9192dd2fb34541ce251ba82fd17475c"
+      "path": "scripts/complete_v13b_gates.py",
+      "bytes": 9911,
+      "sha256": "a58ae4b5862dd2f3f566be2301f6934f666652e07168a0cf6f13f11de7090c08"
     },
     {
       "status": "??",
-      "path": "scripts/prepare_dataset_v13b.py",
-      "bytes": 17627,
-      "sha256": "37067c1d8c2cd414c7d5d11ae28f7e4fb0ef876e090ba55f83a496f2e6b814bf"
+      "path": "scripts/evaluate_v13b_exploratory.py",
+      "bytes": 5557,
+      "sha256": "eccde3071b02082f7061b567e0e5ab3c6709a58e62cfa09eaa6d5969f78eda93"
     },
     {
       "status": "??",
-      "path": "tests/test_v13b.py",
-      "bytes": 5711,
-      "sha256": "fbd6a039dbf81a518f32a62a39b8fdd74563ba281bbe922ec5b474d24ea8c7a4"
+      "path": "scripts/evaluate_v13b_file_complementarity.py",
+      "bytes": 6251,
+      "sha256": "b7481997dda111173de74baa9f7ee02315e9ae2bd7cd54d81fa46109fab407ee"
     },
     {
       "status": "??",
-      "path": "tools/audit_source_shortcut_v13b.py",
-      "bytes": 11045,
-      "sha256": "c32ea4c0ed48e821d9a3c838b87d065f5ab7bab50a25414aaf17c37a992b9856"
+      "path": "scripts/train_v13b_exploratory.py",
+      "bytes": 5528,
+      "sha256": "2474c6a690d9e62945243597cabedf2a782df5b9e3de271891b06c7910901d04"
     },
     {
       "status": "??",
-      "path": "tools/snapshot_worktree_v13b.py",
-      "bytes": 2201,
-      "sha256": "e5962dccb1ac81734c1d2a3c55604aa91bb12b71967da38891b84a50857b6a43"
+      "path": "scripts/train_v13b_music_representations.py",
+      "bytes": 16030,
+      "sha256": "6c3ca8e7d82a69fe2cec44a129c6000e721f59059924a792d740442ce03706c9"
+    },
+    {
+      "status": "??",
+      "path": "src/models/music_forensic.py",
+      "bytes": 5155,
+      "sha256": "fb3b7925e7981d1a7eb36ac279bd83457e42fbec2c7fcb53170e4134b46af791"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_v13b_music_forensic.py",
+      "bytes": 1738,
+      "sha256": "b7a4bd58ebe18dd85ee98e06d258f3695b06ae3aa6728a38a42add18062f97ac"
+    },
+    {
+      "status": "??",
+      "path": "tools/audit_rendered_training_shortcut_v13b.py",
+      "bytes": 6418,
+      "sha256": "662ba0447e3ae9dcffd29aee98411ed0d4acba39e8edd75a27ab76c0c6f28cef"
     },
     {
       "status": "??",
@@ -229,6 +356,6 @@
       "sha256": "008dda6782634caf6ea707f3e8606e03f7ea8671fa424836495ff146cf0800f4"
     }
   ],
-  "entry_count": 37,
-  "note": "Snapshot taken before V13B correctness/ancestry changes; no reset, clean, or stash used."
+  "entry_count": 58,
+  "note": "Current x1 worktree inventory; output file excludes itself. No reset, clean, or stash used."
 }

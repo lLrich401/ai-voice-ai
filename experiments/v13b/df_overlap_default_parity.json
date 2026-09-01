@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "scope": "MEASURED_LOCAL generator-disjoint direct subset; linear projection is PROJECTED",
+  "device": "cpu",
+  "files": 8,
+  "batch": 4,
+  "checkpoints": [
+    8
+  ],
+  "predefined_prediction_tolerance": 1e-06,
+  "decode_strategy": "per-batch executor; persistent executor rejected after no measured gain",
+  "prediction_max_abs_diff": 2.9802322387695312e-08,
+  "prediction_parity": true,
+  "scales": {
+    "8": {
+      "frozen_test5": {
+        "total_seconds": 7.8670563000196125,
+        "seconds_per_file": 0.9833820375024516,
+        "median_batch_seconds_per_file": 0.9833814250014257,
+        "files_per_second": 1.0168987858876841,
+        "projected_1200_file_minutes": 19.66764075004903
+      },
+      "current_x1": {
+        "total_seconds": 10.12439589999849,
+        "seconds_per_file": 1.2655494874998112,
+        "median_batch_seconds_per_file": 1.2655486374969769,
+        "files_per_second": 0.7901706016851033,
+        "projected_1200_file_minutes": 25.310989749996224
+      },
+      "relative_speedup": 0.777039576259635
+    }
+  },
+  "frozen_test5": {
+    "total_seconds": 7.8670563000196125,
+    "seconds_per_file": 0.9833820375024516,
+    "median_batch_seconds_per_file": 0.9833814250014257,
+    "files_per_second": 1.0168987858876841,
+    "projected_1200_file_minutes": 19.66764075004903
+  },
+  "current_x1": {
+    "total_seconds": 10.12439589999849,
+    "seconds_per_file": 1.2655494874998112,
+    "median_batch_seconds_per_file": 1.2655486374969769,
+    "files_per_second": 0.7901706016851033,
+    "projected_1200_file_minutes": 25.310989749996224
+  },
+  "official_test5_runtime": "30m52s USER_REPORTED_PUBLIC",
+  "official_x1_runtime": "NOT RUN",
+  "final_holdout": "NOT READ / NOT RUN"
+}

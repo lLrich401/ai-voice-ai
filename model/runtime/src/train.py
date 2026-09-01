@@ -9,7 +9,7 @@ import pandas as pd
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, WeightedRandomSampler
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 from .metrics import compute_dacon_metrics
 from .dataset import (
     AudioDataset, add_partial_fake_examples, build_val_sets, filter_manifest_provenance,
@@ -123,7 +123,7 @@ def train_one_epoch(model, loader, opt, device, scaler, task="multitask"):
     for wav, labels, _ in loader:
         wav=wav.to(device); labels=labels.to(device)
         opt.zero_grad()
-        with autocast(enabled=(device.type=="cuda")):
+        with autocast(device_type=device.type, enabled=(device.type=="cuda")):
             logits=model(wav)
             # logits dict: file_fake, voice_fake, music_fake, voice_present, music_present
             logit_t=torch.stack([logits[k] for k in ["file_fake","voice_fake","music_fake","voice_present","music_present"]], dim=1)
@@ -170,7 +170,8 @@ def checkpoint_selection_score(metrics_by_split, task="pipeline"):
     return 0.55 * mean_score + 0.25 * worst_score + 0.20 * unseen_score
 
 @torch.no_grad()
-def validate_multisegment(model, df, device, use_demucs=False, task="multitask", sr=16000, seg_sec=4.0, batch_size=None):
+def validate_multisegment(model, df, device, use_demucs=False, task="multitask", sr=16000,
+                          seg_sec=4.0, batch_size=None, allow_load_failures=False):
     """Validate with multi-segment aggregation identical to script.py inference. Batched for speed."""
     model.eval()
     from .preprocess import extract_segments, aggregate_predictions, load_audio
@@ -208,8 +209,10 @@ def validate_multisegment(model, df, device, use_demucs=False, task="multitask",
                 row, sr=sr, is_training=False, use_demucs=use_demucs,
                 task=task, separator=separator)
         except Exception as e:
-            print(f"load fail {path_str}: {e}")
-            continue
+            if allow_load_failures:
+                print(f"diagnostic load failure {path_str}: {e}")
+                continue
+            raise RuntimeError(f"canonical multisegment load failed for {path_str}") from e
         segs = extract_segments(wave, sr=sr, seg_sec=seg_sec, strategy="uniform5")
         file_labels.append(np.array([row.get(k,0) for k in ["file_fake","voice_fake","music_fake","voice_present","music_present"]], dtype=np.float32))
         file_seg_counts.append(len(segs))
@@ -217,7 +220,7 @@ def validate_multisegment(model, df, device, use_demucs=False, task="multitask",
             all_segments.append(s)
             file_indices.append(len(file_labels)-1)
     if len(all_segments)==0:
-        return {"score":0,"file_eer":0.5,"voice_eer":0.5,"music_eer":0.5,"voice_auc":0.5,"music_auc":0.5}
+        raise RuntimeError("canonical multisegment validation has no usable segments")
     # Batch inference over all segments
     all_segments_np=np.stack(all_segments)  # [N_seg, T]
     # Run model in batches
@@ -433,7 +436,7 @@ def main():
         print(f"Strictly initialized from {init_path}")
     opt=torch.optim.AdamW(model.parameters(), lr=args.lr)
     scheduler=torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=args.epochs)
-    scaler=GradScaler(enabled=(device.type=="cuda"))
+    scaler=GradScaler(device.type, enabled=(device.type=="cuda"))
     best_score=-1
     best_path=None
     training_history=[]
@@ -500,21 +503,15 @@ def main():
         model.load_state_dict(ckpt["model"])
         print(f"Loaded best {best_path} for final val (multi-segment)")
         # Use multisegment validation for actual metrics
-        try:
-            final_validation_frames = {
-                "val_a": val_a, "val_b": val_b, "val_c": val_c, "val_d": val_d,
-            }
-            for name, df in final_validation_frames.items():
-                if len(df) == 0:
-                    continue
-                m=validate_multisegment(model, df, device, use_demucs=args.use_demucs,
-                                        task=args.task, batch_size=val_batch)
-                print(f"Final {name} multisegment {m}")
-        except Exception as e:
-            print(f"Multisegment final val failed {e}, fallback to single-crop")
-            for name, loader in [("val_a",val_a_loader)] + list(val_loaders.items()):
-                m=validate(model, loader, device)
-                print(f"Final {name} {m}")
+        final_validation_frames = {
+            "val_a": val_a, "val_b": val_b, "val_c": val_c, "val_d": val_d,
+        }
+        for name, df in final_validation_frames.items():
+            if len(df) == 0:
+                continue
+            m=validate_multisegment(model, df, device, use_demucs=args.use_demucs,
+                                    task=args.task, batch_size=val_batch)
+            print(f"Final {name} multisegment {m}")
 
     history_path=(pathlib.Path(args.history_path) if args.history_path else
                   pathlib.Path("experiments")/f"{args.task}_training_curve.csv")

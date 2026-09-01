@@ -3,7 +3,6 @@
   "status": "CURRENT_SELECTED_SUBMISSION_SOURCE_OF_TRUTH",
   "timestamp": "2026-09-01T00:00:00+09:00",
   "branch": "x1",
-  "development_git_commit": "e8434b9c368ee5de3368d8b0b04559cf19c3ffaa",
   "selected_submission": {
     "name": "TEST5",
     "status": "USER_REPORTED_DACON_PUBLIC_ACTUAL",
@@ -32,7 +31,7 @@
     "dataset_version": "DATASET_V13B_PILOT_20260901_1",
     "dataset_status": "DATASET_NOT_READY",
     "current_stage": 4,
-    "current_stage_name": "validation source acquisition blocked",
+    "current_stage_name": "Music representation screening complete; second Music/source-disjoint acquisition blocked",
     "v13b_decision": "KEEP_TEST5_UNTIL_ALL_ADOPTION_GATES_PASS",
     "v13_historical_status": "FAILED_SOURCE_SHORTCUT_GATE",
     "v13_shortcut_auc": {
@@ -75,20 +74,72 @@
     ],
     "tests": {
       "status": "PASS",
-      "pytest": "146 passed",
-      "seconds": 8.20
+      "pytest": "172 passed",
+      "seconds": 42.52
     },
-    "final_holdout_v13b": "NOT CREATED / NOT RUN"
+    "final_holdout_v13b": "NOT CREATED / NOT RUN",
+    "exploratory_training": "ALLOWED_NOT_SELECTED",
+    "adoption": "BLOCKED_BY_DATA_GATES",
+    "v13b_exploratory_results": {
+      "music": {
+        "status": "EXPLORATORY_MEASURED_NOT_ADOPTABLE",
+        "baseline_music_eer": 0.3125,
+        "candidate_music_eer": 0.3125,
+        "selected": false
+      },
+      "file": {
+        "status": "EXPLORATORY_MEASURED_NOT_ADOPTABLE",
+        "baseline_standalone_file_eer": 0.4242424242424242,
+        "candidate_standalone_file_eer": 0.43939393939393945,
+        "selected": false
+      },
+      "source_disjoint": "NOT MEASURED",
+      "final_holdout": "NOT RUN"
+    },
+    "v13b_representation_results": {
+      "m1_music_eer": 0.375,
+      "m2_music_eer": 0.3125,
+      "m3_artifactnet": {
+        "status": "DIAGNOSTIC_SIGNAL_STRONG_PRODUCTION_REJECTED_NONFINITE",
+        "baseline_music_eer": 0.3125,
+        "median_music_eer": 0.125,
+        "highest_energy_one_crop_music_eer": 0.1875,
+        "estimated_median_music_ads_delta": 0.056249999999999994,
+        "invalid_segments": 1,
+        "evaluated_segments": 95,
+        "source_disjoint": "NOT MEASURED",
+        "competition_license_approval": "NOT CONFIRMED",
+        "selected": false
+      },
+      "m2_file_complementarity": {
+        "canonical_file_eer": 0.12121212121212122,
+        "candidate_file_eer": 0.2727272727272727,
+        "best_same_split_fusion_file_eer": 0.09090909090909093,
+        "adoptable": false
+      },
+      "runtime_bottleneck": {
+        "cuda_cpu_gpu_overlap": "EXPERIMENTAL_OPT_IN_IMPLEMENTED_AND_UNIT_TESTED_SELECTED_DISABLED",
+        "official_l4_runtime": "NOT RUN",
+        "cpu_path": "UNCHANGED",
+        "default_overlap_prediction_parity_8_direct_files": true,
+        "default_overlap_prediction_max_abs_diff": 2.9802322387695312e-08,
+        "df_batch16_seconds_per_file_local": 0.7697061750000103,
+        "df_batch64_seconds_per_file_local": 0.7280127968751913,
+        "batch64_selected": false
+      }
+    }
   },
   "historical_results": {
     "v7_to_v13": "Preserved in versioned experiment directories and git history",
     "previous_latest_results": "Historical values remain in version history and versioned experiment reports."
   },
   "not_run": [
-    "V13B model training",
-    "V13B robust validation",
+    "V13B Voice exploratory candidate",
+    "V13B source-disjoint robust validation",
     "V13B bootstrap",
     "FINAL_HOLDOUT_V13B evaluation",
     "new DACON submission"
-  ]
+  ],
+  "development_base_commit": "e8434b9c368ee5de3368d8b0b04559cf19c3ffaa",
+  "current_git_commit": "a593422aa342c6579f8e3cc799c65e0dad73ad32"
 }

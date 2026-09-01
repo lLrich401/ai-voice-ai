@@ -1,0 +1,29 @@
+{
+  "status": "CANDIDATE_ONLY_NOT_SELECTED_NOT_BUNDLED",
+  "name": "ArtifactNet v9.4 full ONNX",
+  "source": "https://huggingface.co/intrect/artifactnet",
+  "revision": "7c9b753a9d006b48e4bfaf85bf0157e135f4aad4",
+  "files": {
+    "artifactnet_v94_full.onnx": {
+      "bytes": 226020,
+      "sha256": "a923b53899fbb01fcf4436cc5e1837628516de6044c9f238b31b4b02ed601a19"
+    },
+    "artifactnet_v94_full.onnx.data": {
+      "bytes": 16973824,
+      "sha256": "d3f291b4f531e22e5c17dff8b3888050033d301c7b7f3cb24bf4741cdaabbc05"
+    }
+  },
+  "license": "CC-BY-NC-4.0",
+  "license_limits": "Research/non-commercial only. Upstream patent notice states that the copyright license grants no patent license.",
+  "competition_use_approval": "NOT CONFIRMED",
+  "redistribution_in_submission": "NOT APPROVED",
+  "selection": "REJECTED_FOR_PRODUCTION_PENDING_ALL_GATES",
+  "blocking_gates": [
+    "one of 95 evaluated segments produced NaN",
+    "source-disjoint Music validation is unavailable",
+    "competition-use and patent approval are not confirmed",
+    "full median policy exceeds runtime budget",
+    "fast/gated policy lacks independent calibration"
+  ],
+  "final_holdout": "NOT READ / NOT RUN"
+}

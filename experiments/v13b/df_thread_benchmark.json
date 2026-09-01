@@ -1,0 +1,69 @@
+{
+  "status": "MEASURED_LOCAL",
+  "input_shape": [
+    16,
+    64600
+  ],
+  "results": [
+    {
+      "threads": 2,
+      "load_seconds": 9.600807300012093,
+      "batch16_seconds": [
+        42.83837519999361,
+        46.677857100003166
+      ],
+      "median_seconds_per_file": 2.797382259374899,
+      "checksum": 1.413905382156372
+    },
+    {
+      "threads": 4,
+      "load_seconds": 7.034244999988005,
+      "batch16_seconds": [
+        19.059894299978623,
+        18.324607399990782
+      ],
+      "median_seconds_per_file": 1.168265678124044,
+      "checksum": 1.413905382156372
+    },
+    {
+      "threads": 6,
+      "load_seconds": 4.74522579999757,
+      "batch16_seconds": [
+        14.025324299989734,
+        14.940365099988412
+      ],
+      "median_seconds_per_file": 0.9051777937493171,
+      "checksum": 1.4208064079284668
+    },
+    {
+      "threads": 8,
+      "load_seconds": 4.761969699990004,
+      "batch16_seconds": [
+        12.429206899978453,
+        13.246157299989136
+      ],
+      "median_seconds_per_file": 0.8023551312489872,
+      "checksum": 1.4208064079284668
+    },
+    {
+      "threads": 12,
+      "load_seconds": 4.704215500009013,
+      "batch16_seconds": [
+        11.353528600011487,
+        12.234863000019686
+      ],
+      "median_seconds_per_file": 0.7371372375009742,
+      "checksum": 1.4208064079284668
+    },
+    {
+      "threads": 16,
+      "load_seconds": 4.820516800013138,
+      "batch16_seconds": [
+        11.057625599991297,
+        12.77272870001616
+      ],
+      "median_seconds_per_file": 0.744698571875233,
+      "checksum": 1.4208064079284668
+    }
+  ]
+}

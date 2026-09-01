@@ -1,0 +1,13 @@
+{
+  "candidate": "M2_MUSIC",
+  "checkpoint_sha256": "470c6d91a7d9c9a9218bd2f23411aa97543a437fdb54b93a7c34f6fa160391e8",
+  "representation": "official_panns_16k_frozen_embedding_v1",
+  "training": "frozen backbone plus small head Stage-A probe",
+  "baseline_generator_disjoint_music_eer": 0.3125,
+  "candidate_generator_disjoint_music_eer": 0.3125,
+  "delta_ads_music": 0.0,
+  "music_decision": "REJECT_NO_IMPROVEMENT",
+  "file_followup": "M2 FILE auxiliary retained only as non-adoptable complementarity research evidence.",
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN"
+}
