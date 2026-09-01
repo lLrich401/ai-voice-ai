@@ -26,6 +26,8 @@ experiments/v12/cache/*.npy
 archive/pre_v13_selected/submit.zip
 model/candidates/v13/
 data/splits_v13/final_holdout_v13.csv
+experiments/v13b/*_stdout.log
+experiments/v13b/*_stderr.log
 # Keep small checkpoints (<100MB) - uncomment if you want LFS for them
 # *.pt
 submit.zip

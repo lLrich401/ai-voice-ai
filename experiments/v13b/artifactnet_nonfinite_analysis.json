@@ -1,0 +1,215 @@
+{
+  "status": "MEASURED",
+  "policy_frozen_from_cal": "peak_0.25",
+  "nonfinite_count": 1,
+  "records": [
+    {
+      "row_index": 24,
+      "audio_id": "f42e4d7e514ca768cc300690939c982576aff43d70ed89d3c998c80e150bc773",
+      "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\f42e4d7e514ca768cc300690939c982576aff43d70ed89d3c998c80e150bc773.wav",
+      "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\real\\fma_150311.mp3",
+      "generator": "Echoes::FMA_original",
+      "music_fake": 0,
+      "segment_index": 0,
+      "output": [
+        NaN
+      ],
+      "finite": false,
+      "ceiling": 0.25,
+      "gain_adjusted": true,
+      "input_min": -0.27715814113616943,
+      "input_max": 0.2588905692100525,
+      "input_peak": 0.27715814113616943,
+      "input_rms": 0.047308316454346175,
+      "input_silence_ratio_abs_le_1e_6": 0.205515873015873,
+      "post_gain_min": -0.25,
+      "post_gain_max": 0.233522430062294,
+      "post_gain_peak": 0.25,
+      "post_gain_rms": 0.042672674333381275,
+      "sample_rate": 44100,
+      "duration_seconds": 4.0
+    }
+  ],
+  "same_segment_all_frontend_trials": [
+    {
+      "audio_id": "f42e4d7e514ca768cc300690939c982576aff43d70ed89d3c998c80e150bc773",
+      "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\f42e4d7e514ca768cc300690939c982576aff43d70ed89d3c998c80e150bc773.wav",
+      "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\real\\fma_150311.mp3",
+      "segment_index": 0,
+      "trials": [
+        {
+          "policy": "peak_0.10",
+          "ceiling": 0.1,
+          "finite": true,
+          "output": [
+            2.8520822525024414e-05
+          ],
+          "gain_adjusted": true,
+          "input_min": -0.4539361894130707,
+          "input_max": 0.46759429574012756,
+          "input_peak": 0.46759429574012756,
+          "input_rms": 0.07206455429705631,
+          "input_silence_ratio_abs_le_1e_6": 2.2675736961451248e-05,
+          "post_gain_min": -0.0970790684223175,
+          "post_gain_max": 0.09999999403953552,
+          "post_gain_peak": 0.09999999403953552,
+          "post_gain_rms": 0.015411768905864284,
+          "sample_rate": 44100,
+          "duration_seconds": 4.0
+        },
+        {
+          "policy": "peak_0.15",
+          "ceiling": 0.15,
+          "finite": true,
+          "output": [
+            1.7881393432617188e-05
+          ],
+          "gain_adjusted": true,
+          "input_min": -0.4539361894130707,
+          "input_max": 0.46759429574012756,
+          "input_peak": 0.46759429574012756,
+          "input_rms": 0.07206455429705631,
+          "input_silence_ratio_abs_le_1e_6": 2.2675736961451248e-05,
+          "post_gain_min": -0.14561860263347626,
+          "post_gain_max": 0.15000000596046448,
+          "post_gain_peak": 0.15000000596046448,
+          "post_gain_rms": 0.023117654429841917,
+          "sample_rate": 44100,
+          "duration_seconds": 4.0
+        },
+        {
+          "policy": "peak_0.20",
+          "ceiling": 0.2,
+          "finite": true,
+          "output": [
+            2.0503997802734375e-05
+          ],
+          "gain_adjusted": true,
+          "input_min": -0.4539361894130707,
+          "input_max": 0.46759429574012756,
+          "input_peak": 0.46759429574012756,
+          "input_rms": 0.07206455429705631,
+          "input_silence_ratio_abs_le_1e_6": 2.2675736961451248e-05,
+          "post_gain_min": -0.194158136844635,
+          "post_gain_max": 0.19999998807907104,
+          "post_gain_peak": 0.19999998807907104,
+          "post_gain_rms": 0.030823537811728568,
+          "sample_rate": 44100,
+          "duration_seconds": 4.0
+        },
+        {
+          "policy": "peak_0.25",
+          "ceiling": 0.25,
+          "finite": true,
+          "output": [
+            4.476308822631836e-05
+          ],
+          "gain_adjusted": true,
+          "input_min": -0.4539361894130707,
+          "input_max": 0.46759429574012756,
+          "input_peak": 0.46759429574012756,
+          "input_rms": 0.07206455429705631,
+          "input_silence_ratio_abs_le_1e_6": 2.2675736961451248e-05,
+          "post_gain_min": -0.24269767105579376,
+          "post_gain_max": 0.25,
+          "post_gain_peak": 0.25,
+          "post_gain_rms": 0.03852942334300672,
+          "sample_rate": 44100,
+          "duration_seconds": 4.0
+        },
+        {
+          "policy": "peak_0.35",
+          "ceiling": 0.35,
+          "finite": true,
+          "output": [
+            0.0005522370338439941
+          ],
+          "gain_adjusted": true,
+          "input_min": -0.4539361894130707,
+          "input_max": 0.46759429574012756,
+          "input_peak": 0.46759429574012756,
+          "input_rms": 0.07206455429705631,
+          "input_silence_ratio_abs_le_1e_6": 2.2675736961451248e-05,
+          "post_gain_min": -0.33977675437927246,
+          "post_gain_max": 0.3500000238418579,
+          "post_gain_peak": 0.3500000238418579,
+          "post_gain_rms": 0.05394119439771453,
+          "sample_rate": 44100,
+          "duration_seconds": 4.0
+        },
+        {
+          "policy": "peak_0.50",
+          "ceiling": 0.5,
+          "finite": true,
+          "output": [
+            0.0017630457878112793
+          ],
+          "gain_adjusted": false,
+          "input_min": -0.4539361894130707,
+          "input_max": 0.46759429574012756,
+          "input_peak": 0.46759429574012756,
+          "input_rms": 0.07206455429705631,
+          "input_silence_ratio_abs_le_1e_6": 2.2675736961451248e-05,
+          "post_gain_min": -0.4539361894130707,
+          "post_gain_max": 0.46759429574012756,
+          "post_gain_peak": 0.46759429574012756,
+          "post_gain_rms": 0.07206455429705631,
+          "sample_rate": 44100,
+          "duration_seconds": 4.0
+        },
+        {
+          "policy": "peak_0.75",
+          "ceiling": 0.75,
+          "finite": true,
+          "output": [
+            0.0017630457878112793
+          ],
+          "gain_adjusted": false,
+          "input_min": -0.4539361894130707,
+          "input_max": 0.46759429574012756,
+          "input_peak": 0.46759429574012756,
+          "input_rms": 0.07206455429705631,
+          "input_silence_ratio_abs_le_1e_6": 2.2675736961451248e-05,
+          "post_gain_min": -0.4539361894130707,
+          "post_gain_max": 0.46759429574012756,
+          "post_gain_peak": 0.46759429574012756,
+          "post_gain_rms": 0.07206455429705631,
+          "sample_rate": 44100,
+          "duration_seconds": 4.0
+        },
+        {
+          "policy": "none",
+          "ceiling": null,
+          "finite": true,
+          "output": [
+            0.0017630457878112793
+          ],
+          "gain_adjusted": false,
+          "input_min": -0.4539361894130707,
+          "input_max": 0.46759429574012756,
+          "input_peak": 0.46759429574012756,
+          "input_rms": 0.07206455429705631,
+          "input_silence_ratio_abs_le_1e_6": 2.2675736961451248e-05,
+          "post_gain_min": -0.4539361894130707,
+          "post_gain_max": 0.46759429574012756,
+          "post_gain_peak": 0.46759429574012756,
+          "post_gain_rms": 0.07206455429705631,
+          "sample_rate": 44100,
+          "duration_seconds": 4.0
+        }
+      ]
+    }
+  ],
+  "diagnostic_runtime_seconds": 85.11736210004892,
+  "model_intermediates": "NOT AVAILABLE: released ONNX exposes only final prob output",
+  "root_cause": {
+    "measured": "nonfinite output occurs after finite, non-silent 44.1 kHz input reaches the opaque ONNX graph; same-segment frontend trials are recorded above",
+    "not_established": [
+      "specific internal operator",
+      "weight corruption",
+      "normalization denominator"
+    ],
+    "production_consequence": "FAIL_CLOSED; direct deployment is rejected if any segment is non-finite"
+  },
+  "final_holdout": "NOT RUN"
+}

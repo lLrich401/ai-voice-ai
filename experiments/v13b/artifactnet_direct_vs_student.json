@@ -1,0 +1,28 @@
+{
+  "status": "BLOCKED",
+  "direct": {
+    "status": "REJECTED_FAIL_CLOSED",
+    "license_approval": false,
+    "selected_one_crop_numerical_stability": true,
+    "multi_crop_policy": "REJECTED_NONFINITE",
+    "calibration_status": "PASS_CAL_ONLY",
+    "generator_confirmation_status": "PASS_CONFIRMATION",
+    "post_policy_diagnostic_nonfinite_count": 1
+  },
+  "student": {
+    "status": "BLOCKED_BEFORE_TRAINING",
+    "reason": [
+      "teacher competition-use and redistribution approval are not confirmed",
+      "teacher is not eligible for a competition submission even though selected one-crop diagnostics passed",
+      "no teacher scores or labels may be exported from CAL/generator validation"
+    ],
+    "permitted_after_all_gates": [
+      "generate teacher labels from train_v13b only",
+      "train student from train_v13b only",
+      "use CAL for one policy decision and generator-disjoint only for confirmation",
+      "retain teacher/student provenance and licence chain in candidate metadata"
+    ]
+  },
+  "selected_artifacts_mutated": false,
+  "final_holdout": "NOT RUN"
+}

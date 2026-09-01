@@ -1,0 +1,62 @@
+{
+  "status": "CAL_SIGNAL_ONLY",
+  "selection_data": "cal_v13b only",
+  "rows": 112,
+  "device": "cpu",
+  "candidates": [
+    {
+      "f2_weight": 0.0,
+      "file_eer": 0.10714285714285712
+    },
+    {
+      "f2_weight": 0.1,
+      "file_eer": 0.0892857142857143
+    },
+    {
+      "f2_weight": 0.2,
+      "file_eer": 0.0892857142857143
+    },
+    {
+      "f2_weight": 0.25,
+      "file_eer": 0.07142857142857141
+    },
+    {
+      "f2_weight": 0.35,
+      "file_eer": 0.05357142857142859
+    },
+    {
+      "f2_weight": 0.5,
+      "file_eer": 0.0892857142857143
+    }
+  ],
+  "selected": {
+    "f2_weight": 0.35,
+    "file_eer": 0.05357142857142859
+  },
+  "baseline": {
+    "f2_weight": 0.0,
+    "file_eer": 0.10714285714285712
+  },
+  "strict_cal_file_eer_delta": 0.053571428571428534,
+  "selection_constraints": [
+    "no generator-disjoint score was used to choose the weight",
+    "no final holdout was read",
+    "frozen TEST5 fusion_weights.json was not edited",
+    "source-disjoint, bootstrap, runtime, and adoption data gates remain required"
+  ],
+  "runtime": {
+    "canonical_seconds": 198.06608139997115,
+    "f2_seconds": 12.32636750000529,
+    "f2_added_1200_file_minutes_projected": 2.2011370535723733
+  },
+  "dependencies": {
+    "cal_sha256": "b0b57a63b3cdf35d8eb467a5bc222075d9b4fbb26bf055f9baea124dee6d4d1c",
+    "f2_checkpoint_sha256": "470c6d91a7d9c9a9218bd2f23411aa97543a437fdb54b93a7c34f6fa160391e8",
+    "frozen_fusion_sha256": "87d46c317398bed0a9dc87c6b451246851ba6c34683e4468a0251461f7c42402"
+  },
+  "scores_file": "experiments/v13b/f2_calibration_scores.csv",
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN",
+  "selected_artifacts_mutated": false,
+  "decision": "KEEP_TEST5"
+}

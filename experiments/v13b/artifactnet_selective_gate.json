@@ -1,0 +1,13 @@
+{
+  "status": "GENERATOR_CONFIRMATION_ONLY",
+  "threshold_frozen_from_cal": 0.3,
+  "execution_rate_generator_full": 0.23484848484848486,
+  "music_present_recall_generator": 0.96875,
+  "music_eer_generator": 0.1875,
+  "candidate_added_runtime_minutes_projected": 6.266670108898876,
+  "presence_runtime_seconds": 19.235813400009647,
+  "cps_delta": "NOT MEASURED: presence scores are unchanged",
+  "file_delta": "NOT MEASURED: requires independent fusion calibration",
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN"
+}

@@ -35,6 +35,15 @@ def test_artifactnet_frontend_preserves_safe_level_audio():
     assert np.array_equal(output, source)
 
 
+def test_artifactnet_frontend_named_peak_ceiling_is_explicit_and_finite():
+    source = np.full(1_000, 0.5, dtype=np.float32)
+    output, adjusted = to_artifactnet_input(source, peak_ceiling=0.10)
+    assert adjusted is True
+    assert output.shape == (ARTIFACTNET_SAMPLES,)
+    assert np.isfinite(output).all()
+    assert np.isclose(np.max(np.abs(output)), 0.10)
+
+
 def test_artifactnet_evaluation_fails_closed_on_nonfinite_by_default():
     parameter = inspect.signature(artifactnet_predictions).parameters[
         "diagnostic_skip_nonfinite"]

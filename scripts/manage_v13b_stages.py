@@ -74,6 +74,12 @@ def main() -> None:
     m1_evaluation = load_optional("experiments/v13b/m1_music_representation_probe.json")
     m2_evaluation = load_optional("experiments/v13b/m2_music_representation_probe.json")
     file_complementarity = load_optional("experiments/v13b/m2_file_complementarity.json")
+    artifactnet_calibration = load_optional("experiments/v13b/artifactnet_calibration.json")
+    artifactnet_generator = load_optional("experiments/v13b/artifactnet_generator_confirmation.json")
+    artifactnet_gate = load_optional("experiments/v13b/artifactnet_selective_gate.json")
+    artifactnet_nonfinite = load_optional("experiments/v13b/artifactnet_nonfinite_analysis.json")
+    artifactnet_direct_student = load_optional("experiments/v13b/artifactnet_direct_vs_student.json")
+    f2_calibration = load_optional("experiments/v13b/f2_calibration.json")
     gates = evaluate_gates(dataset, shortcut, policy)
     failed = [name for name, value in gates["adoption_checks"].items() if not value]
     stages = {
@@ -96,6 +102,12 @@ def main() -> None:
     if music_evaluation or file_evaluation:
         stages["9_robust_validation"] = "PASS_WITH_WARNING"
     if m1_evaluation or m2_evaluation:
+        stages["5_music_architecture"] = "PASS_WITH_WARNING"
+        stages["9_robust_validation"] = "PASS_WITH_WARNING"
+    if artifactnet_calibration:
+        # This is evidence only: the released model remains non-selected until
+        # its direct path is finite on all required domains and legal approval
+        # is recorded.  Never promote a research report into a candidate lock.
         stages["5_music_architecture"] = "PASS_WITH_WARNING"
         stages["9_robust_validation"] = "PASS_WITH_WARNING"
     if file_complementarity:
@@ -185,6 +197,43 @@ def main() -> None:
             "adoptable": False,
         } if file_complementarity else "NOT RUN"),
     }
+    latest["development"]["v13b_artifactnet_research"] = {
+        "calibration": ({
+            "status": artifactnet_calibration.get("status"),
+            "frontend": artifactnet_calibration.get("frontend", {}).get("selected"),
+            "aggregation": artifactnet_calibration.get("aggregation", {}).get("selected"),
+            "selected_for_submission": False,
+        } if artifactnet_calibration else "NOT RUN"),
+        "generator_confirmation": ({
+            "status": artifactnet_generator.get("status"),
+            "music_eer": artifactnet_generator.get("music_eer"),
+            "selected_for_submission": False,
+        } if artifactnet_generator else "NOT RUN"),
+        "selective_gate": ({
+            "status": artifactnet_gate.get("status"),
+            "threshold": artifactnet_gate.get("threshold_frozen_from_cal"),
+            "selected_for_submission": False,
+        } if artifactnet_gate else "NOT RUN"),
+        "nonfinite_diagnostic": ({
+            "status": artifactnet_nonfinite.get("status"),
+            "count": artifactnet_nonfinite.get("nonfinite_count"),
+        } if artifactnet_nonfinite else "NOT RUN"),
+        "direct_vs_student": ({
+            "status": artifactnet_direct_student.get("status"),
+            "direct": artifactnet_direct_student.get("direct", {}).get("status"),
+            "student": artifactnet_direct_student.get("student", {}).get("status"),
+        } if artifactnet_direct_student else "NOT RUN"),
+        "license_and_competition_approval": "NOT_CONFIRMED",
+        "final_holdout": "NOT RUN",
+    }
+    latest["development"]["v13b_f2_calibration"] = ({
+        "status": f2_calibration.get("status"),
+        "selection_data": f2_calibration.get("selection_data"),
+        "selected": f2_calibration.get("selected"),
+        "selected_for_submission": False,
+        "source_disjoint": f2_calibration.get("source_disjoint"),
+        "final_holdout": f2_calibration.get("final_holdout"),
+    } if f2_calibration else "NOT RUN")
     latest["not_run"] = [
         "V13B Voice exploratory candidate",
         "V13B source-disjoint robust validation",

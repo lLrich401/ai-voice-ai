@@ -8,11 +8,20 @@ import hashlib
 import json
 import os
 import pathlib
+import sys
 
 import pandas as pd
 
-
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools.build_global_history_index_v13b import (
+    build_global_history_index,
+    overlap_with_index,
+)
+
+
 ANCESTRY = ("content_group", "split_group_id", "near_duplicate_group", "base_audio_id",
             "base_voice_id", "base_music_id", "parent_real_id", "parent_fake_id",
             "voice_content_group", "music_content_group", "audio_sha256",
@@ -130,33 +139,17 @@ def validate_source_disjoint(candidate: pd.DataFrame, development: pd.DataFrame)
             "overlap": overlap}
 
 
-def history_frames() -> tuple[pd.DataFrame, list[str]]:
-    frames, paths = [], []
-    for base in (ROOT / "data", ROOT / "experiments"):
-        for path in sorted(base.rglob("*.csv")):
-            if "final_holdout_v13b" in path.name.lower():
-                continue
-            try:
-                frame = pd.read_csv(path, low_memory=False)
-            except (pd.errors.EmptyDataError, UnicodeDecodeError, ValueError):
-                continue
-            if {"source", "file_fake"} & set(frame.columns):
-                frames.append(frame)
-                paths.append(path.relative_to(ROOT).as_posix())
-    return pd.concat(frames, ignore_index=True, sort=False) if frames else pd.DataFrame(), paths
-
-
-def validate_final(candidate: pd.DataFrame) -> dict:
+def validate_final(candidate: pd.DataFrame, history_index: dict | None = None) -> dict:
     require_approved(candidate, "final holdout")
     completeness = metric_complete(candidate)
     if not all(completeness.values()):
         raise RuntimeError(f"final holdout is not metric-complete: {completeness}")
-    history, paths = history_frames()
-    overlap = overlap_report(candidate, history, include_source=True, include_generator=True)
+    history_index = history_index or build_global_history_index()
+    overlap = overlap_with_index(candidate, history_index, include_generator=True)
     if any(overlap.values()):
         raise RuntimeError(f"final holdout overlaps global project history: {overlap}")
     return {"status": "SEALED_NOT_FOR_DEVELOPMENT", "rows": len(candidate),
-            "history_files_scanned": len(paths), "overlap": overlap,
+            "history_files_scanned": len(history_index["files_scanned"]), "overlap": overlap,
             "maximum_evaluations": 1}
 
 
@@ -169,7 +162,12 @@ def main() -> None:
     args = parser.parse_args()
     train = pd.read_csv(ROOT / "data/splits_v13b/train.csv")
     cal = pd.read_csv(ROOT / "data/splits_v13b/cal_v13b.csv")
-    development = pd.concat([train, cal], ignore_index=True, sort=False)
+    generator_val = pd.read_csv(ROOT / "data/splits_v13b/val_generator_disjoint.csv")
+    development = pd.concat([train, cal, generator_val], ignore_index=True, sort=False)
+    root = pathlib.Path(args.data_root).resolve() if args.data_root else None
+    history_index = build_global_history_index(root)
+    history_path = ROOT / "experiments/v13b/global_history_index.json"
+    history_path.write_text(json.dumps(history_index, indent=2) + "\n", encoding="utf-8")
     report = {"paired_music": "NOT ACQUIRED", "source_disjoint": "NOT ACQUIRED",
               "final_holdout": "NOT ACQUIRED / NOT SEALED / NOT RUN"}
     if args.paired_music:
@@ -189,7 +187,7 @@ def main() -> None:
             raise RuntimeError("AI_VOICE_DATA_ROOT/--data-root required for final holdout")
         source = args.final_holdout.resolve()
         final = pd.read_csv(source)
-        seal = validate_final(final)
+        seal = validate_final(final, history_index)
         destination = pathlib.Path(args.data_root).resolve() / "splits/final_holdout_v13b.csv"
         destination.parent.mkdir(parents=True, exist_ok=True)
         final.to_csv(destination, index=False)

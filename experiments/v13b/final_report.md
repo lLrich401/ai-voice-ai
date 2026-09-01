@@ -11,9 +11,9 @@
 
 ## CURRENT COMMIT
 
-- Branch: `x1`
+- Branch: `x3`
 - development_base_commit: `e8434b9c368ee5de3368d8b0b04559cf19c3ffaa`
-- current_git_commit: `a593422aa342c6579f8e3cc799c65e0dad73ad32`
+- current_git_commit: `d7e09603229a6ba0fb8d3c5e6867f0d010ae0676`
 
 ## DATA
 
@@ -47,13 +47,14 @@ Decision: `PASS <= 0.75`. The earlier interpretation of partial raw AUC `0.4033`
 | M0 | TEST5 Music SpecCNN | 0.312500 | NOT MEASURED | 0.000000 | 1.99 s / 132 rows, specialist-only MEASURED |
 | M1 | Log-mel + STFT constant-Q dual branch | 0.375000 | NOT MEASURED | -0.018750 | train 122.07 s; eval 8.73 s MEASURED |
 | M2 | Official PANNs 16 kHz frozen embedding + small head | 0.312500 | NOT MEASURED | 0.000000 | train/embedding 59.60 s; eval 46.56 s MEASURED |
-| M3 | ArtifactNet v9.4 forensic residual ONNX | 0.125000 median / 0.187500 one-crop, DIAGNOSTIC | NOT MEASURED | +0.056250 median / +0.037500 one-crop, DIAGNOSTIC | +54.31 min median / +18.29 min one-crop if all 1200, PROJECTED |
+| M3 | ArtifactNet v9.4 forensic residual ONNX | 0.187500 one-crop after CAL-only policy freeze | NOT MEASURED | +0.037500, diagnostic only | gated +5.72 min / 1200 PROJECTED |
 
 - M1: `REJECT_REGRESSION`
 - M2 Music: `REJECT_NO_IMPROVEMENT`
 - Neither reached the clear screening threshold `EER <= 0.28`; no partial unfreeze or full fine-tune was run.
 - The failed SpecCNN, M1 and M2 Music evidence is preserved under `experiments/v13b/rejected/`.
-- M3 showed a strong diagnostic representation signal, but failed production screening: 1/95 segments produced NaN and was explicitly skipped only in diagnostic mode. The default evaluator fails closed. Its source-disjoint score is unavailable, CC-BY-NC/patent competition approval is unconfirmed, and its CPU runtime is outside the all-file budget. It was not copied into selected artifacts or `submit.zip`.
+- M3 CAL-only frontend selection chose `peak_0.25`, one high-energy crop, and presence threshold `0.30`; CAL Music EER was `0.000000` on 12 Music rows. Generator confirmation after that freeze was `0.187500` versus TEST5 `0.312500` on 32 Music rows. This small-sample diagnostic is not a selection.
+- M3 multi-crop is rejected: 1 post-policy diagnostic segment produced NaN. Repeating that saved segment 8 times in one session and 4 fresh sessions was finite, so the failure is not reproducibly input-only, but it is retained and the direct evaluator remains fail-closed. One-crop had zero CAL/generator non-finite outputs. Competition use, redistribution and patent approval remain unconfirmed; no direct model or distilled student is eligible for submission.
 
 ## FILE ARCHITECTURE TABLE
 
@@ -64,6 +65,8 @@ Decision: `PASS <= 0.75`. The earlier interpretation of partial raw AUC `0.4033`
 | F0 + 25% F2 | 0.090909 | NOT MEASURED | complementary blend | +3.15 min / 1200 PROJECTED |
 
 All FILE values above are `MEASURED_GENERATOR_DISJOINT`. The 25% blend was inspected on the same split and is therefore exploratory, not independent calibration and not adoptable. Its apparent FILE contribution is `+0.015152 ADS`; F2 alone contributes `-0.075758 ADS` versus canonical F0.
+
+Independent CAL-only F2 screen: the predeclared grid selected `F2 weight = 0.35` with FILE EER `0.053571` versus canonical `0.107143` (`+0.053571` absolute, 112 CAL rows). It did not alter `fusion_weights.json`, use generator-disjoint rows to choose a weight, or read final holdout. It remains `CAL_SIGNAL_ONLY`, not adoptable without source-disjoint confirmation, bootstrap and runtime gates.
 
 Error overlap at each detector's empirical EER threshold:
 
@@ -126,6 +129,6 @@ Using generator-disjoint roots with deterministic virtual rendering:
 
 `KEEP_TEST5`
 
-M1 and M2 did not improve Music. M3 demonstrated a large non-final generator-disjoint gain but was correctly held out of production. F2 showed low error correlation and a same-split blend signal. Adoption remains blocked by the missing second approved paired Music source, source-disjoint validation, sealed globally unused final, independent fusion calibration, bootstrap, runtime, numerical-stability, and license gates.
+M1 and M2 did not improve Music. M3 one-crop demonstrated a non-final generator-disjoint signal but is correctly held out of production by license/competition approval and multi-crop numerical-stability gates. F2 now has a CAL-only blend signal, but no source-disjoint confirmation. Adoption remains blocked by the missing second approved paired Music source, source-disjoint validation, sealed globally unused final, bootstrap, runtime and license gates.
 
-Full repository regression: `172 passed in 42.52s`.
+Full repository regression: `177 passed in 31.16s`.

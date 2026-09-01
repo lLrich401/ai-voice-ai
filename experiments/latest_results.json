@@ -2,7 +2,7 @@
   "schema_version": 3,
   "status": "CURRENT_SELECTED_SUBMISSION_SOURCE_OF_TRUTH",
   "timestamp": "2026-09-01T00:00:00+09:00",
-  "branch": "x1",
+  "branch": "x3",
   "selected_submission": {
     "name": "TEST5",
     "status": "USER_REPORTED_DACON_PUBLIC_ACTUAL",
@@ -74,8 +74,8 @@
     ],
     "tests": {
       "status": "PASS",
-      "pytest": "172 passed",
-      "seconds": 42.52
+      "pytest": "177 passed",
+      "seconds": 31.16
     },
     "final_holdout_v13b": "NOT CREATED / NOT RUN",
     "exploratory_training": "ALLOWED_NOT_SELECTED",
@@ -99,34 +99,61 @@
     "v13b_representation_results": {
       "m1_music_eer": 0.375,
       "m2_music_eer": 0.3125,
-      "m3_artifactnet": {
-        "status": "DIAGNOSTIC_SIGNAL_STRONG_PRODUCTION_REJECTED_NONFINITE",
-        "baseline_music_eer": 0.3125,
-        "median_music_eer": 0.125,
-        "highest_energy_one_crop_music_eer": 0.1875,
-        "estimated_median_music_ads_delta": 0.056249999999999994,
-        "invalid_segments": 1,
-        "evaluated_segments": 95,
-        "source_disjoint": "NOT MEASURED",
-        "competition_license_approval": "NOT CONFIRMED",
-        "selected": false
-      },
       "m2_file_complementarity": {
         "canonical_file_eer": 0.12121212121212122,
         "candidate_file_eer": 0.2727272727272727,
         "best_same_split_fusion_file_eer": 0.09090909090909093,
         "adoptable": false
-      },
-      "runtime_bottleneck": {
-        "cuda_cpu_gpu_overlap": "EXPERIMENTAL_OPT_IN_IMPLEMENTED_AND_UNIT_TESTED_SELECTED_DISABLED",
-        "official_l4_runtime": "NOT RUN",
-        "cpu_path": "UNCHANGED",
-        "default_overlap_prediction_parity_8_direct_files": true,
-        "default_overlap_prediction_max_abs_diff": 2.9802322387695312e-08,
-        "df_batch16_seconds_per_file_local": 0.7697061750000103,
-        "df_batch64_seconds_per_file_local": 0.7280127968751913,
-        "batch64_selected": false
       }
+    },
+    "v13b_artifactnet_research": {
+      "calibration": {
+        "status": "PASS_CAL_ONLY",
+        "frontend": {
+          "ceiling": 0.25,
+          "policy": "peak_0.25",
+          "maximum_crops": 1,
+          "nonfinite_files": 0,
+          "nonfinite_segments": 0,
+          "music_eer": 0.0,
+          "runtime_seconds": 12.798124600027222,
+          "rank_correlation_vs_first_finite": 0.8951048951048951
+        },
+        "aggregation": "highest_energy_one_crop",
+        "selected_for_submission": false
+      },
+      "generator_confirmation": {
+        "status": "PASS_CONFIRMATION",
+        "music_eer": 0.1875,
+        "selected_for_submission": false
+      },
+      "selective_gate": {
+        "status": "GENERATOR_CONFIRMATION_ONLY",
+        "threshold": 0.3,
+        "selected_for_submission": false
+      },
+      "nonfinite_diagnostic": {
+        "status": "MEASURED",
+        "count": 1
+      },
+      "direct_vs_student": {
+        "status": "BLOCKED",
+        "direct": "REJECTED_FAIL_CLOSED",
+        "student": "BLOCKED_BEFORE_TRAINING"
+      },
+      "license_and_competition_approval": "NOT_CONFIRMED",
+      "final_holdout": "NOT RUN"
+    },
+    "v13b_f2_calibration": {
+      "status": "CAL_SIGNAL_ONLY",
+      "selection_data": "cal_v13b only",
+      "selected": {
+        "f2_weight": 0.35,
+        "file_eer": 0.05357142857142859
+      },
+      "selected_for_submission": false,
+      "source_disjoint": "NOT MEASURED",
+      "final_holdout": "NOT RUN"
     }
   },
   "historical_results": {
@@ -141,5 +168,5 @@
     "new DACON submission"
   ],
   "development_base_commit": "e8434b9c368ee5de3368d8b0b04559cf19c3ffaa",
-  "current_git_commit": "a593422aa342c6579f8e3cc799c65e0dad73ad32"
+  "current_git_commit": "d7e09603229a6ba0fb8d3c5e6867f0d010ae0676"
 }

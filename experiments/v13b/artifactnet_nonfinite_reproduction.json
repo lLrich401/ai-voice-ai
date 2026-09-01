@@ -1,0 +1,150 @@
+{
+  "status": "MEASURED",
+  "policy_frozen_from_cal": "peak_0.25",
+  "records": [
+    {
+      "audio_id": "f42e4d7e514ca768cc300690939c982576aff43d70ed89d3c998c80e150bc773",
+      "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\f42e4d7e514ca768cc300690939c982576aff43d70ed89d3c998c80e150bc773.wav",
+      "segment_index": 0,
+      "same_session": [
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ],
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ],
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ],
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ],
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ],
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ],
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ],
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ]
+      ],
+      "fresh_sessions": [
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ],
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ],
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ],
+        [
+          true,
+          [
+            4.476308822631836e-05
+          ]
+        ]
+      ],
+      "all_same_session_finite": true,
+      "all_fresh_session_finite": true,
+      "frontend_trials": [
+        {
+          "policy": "peak_0.10",
+          "finite": true,
+          "output": [
+            2.8520822525024414e-05
+          ]
+        },
+        {
+          "policy": "peak_0.15",
+          "finite": true,
+          "output": [
+            1.7881393432617188e-05
+          ]
+        },
+        {
+          "policy": "peak_0.20",
+          "finite": true,
+          "output": [
+            2.0503997802734375e-05
+          ]
+        },
+        {
+          "policy": "peak_0.25",
+          "finite": true,
+          "output": [
+            4.476308822631836e-05
+          ]
+        },
+        {
+          "policy": "peak_0.35",
+          "finite": true,
+          "output": [
+            0.0005522370338439941
+          ]
+        },
+        {
+          "policy": "peak_0.50",
+          "finite": true,
+          "output": [
+            0.0017630457878112793
+          ]
+        },
+        {
+          "policy": "peak_0.75",
+          "finite": true,
+          "output": [
+            0.0017630457878112793
+          ]
+        },
+        {
+          "policy": "none",
+          "finite": true,
+          "output": [
+            0.0017630457878112793
+          ]
+        }
+      ]
+    }
+  ],
+  "selection_effect": "NONE; diagnostic only",
+  "final_holdout": "NOT RUN",
+  "interpretation": "A finite repeat does not clear the original failure; production remains fail-closed. It only distinguishes a reproducible input pathology from an intermittent ONNX/session-path failure."
+}

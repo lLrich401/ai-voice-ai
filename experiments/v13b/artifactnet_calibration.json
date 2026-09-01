@@ -1,0 +1,554 @@
+{
+  "status": "PASS_CAL_ONLY",
+  "selection_data": "cal_v13b music-present only",
+  "model_sha256": "a923b53899fbb01fcf4436cc5e1837628516de6044c9f238b31b4b02ed601a19",
+  "model_data_sha256": "d3f291b4f531e22e5c17dff8b3888050033d301c7b7f3cb24bf4741cdaabbc05",
+  "frontend": {
+    "status": "PASS_CAL_ONLY",
+    "candidates": [
+      {
+        "ceiling": 0.1,
+        "policy": "peak_0.10",
+        "maximum_crops": 1,
+        "nonfinite_files": 0,
+        "nonfinite_segments": 0,
+        "music_eer": 0.16666666666666663,
+        "runtime_seconds": 18.85833909997018,
+        "rank_correlation_vs_first_finite": 1.0
+      },
+      {
+        "ceiling": 0.15,
+        "policy": "peak_0.15",
+        "maximum_crops": 1,
+        "nonfinite_files": 0,
+        "nonfinite_segments": 0,
+        "music_eer": 0.16666666666666663,
+        "runtime_seconds": 15.8582903999486,
+        "rank_correlation_vs_first_finite": 0.9790209790209792
+      },
+      {
+        "ceiling": 0.2,
+        "policy": "peak_0.20",
+        "maximum_crops": 1,
+        "nonfinite_files": 0,
+        "nonfinite_segments": 0,
+        "music_eer": 0.16666666666666663,
+        "runtime_seconds": 12.103906999982428,
+        "rank_correlation_vs_first_finite": 0.9510489510489512
+      },
+      {
+        "ceiling": 0.25,
+        "policy": "peak_0.25",
+        "maximum_crops": 1,
+        "nonfinite_files": 0,
+        "nonfinite_segments": 0,
+        "music_eer": 0.0,
+        "runtime_seconds": 12.798124600027222,
+        "rank_correlation_vs_first_finite": 0.8951048951048951
+      },
+      {
+        "ceiling": 0.35,
+        "policy": "peak_0.35",
+        "maximum_crops": 1,
+        "nonfinite_files": 0,
+        "nonfinite_segments": 0,
+        "music_eer": 0.0,
+        "runtime_seconds": 16.396317400038242,
+        "rank_correlation_vs_first_finite": 0.8391608391608393
+      },
+      {
+        "ceiling": 0.5,
+        "policy": "peak_0.50",
+        "maximum_crops": 1,
+        "nonfinite_files": 0,
+        "nonfinite_segments": 0,
+        "music_eer": 0.0,
+        "runtime_seconds": 16.9430427000043,
+        "rank_correlation_vs_first_finite": 0.8321678321678322
+      },
+      {
+        "ceiling": 0.75,
+        "policy": "peak_0.75",
+        "maximum_crops": 1,
+        "nonfinite_files": 1,
+        "nonfinite_segments": 1,
+        "music_eer": null,
+        "runtime_seconds": 17.099217400013003,
+        "rank_correlation_vs_first_finite": null
+      },
+      {
+        "ceiling": null,
+        "policy": "none",
+        "maximum_crops": 1,
+        "nonfinite_files": 1,
+        "nonfinite_segments": 1,
+        "music_eer": null,
+        "runtime_seconds": 17.580304199946113,
+        "rank_correlation_vs_first_finite": null
+      }
+    ],
+    "selected": {
+      "ceiling": 0.25,
+      "policy": "peak_0.25",
+      "maximum_crops": 1,
+      "nonfinite_files": 0,
+      "nonfinite_segments": 0,
+      "music_eer": 0.0,
+      "runtime_seconds": 12.798124600027222,
+      "rank_correlation_vs_first_finite": 0.8951048951048951
+    }
+  },
+  "source_disjoint": "NOT MEASURED",
+  "final_holdout": "NOT RUN",
+  "aggregation": {
+    "selection_rule": "CAL-only deployment policy fixes highest_energy_one_crop; alternatives reported only",
+    "selected": "highest_energy_one_crop",
+    "candidates": [
+      {
+        "name": "highest_energy_one_crop",
+        "maximum_crops": 1,
+        "music_eer": 0.0,
+        "nonfinite_files": 0
+      },
+      {
+        "name": "top2_mean",
+        "maximum_crops": 3,
+        "music_eer": null,
+        "nonfinite_files": 2
+      },
+      {
+        "name": "median",
+        "maximum_crops": 3,
+        "music_eer": null,
+        "nonfinite_files": 2
+      }
+    ],
+    "runtime_seconds": 32.625768700032495
+  },
+  "nonfinite_on_cal": [
+    {
+      "row_index": 1,
+      "audio_id": "2ab66dfb41c91c012e522ebf0e3e5d5ad2acf75cd0667faeaf17941318a81809",
+      "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\2ab66dfb41c91c012e522ebf0e3e5d5ad2acf75cd0667faeaf17941318a81809.wav",
+      "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\fake\\Digital_Lightning_Cloudkicker_udio_TTA_001.mp3",
+      "generator": "Echoes::udio",
+      "music_fake": 1,
+      "segment_index": 2,
+      "output": [
+        NaN
+      ],
+      "finite": false,
+      "ceiling": 0.25,
+      "gain_adjusted": true,
+      "input_min": -0.7735595703125,
+      "input_max": 0.8306760787963867,
+      "input_peak": 0.8306760787963867,
+      "input_rms": 0.1611396774282461,
+      "input_silence_ratio_abs_le_1e_6": 0.04141156462585034,
+      "post_gain_min": -0.23281024396419525,
+      "post_gain_max": 0.25,
+      "post_gain_peak": 0.25,
+      "post_gain_rms": 0.048496545192640364,
+      "sample_rate": 44100,
+      "duration_seconds": 4.0
+    },
+    {
+      "row_index": 5,
+      "audio_id": "2a8dac9850155e00599294ba54f3cb9dbb7565648901f7acbf9e37edf502a3d8",
+      "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\2a8dac9850155e00599294ba54f3cb9dbb7565648901f7acbf9e37edf502a3d8.wav",
+      "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\fake\\First_Glance_Oh_Yeah_the_Future_udio_TTA_001.mp3",
+      "generator": "Echoes::udio",
+      "music_fake": 1,
+      "segment_index": 0,
+      "output": [
+        NaN
+      ],
+      "finite": false,
+      "ceiling": 0.25,
+      "gain_adjusted": true,
+      "input_min": -0.5451281666755676,
+      "input_max": 0.6102766990661621,
+      "input_peak": 0.6102766990661621,
+      "input_rms": 0.09750106905566015,
+      "input_silence_ratio_abs_le_1e_6": 0.11583333333333333,
+      "post_gain_min": -0.2233118861913681,
+      "post_gain_max": 0.25,
+      "post_gain_peak": 0.25,
+      "post_gain_rms": 0.03994133598948097,
+      "sample_rate": 44100,
+      "duration_seconds": 4.0
+    }
+  ],
+  "selective_gate": {
+    "status": "PASS_CAL_ONLY",
+    "candidates": [
+      {
+        "threshold": 0.1,
+        "execution_rate": 0.20535714285714285,
+        "music_present_recall": 1.0,
+        "music_eer": 0.0
+      },
+      {
+        "threshold": 0.2,
+        "execution_rate": 0.11607142857142858,
+        "music_present_recall": 1.0,
+        "music_eer": 0.0
+      },
+      {
+        "threshold": 0.3,
+        "execution_rate": 0.10714285714285714,
+        "music_present_recall": 1.0,
+        "music_eer": 0.0
+      },
+      {
+        "threshold": 0.4,
+        "execution_rate": 0.10714285714285714,
+        "music_present_recall": 1.0,
+        "music_eer": 0.0
+      },
+      {
+        "threshold": 0.5,
+        "execution_rate": 0.10714285714285714,
+        "music_present_recall": 1.0,
+        "music_eer": 0.0
+      },
+      {
+        "threshold": 0.6,
+        "execution_rate": 0.10714285714285714,
+        "music_present_recall": 1.0,
+        "music_eer": 0.0
+      },
+      {
+        "threshold": 0.7,
+        "execution_rate": 0.10714285714285714,
+        "music_present_recall": 1.0,
+        "music_eer": 0.0
+      }
+    ],
+    "selected": {
+      "threshold": 0.3,
+      "execution_rate": 0.10714285714285714,
+      "music_present_recall": 1.0,
+      "music_eer": 0.0
+    },
+    "presence_runtime_seconds": 12.954191100026947
+  },
+  "one_crop_recheck": {
+    "status": "PASS",
+    "runtime_seconds": 16.772830399975646,
+    "records": [
+      {
+        "row_index": 0,
+        "audio_id": "fdc89dbd163e7d62db1224497de74282c477fe263852df26b0b360b81d626d8b",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\fdc89dbd163e7d62db1224497de74282c477fe263852df26b0b360b81d626d8b.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\real\\fma_112315.mp3",
+        "generator": "Echoes::FMA_original",
+        "music_fake": 0,
+        "segment_index": 0,
+        "output": [
+          1.4007091522216797e-06
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -0.9993748664855957,
+        "input_max": 0.9801608920097351,
+        "input_peak": 0.9993748664855957,
+        "input_rms": 0.30521727263558424,
+        "input_silence_ratio_abs_le_1e_6": 0.0,
+        "post_gain_min": -0.2499999850988388,
+        "post_gain_max": 0.2451934963464737,
+        "post_gain_peak": 0.2499999850988388,
+        "post_gain_rms": 0.07635204583018061,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      },
+      {
+        "row_index": 1,
+        "audio_id": "2ab66dfb41c91c012e522ebf0e3e5d5ad2acf75cd0667faeaf17941318a81809",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\2ab66dfb41c91c012e522ebf0e3e5d5ad2acf75cd0667faeaf17941318a81809.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\fake\\Digital_Lightning_Cloudkicker_udio_TTA_001.mp3",
+        "generator": "Echoes::udio",
+        "music_fake": 1,
+        "segment_index": 0,
+        "output": [
+          0.9947763681411743
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -0.8316965103149414,
+        "input_max": 0.7862720489501953,
+        "input_peak": 0.8316965103149414,
+        "input_rms": 0.19515589804602593,
+        "input_silence_ratio_abs_le_1e_6": 0.0,
+        "post_gain_min": -0.25,
+        "post_gain_max": 0.23634585738182068,
+        "post_gain_peak": 0.25,
+        "post_gain_rms": 0.058661994468974084,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      },
+      {
+        "row_index": 2,
+        "audio_id": "26d7eee5652d2840f6717267e4e510e4c4b44254dff18ed7d6ed223f8fc444f0",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\26d7eee5652d2840f6717267e4e510e4c4b44254dff18ed7d6ed223f8fc444f0.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\real\\fma_114404.mp3",
+        "generator": "Echoes::FMA_original",
+        "music_fake": 0,
+        "segment_index": 0,
+        "output": [
+          0.07375144958496094
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -0.4263554811477661,
+        "input_max": 0.43600842356681824,
+        "input_peak": 0.43600842356681824,
+        "input_rms": 0.14721003554559323,
+        "input_silence_ratio_abs_le_1e_6": 5.668934240362812e-06,
+        "post_gain_min": -0.2444651573896408,
+        "post_gain_max": 0.2499999850988388,
+        "post_gain_peak": 0.2499999850988388,
+        "post_gain_rms": 0.08440778935556288,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      },
+      {
+        "row_index": 3,
+        "audio_id": "5de67f48a77b605e6f2db6fbf3e43fbdc997275d60da222b3600ed7e88b73ea0",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\5de67f48a77b605e6f2db6fbf3e43fbdc997275d60da222b3600ed7e88b73ea0.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\fake\\Colossal_Stillness_Scott_Holmes_udio_TTA_001.mp3",
+        "generator": "Echoes::udio",
+        "music_fake": 1,
+        "segment_index": 0,
+        "output": [
+          0.9999970197677612
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -0.7097389101982117,
+        "input_max": 0.7598757743835449,
+        "input_peak": 0.7598757743835449,
+        "input_rms": 0.19906373758101487,
+        "input_silence_ratio_abs_le_1e_6": 5.668934240362812e-06,
+        "post_gain_min": -0.23350492119789124,
+        "post_gain_max": 0.25,
+        "post_gain_peak": 0.25,
+        "post_gain_rms": 0.06549220026926769,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      },
+      {
+        "row_index": 4,
+        "audio_id": "91644839ac6f302d77a9d8ea31302a4b9be3ab2ff257269927f85a2358db2c64",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\91644839ac6f302d77a9d8ea31302a4b9be3ab2ff257269927f85a2358db2c64.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\real\\fma_127296.mp3",
+        "generator": "Echoes::FMA_original",
+        "music_fake": 0,
+        "segment_index": 0,
+        "output": [
+          5.987286567687988e-05
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -1.0035583972930908,
+        "input_max": 0.9982711672782898,
+        "input_peak": 1.0035583972930908,
+        "input_rms": 0.3292202565213631,
+        "input_silence_ratio_abs_le_1e_6": 5.668934240362812e-06,
+        "post_gain_min": -0.25,
+        "post_gain_max": 0.2486828863620758,
+        "post_gain_peak": 0.25,
+        "post_gain_rms": 0.08201323004002274,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      },
+      {
+        "row_index": 5,
+        "audio_id": "2a8dac9850155e00599294ba54f3cb9dbb7565648901f7acbf9e37edf502a3d8",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\2a8dac9850155e00599294ba54f3cb9dbb7565648901f7acbf9e37edf502a3d8.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\fake\\First_Glance_Oh_Yeah_the_Future_udio_TTA_001.mp3",
+        "generator": "Echoes::udio",
+        "music_fake": 1,
+        "segment_index": 0,
+        "output": [
+          0.5102460384368896
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -0.6812876462936401,
+        "input_max": 0.7617812752723694,
+        "input_peak": 0.7617812752723694,
+        "input_rms": 0.12934658618028733,
+        "input_silence_ratio_abs_le_1e_6": 0.0,
+        "post_gain_min": -0.22358375787734985,
+        "post_gain_max": 0.25,
+        "post_gain_peak": 0.25,
+        "post_gain_rms": 0.04244872945899052,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      },
+      {
+        "row_index": 6,
+        "audio_id": "73550e48b278d75ee92e1e097037edd967f49dc4d80f09285a55b120f3034e17",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\73550e48b278d75ee92e1e097037edd967f49dc4d80f09285a55b120f3034e17.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\real\\fma_149414.mp3",
+        "generator": "Echoes::FMA_original",
+        "music_fake": 0,
+        "segment_index": 0,
+        "output": [
+          1.6927719116210938e-05
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -0.7888281941413879,
+        "input_max": 0.7842752933502197,
+        "input_peak": 0.7888281941413879,
+        "input_rms": 0.2011519159922906,
+        "input_silence_ratio_abs_le_1e_6": 5.668934240362812e-06,
+        "post_gain_min": -0.25,
+        "post_gain_max": 0.24855707585811615,
+        "post_gain_peak": 0.25,
+        "post_gain_rms": 0.0637502306647006,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      },
+      {
+        "row_index": 7,
+        "audio_id": "1c2fe48b74292ea0e256bd26a8bfc9ea84ff7066796f6fe215d9613dd5f528b1",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\1c2fe48b74292ea0e256bd26a8bfc9ea84ff7066796f6fe215d9613dd5f528b1.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\fake\\Formic_Acid_for_Blood_Punk_Rock_Opera_suno_TTA_001.mp3",
+        "generator": "Echoes::suno",
+        "music_fake": 1,
+        "segment_index": 0,
+        "output": [
+          0.999178409576416
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -0.5508111715316772,
+        "input_max": 0.5454297065734863,
+        "input_peak": 0.5508111715316772,
+        "input_rms": 0.12567405697545525,
+        "input_silence_ratio_abs_le_1e_6": 1.7006802721088435e-05,
+        "post_gain_min": -0.25,
+        "post_gain_max": 0.24755747616291046,
+        "post_gain_peak": 0.25,
+        "post_gain_rms": 0.05704044435368499,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      },
+      {
+        "row_index": 8,
+        "audio_id": "4f4e823d75d74ea259ceda929001ea3af55fdc07cc8a5cac18f220b7c598e5d2",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\4f4e823d75d74ea259ceda929001ea3af55fdc07cc8a5cac18f220b7c598e5d2.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\real\\fma_22480.mp3",
+        "generator": "Echoes::FMA_original",
+        "music_fake": 0,
+        "segment_index": 0,
+        "output": [
+          0.25396689772605896
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -0.720621645450592,
+        "input_max": 0.8760808706283569,
+        "input_peak": 0.8760808706283569,
+        "input_rms": 0.16733411571165488,
+        "input_silence_ratio_abs_le_1e_6": 5.668934240362812e-06,
+        "post_gain_min": -0.2056378871202469,
+        "post_gain_max": 0.25,
+        "post_gain_peak": 0.25,
+        "post_gain_rms": 0.04775076390132666,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      },
+      {
+        "row_index": 9,
+        "audio_id": "f36f61199334b4049261c0a779e3902cdf628169f6b9157984064d3866375b0f",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\f36f61199334b4049261c0a779e3902cdf628169f6b9157984064d3866375b0f.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\fake\\Celia_Ergo_Phizmiz_suno_TTA_001.mp3",
+        "generator": "Echoes::suno",
+        "music_fake": 1,
+        "segment_index": 0,
+        "output": [
+          0.8940398693084717
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -0.6419225335121155,
+        "input_max": 0.620150625705719,
+        "input_peak": 0.6419225335121155,
+        "input_rms": 0.12409924458892915,
+        "input_silence_ratio_abs_le_1e_6": 5.668934240362812e-06,
+        "post_gain_min": -0.2499999850988388,
+        "post_gain_max": 0.24152080714702606,
+        "post_gain_peak": 0.2499999850988388,
+        "post_gain_rms": 0.0483310812452224,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      },
+      {
+        "row_index": 10,
+        "audio_id": "d31d3f99cf2241671ca8a892d5ccff36ef2ba5db09031da13990cffc8906d683",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\d31d3f99cf2241671ca8a892d5ccff36ef2ba5db09031da13990cffc8906d683.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\real\\fma_71505.mp3",
+        "generator": "Echoes::FMA_original",
+        "music_fake": 0,
+        "segment_index": 0,
+        "output": [
+          9.238719940185547e-07
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -0.9833897948265076,
+        "input_max": 0.979037880897522,
+        "input_peak": 0.9833897948265076,
+        "input_rms": 0.43728060935943386,
+        "input_silence_ratio_abs_le_1e_6": 0.0,
+        "post_gain_min": -0.25,
+        "post_gain_max": 0.2488936483860016,
+        "post_gain_peak": 0.25,
+        "post_gain_rms": 0.11116665326724082,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      },
+      {
+        "row_index": 11,
+        "audio_id": "61554b35ccda5ac46d8a0b4a68ccb8f594a4959abe72d8f49b8812918fb77980",
+        "path": "C:\\Users\\lLrich\\ai_voice_data_v13b\\processed\\canonical16k_pcm16\\echoes_fma_paired\\61554b35ccda5ac46d8a0b4a68ccb8f594a4959abe72d8f49b8812918fb77980.wav",
+        "source_path": "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\raw\\public_v9\\echoes_fma_paired\\fake\\Empower_Thee_vargero_udio_TTA_001.mp3",
+        "generator": "Echoes::udio",
+        "music_fake": 1,
+        "segment_index": 0,
+        "output": [
+          0.9998887777328491
+        ],
+        "finite": true,
+        "ceiling": 0.25,
+        "gain_adjusted": true,
+        "input_min": -0.9049009680747986,
+        "input_max": 0.8510128855705261,
+        "input_peak": 0.9049009680747986,
+        "input_rms": 0.21509328503843292,
+        "input_silence_ratio_abs_le_1e_6": 5.668934240362812e-06,
+        "post_gain_min": -0.25,
+        "post_gain_max": 0.23511217534542084,
+        "post_gain_peak": 0.25,
+        "post_gain_rms": 0.059424540264780404,
+        "sample_rate": 44100,
+        "duration_seconds": 4.0
+      }
+    ]
+  }
+}

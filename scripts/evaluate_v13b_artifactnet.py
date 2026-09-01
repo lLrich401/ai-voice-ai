@@ -48,7 +48,7 @@ def sha256(path: pathlib.Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def to_artifactnet_input(segment: np.ndarray) -> tuple[np.ndarray, bool]:
+def to_artifactnet_input(segment: np.ndarray, peak_ceiling: float | None = 0.25) -> tuple[np.ndarray, bool]:
     """Make a four-second input and apply a fixed numerical-stability ceiling.
 
     The released graph produces NaN for some ordinary full-scale material.  A
@@ -63,10 +63,12 @@ def to_artifactnet_input(segment: np.ndarray) -> tuple[np.ndarray, bool]:
         converted = np.pad(wave, (0, ARTIFACTNET_SAMPLES - len(wave)))
     else:
         converted = wave[:ARTIFACTNET_SAMPLES]
+    if peak_ceiling is not None and float(peak_ceiling) <= 0.0:
+        raise ValueError("ArtifactNet peak ceiling must be positive or None")
     peak = float(np.max(np.abs(converted)))
-    adjusted = peak > 0.25
+    adjusted = peak_ceiling is not None and peak > float(peak_ceiling)
     if adjusted:
-        converted = converted * np.float32(0.25 / peak)
+        converted = converted * np.float32(float(peak_ceiling) / peak)
     if peak == 0.0:
         converted = converted.copy()
         converted[0] = np.finfo(np.float32).eps

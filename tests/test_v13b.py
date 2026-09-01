@@ -13,6 +13,8 @@ from scripts.manage_v13b_stages import evaluate_gates
 from scripts.complete_v13b_gates import (
     validate_final, validate_paired_music, validate_source_disjoint,
 )
+from tools.build_global_history_index_v13b import build_global_history_index
+from tools.update_v13b_source_of_truth import expected as source_of_truth_expected
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -312,6 +314,44 @@ def test_source_disjoint_train_overlap_zero():
     candidate = _approved_rows("development_source")
     with pytest.raises(RuntimeError, match="overlap detected"):
         validate_source_disjoint(candidate, _approved_rows("development_source"))
+
+
+def test_source_disjoint_checks_generator_val_history():
+    candidate = _approved_rows("generator_validation_source")
+    development = pd.concat([
+        _approved_rows("train_source"), _approved_rows("cal_source"),
+        _approved_rows("generator_validation_source"),
+    ], ignore_index=True)
+    with pytest.raises(RuntimeError, match="overlap detected"):
+        validate_source_disjoint(candidate, development)
+
+
+def test_global_history_index_includes_external_manifests(tmp_path):
+    manifest_dir = tmp_path / "manifests"
+    manifest_dir.mkdir()
+    _approved_rows("external_history_source").to_csv(manifest_dir / "used.csv", index=False)
+    index = build_global_history_index(tmp_path)
+    assert str(tmp_path) == index["external_data_root"]
+    assert any(entry["source"] == "external_history_source" for entry in index["entries"])
+
+
+def test_global_history_index_keeps_source_dataset_identities_row_scoped(tmp_path):
+    manifest_dir = tmp_path / "manifests"
+    manifest_dir.mkdir()
+    left = _approved_rows("history_left").iloc[:1]
+    right = _approved_rows("history_right").iloc[:1]
+    pd.concat([left, right], ignore_index=True).to_csv(manifest_dir / "mixed.csv", index=False)
+    index = build_global_history_index(tmp_path)
+    entry = next(value for value in index["entries"] if value["source"] == "history_left")
+    assert all(not token.startswith("history_right_")
+               for token in entry["identities"]["content_group"])
+
+
+def test_current_branch_sha_source_of_truth():
+    expected = source_of_truth_expected()
+    assert expected["branch"]
+    assert len(expected["current_git_commit"]) == 40
+    assert len(expected["development_base_commit"]) == 40
 
 
 def test_final_global_history_source_disjoint():
