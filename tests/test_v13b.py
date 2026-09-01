@@ -1,5 +1,6 @@
 import json
 import pathlib
+import sys
 
 import pandas as pd
 import pytest
@@ -11,9 +12,9 @@ from scripts.prepare_dataset_v13b import (
 )
 from scripts.manage_v13b_stages import evaluate_gates
 from scripts.complete_v13b_gates import (
-    validate_final, validate_paired_music, validate_source_disjoint,
+    main as complete_gates_main, validate_final, validate_paired_music, validate_source_disjoint,
 )
-from tools.build_global_history_index_v13b import build_global_history_index
+from tools.build_global_history_index_v13b import build_global_history_index, index_tokens
 from tools.update_v13b_source_of_truth import expected as source_of_truth_expected
 
 
@@ -280,6 +281,12 @@ def _approved_rows(source: str) -> pd.DataFrame:
             "split_group_id": f"{source}_split_{index}",
             "near_duplicate_group": f"{source}_near_{index}",
             "base_audio_id": f"{source}_base_{index}",
+            "base_voice_id": f"{source}_voice_base_{index}",
+            "base_music_id": f"{source}_music_base_{index}",
+            "parent_real_id": f"{source}_parent_real_{index}",
+            "parent_fake_id": f"{source}_parent_fake_{index}",
+            "voice_content_group": f"{source}_voice_content_{index}",
+            "music_content_group": f"{source}_music_content_{index}",
             "audio_sha256": f"{source}_sha_{index}",
             "source_audio_sha256": f"{source}_source_sha_{index}",
             "generator_family": f"{source}_generator_{index}" if file_fake else "REAL",
@@ -299,7 +306,7 @@ def test_second_music_source_must_be_independent():
     music_pair = _approved_rows(source).query("voice_present == 0 and music_present == 1")
     candidate = pd.concat([music_pair.assign(
         content_group=f"music_{index}") for index in range(10)], ignore_index=True)
-    with pytest.raises(RuntimeError, match="not independent"):
+    with pytest.raises(RuntimeError, match="overlaps existing development"):
         validate_paired_music(candidate, existing)
 
 
@@ -350,14 +357,14 @@ def test_global_history_index_keeps_source_dataset_identities_row_scoped(tmp_pat
 def test_current_branch_sha_source_of_truth():
     expected = source_of_truth_expected()
     assert expected["branch"]
-    assert len(expected["current_git_commit"]) == 40
+    assert len(expected["report_generated_from_commit"]) == 40
     assert len(expected["development_base_commit"]) == 40
 
 
 def test_final_global_history_source_disjoint():
     candidate = _approved_rows("mlaad_tiny_matched")
     with pytest.raises(RuntimeError, match="overlaps global project history"):
-        validate_final(candidate)
+        validate_final(candidate, build_global_history_index(ROOT), external_history_configured=True)
 
 
 def test_final_global_history_generator_disjoint():
@@ -368,7 +375,140 @@ def test_final_global_history_generator_disjoint():
     else:
         candidate.loc[candidate.music_fake.eq(1), "music_generator_family"] = historical.music_generator_family
     with pytest.raises(RuntimeError, match="overlaps global project history"):
-        validate_final(candidate)
+        validate_final(candidate, build_global_history_index(ROOT), external_history_configured=True)
+
+
+@pytest.mark.parametrize("column", ["audio_sha256", "near_duplicate_group", "base_audio_id",
+                                     "base_voice_id", "base_music_id"])
+def test_source_disjoint_missing_critical_identity_fails(column):
+    candidate = _approved_rows("unknown_identity_source")
+    candidate.loc[0, column] = ""
+    with pytest.raises(RuntimeError, match="unknown required identity"):
+        validate_source_disjoint(candidate, _approved_rows("development_identity_source"))
+
+
+def test_final_missing_identity_columns_fails():
+    candidate = _approved_rows("missing_final_identity").drop(columns=["source_audio_sha256"])
+    with pytest.raises(RuntimeError, match="missing columns"):
+        validate_final(candidate, build_global_history_index(ROOT), external_history_configured=True)
+
+
+def test_final_without_external_history_is_fail_closed():
+    with pytest.raises(RuntimeError, match="external history root"):
+        validate_final(_approved_rows("external_missing"))
+
+
+def test_unknown_identity_is_not_zero_overlap():
+    candidate = _approved_rows("unknown_identity")
+    candidate.loc[0, "source"] = ""
+    with pytest.raises(RuntimeError, match="unknown required identity"):
+        validate_source_disjoint(candidate, _approved_rows("known_development"))
+
+
+def test_global_history_indexes_voice_generator_family(tmp_path):
+    manifest_dir = tmp_path / "manifests"; manifest_dir.mkdir()
+    frame = _approved_rows("component_lineage")
+    frame.to_csv(manifest_dir / "history.csv", index=False)
+    index = build_global_history_index(tmp_path)
+    assert "component_lineage_voice_gen" in index_tokens(index, "voice_generator_family")
+
+
+def test_global_history_indexes_music_generator_family(tmp_path):
+    manifest_dir = tmp_path / "manifests"; manifest_dir.mkdir()
+    frame = _approved_rows("component_lineage")
+    frame.to_csv(manifest_dir / "history.csv", index=False)
+    index = build_global_history_index(tmp_path)
+    assert "component_lineage_music_gen" in index_tokens(index, "music_generator_family")
+
+
+def test_global_history_json_has_real_coverage():
+    payload = json.loads((ROOT / "experiments/v13b/global_history_index.json").read_text())
+    assert payload["status"] == "PASS"
+    assert payload["history_files_scanned"] > 0
+    assert payload["history_entries"] > 0
+    assert payload["external_data_root"] == "NOT_CONFIGURED"
+
+
+def _paired_music_fixture(source: str) -> pd.DataFrame:
+    base = _approved_rows(source).query("voice_present == 0 and music_present == 1")
+    return pd.concat([base.assign(
+        content_group=f"{source}_pair_{index}", split_group_id=f"{source}_pair_split_{index}",
+        near_duplicate_group=f"{source}_pair_near_{index}",
+        audio_sha256=lambda value: value.audio_sha256 + f"_{index}",
+        source_audio_sha256=lambda value: value.source_audio_sha256 + f"_{index}")
+        for index in range(10)], ignore_index=True)
+
+
+def test_same_run_paired_music_added_before_source_val_check(tmp_path, monkeypatch):
+    paired = _paired_music_fixture("same_run_pair")
+    source = _approved_rows("same_run_pair")
+    paired_path, source_path = tmp_path / "paired.csv", tmp_path / "source.csv"
+    paired.to_csv(paired_path, index=False); source.to_csv(source_path, index=False)
+    monkeypatch.setattr(sys, "argv", ["complete_v13b_gates.py", "--paired-music", str(paired_path),
+                                       "--source-disjoint", str(source_path), "--data-root", str(tmp_path)])
+    history_path = ROOT / "experiments/v13b/global_history_index.json"
+    original_history = history_path.read_bytes()
+    try:
+        with pytest.raises(RuntimeError, match="overlap detected"):
+            complete_gates_main()
+    finally:
+        # Gate tests deliberately reach the same-run history build; do not let
+        # their temporary external root become persistent project evidence.
+        history_path.write_bytes(original_history)
+
+
+def test_same_run_paired_music_added_before_final_history_check(tmp_path, monkeypatch):
+    paired = _paired_music_fixture("same_run_final")
+    final = _approved_rows("same_run_final")
+    paired_path, final_path = tmp_path / "paired.csv", tmp_path / "final.csv"
+    paired.to_csv(paired_path, index=False); final.to_csv(final_path, index=False)
+    monkeypatch.setattr(sys, "argv", ["complete_v13b_gates.py", "--paired-music", str(paired_path),
+                                       "--final-holdout", str(final_path), "--data-root", str(tmp_path)])
+    history_path = ROOT / "experiments/v13b/global_history_index.json"
+    original_history = history_path.read_bytes()
+    try:
+        with pytest.raises(RuntimeError, match="overlaps global project history"):
+            complete_gates_main()
+    finally:
+        history_path.write_bytes(original_history)
+
+
+def test_paired_music_hash_overlap_rejected():
+    existing = _approved_rows("existing_hash_source")
+    candidate = _paired_music_fixture("new_hash_source")
+    candidate["audio_sha256"] = existing.loc[0, "audio_sha256"]
+    with pytest.raises(RuntimeError, match="overlaps existing development"):
+        validate_paired_music(candidate, existing)
+
+
+def test_report_generated_from_commit_semantics():
+    latest = json.loads((ROOT / "experiments/latest_results.json").read_text())
+    assert "current_git_commit" not in latest
+    assert len(latest["report_generated_from_commit"]) == 40
+    assert "current_git_commit_deprecated" in latest
+
+
+def test_final_report_uses_current_artifactnet_one_crop_result():
+    report = (ROOT / "experiments/v13b/final_report.md").read_text(encoding="utf-8")
+    assert "0.187500 one-crop" in report
+    assert "0.125000` Music EER" in report
+    assert "CURRENT PRODUCTION-ORIENTED" not in report  # never call a diagnostic production-ready
+
+
+def test_f2_generator_confirmation_uses_only_weight_0_35():
+    result = json.loads((ROOT / "experiments/v13b/f2_generator_confirmation.json").read_text())
+    assert result["selection"]["f2_weight_frozen"] == pytest.approx(0.35)
+    assert result["selection"]["generator_weight_search"] == "FORBIDDEN_NOT_RUN"
+    source = (ROOT / "scripts/confirm_v13b_f2_generator.py").read_text(encoding="utf-8")
+    assert "WEIGHT = 0.35" in source
+
+
+def test_artifactnet_generator_confirmation_does_not_retune_cal_policy():
+    result = json.loads((ROOT / "experiments/v13b/artifactnet_generator_confirmation.json").read_text())
+    policy = result["policy_from_cal_only"]
+    assert policy["frontend"]["selected"]["ceiling"] == pytest.approx(0.25)
+    assert policy["aggregation"]["selected"] == "highest_energy_one_crop"
+    assert policy["selective_gate"]["selected"]["threshold"] == pytest.approx(0.3)
 
 
 def test_final_not_written_into_git_training_splits():

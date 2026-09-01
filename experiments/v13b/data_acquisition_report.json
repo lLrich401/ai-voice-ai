@@ -34,6 +34,7 @@
     "artifactbench_v1_1": "REVIEW_REQUIRED: attractive 22-generator unseen-music benchmark, but its real arm includes YouTube retrieval and historical FMA/SONICS sources; use only after row-rights and global-history filtering"
   },
   "decision": "Do not manufacture the second paired music source by relabeling DSP transformations as AI fake.",
+  "x3_source_disjoint_requirement": "A source-disjoint candidate must be metric-complete and provide every lineage/hash/provenance identifier required by scripts/complete_v13b_gates.py; unknown is FAIL, never zero overlap.",
   "next_acquisition": "Obtain a row-license-resolved paired music corpus with at least 10 independent content groups, then reserve a distinct unused source for FINAL_HOLDOUT_V13B.",
   "latest_official_source_review": {
     "reviewed_at": "2026-09-01",

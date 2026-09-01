@@ -1,5 +1,5 @@
 {
-  "version": "V13B_GLOBAL_HISTORY_INDEX_V1",
+  "version": "V13B_GLOBAL_HISTORY_INDEX_V2",
   "status": "PASS",
   "files_scanned": [
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\data\\generated_v8\\manifest.csv",
@@ -58,12 +58,14 @@
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\fusion_calibration_predictions.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\fusion_calibration_predictions_16k.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\fusion_calibration_predictions_16k_voice_max.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\music_training_curve.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\music_validation_breakdown.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\panns_ab\\fusion_calibration_16k.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\panns_ab\\val_a_16k.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\panns_ab\\val_b_16k.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\panns_ab\\val_c_16k.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\panns_ab\\val_d_16k.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\results.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v10\\channel_features.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v10\\stress_clean.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v10\\stress_codec_lp35.csv",
@@ -75,12 +77,54 @@
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v10\\stress_telephone_gsm_proxy.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v10\\stress_telephone_mulaw.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v10\\stress_telephone_narrow.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v10\\voice_spec_cnn_v10_finetune_curve.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v10\\voice_spec_cnn_v10_training_curve.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v11\\cache\\expanded_unseen.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v11\\cache\\fusion_calibration.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v11\\cache\\original_val_a.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v11\\cache\\original_val_b.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v11\\cache\\original_val_c.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v11\\cache\\original_val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v11\\joint_grid.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v11\\music_grid.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v11\\voice_grid.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m1\\cal_old.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m1\\cal_v12.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m1\\expanded_unseen.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m1\\val_a.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m1\\val_b.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m1\\val_c.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m1\\val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m2\\cal_old.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m2\\cal_v12.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m2\\expanded_unseen.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m2\\val_a.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m2\\val_b.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m2\\val_c.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m2\\val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m3\\cal_old.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m3\\cal_v12.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m3\\expanded_unseen.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m3\\val_a.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m3\\val_b.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m3\\val_c.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m3\\val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m4\\cal_old.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m4\\cal_v12.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m4\\expanded_unseen.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m4\\val_a.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m4\\val_b.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m4\\val_c.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m4\\val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m5\\cal_old.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m5\\cal_v12.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m5\\expanded_unseen.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m5\\val_a.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m5\\val_b.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m5\\val_c.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\music_students\\m5\\val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\teacher_music.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\teacher_voice.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\v7_canonical\\cal_old.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\v7_canonical\\cal_v12.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\v7_canonical\\expanded_unseen.csv",
@@ -88,16 +132,70 @@
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\v7_canonical\\val_b.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\v7_canonical\\val_c.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\v7_canonical\\val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v1\\cal_old.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v1\\cal_v12.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v1\\expanded_unseen.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v1\\val_a.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v1\\val_b.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v1\\val_c.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v1\\val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v2\\cal_old.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v2\\cal_v12.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v2\\expanded_unseen.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v2\\val_a.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v2\\val_b.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v2\\val_c.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v2\\val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v3\\cal_old.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v3\\cal_v12.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v3\\expanded_unseen.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v3\\val_a.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v3\\val_b.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v3\\val_c.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v3\\val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v4\\cal_old.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v4\\cal_v12.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v4\\expanded_unseen.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v4\\val_a.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v4\\val_b.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v4\\val_c.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v4\\val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v5\\cal_old.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v5\\cal_v12.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v5\\expanded_unseen.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v5\\val_a.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v5\\val_b.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v5\\val_c.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\cache\\voice_students\\v5\\val_d.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\music_student_evaluation.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v12\\voice_student_evaluation.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v13\\pre_v13_error_samples.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v13\\source_shortcut_audit_features.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v13\\source_shortcut_audit_v13_pilot_features.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v13b\\artifactnet_generator_disjoint_scores.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v13b\\f2_calibration_scores.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v13b\\m2_file_complementarity_scores.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v13b\\rendered_training_shortcut_audit_features.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v13b\\rendered_training_shortcut_audit_fingerprints.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v13b\\source_shortcut_audit_features.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v13b\\source_shortcut_audit_source_label_fingerprints.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\fusion_calibration_predictions.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\train_baseline.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\train_channel.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\train_hard.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\train_hard_scores.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\train_partial.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\val_a_voice_features.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\val_b_voice_features.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\val_c_voice_features.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\val_d_voice_features.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\voice_error_samples.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v7\\voice_segment_scores.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v8\\acoustic_domain_features.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v8\\train_existing_only_seed20260902.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v8\\v7_procedural_stress_predictions.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v9\\music_spec_cnn_training_curve.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\v9\\voice_aasist_training_curve.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\val_a_features_16k.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\val_a_voice_aggregation.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\val_b_features_16k.csv",
@@ -106,13 +204,18 @@
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\val_c_voice_aggregation.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\val_d_features_16k.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\val_d_voice_aggregation.csv",
+    "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\experiments\\voice_training_curve.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\training_evidence_v13\\licenses\\dataset_terms.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\training_evidence_v13\\manifest.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\training_evidence_v13\\provenance\\sources_and_generators.csv",
     "C:\\Users\\lLrich\\Desktop\\\ubcf4\uc774\uc2a4ai\ud574\ucee4\ud1a4\\training_evidence_v13\\used_training_files.csv"
   ],
   "external_data_root": "NOT_CONFIGURED",
+  "external_root_scanned": false,
   "skipped_files": [],
+  "history_files_scanned": 207,
+  "history_entries": 41,
+  "skipped_files_count": 0,
   "entries": [
     {
       "source": "<SOURCE_MISSING>",
@@ -134,6 +237,8 @@
           "Echoes::songgen",
           "Echoes::stableaudio"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [],
         "near_duplicate_group": [],
@@ -167,6 +272,8 @@
         "generator": [
           "ALL"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [],
         "near_duplicate_group": [],
@@ -226,6 +333,8 @@
           "A03",
           "bonafide"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [
           "asvspoof::LA_0079",
@@ -301,6 +410,12 @@
           "A01",
           "A02",
           "A03",
+          "bonafide"
+        ],
+        "voice_generator_family": [],
+        "music_generator_family": [
+          "A01",
+          "A02",
           "bonafide"
         ],
         "content_group": [
@@ -972,6 +1087,8 @@
           "mix::MLAAD_original::Echoes::suno",
           "mix::MLAAD_original::Echoes::udio"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [],
         "near_duplicate_group": [],
@@ -1080,6 +1197,8 @@
           "mix::MLAAD_original::Echoes::suno",
           "mix::MLAAD_original::Echoes::udio"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [
           "calv12::mlaad_tiny::en::dorothy_and_wizard_oz_07_f000014::echoes_fma::106336",
@@ -1469,6 +1588,8 @@
           "mix::MLAAD::suno_bark::guitarset_mic::real",
           "mix::MLAAD_original::guitarset_mic::real"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [],
         "near_duplicate_group": [],
@@ -1516,6 +1637,8 @@
           "mix::MLAAD::suno_bark::guitarset_mic::real",
           "mix::MLAAD_original::guitarset_mic::real"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [
           "calv12::mlaad_tiny::en::dorothy_and_wizard_oz_07_f000014::guitarset::player::00",
@@ -1673,6 +1796,8 @@
           "mix::MLAAD::suno_bark::mtg_jamendo_cc::real",
           "mix::MLAAD_original::mtg_jamendo_cc::real"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [],
         "near_duplicate_group": [],
@@ -1720,6 +1845,8 @@
           "mix::MLAAD::suno_bark::mtg_jamendo_cc::real",
           "mix::MLAAD_original::mtg_jamendo_cc::real"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [
           "calv12::mlaad_tiny::en::dorothy_and_wizard_oz_07_f000014::jamendo::artist::074c08e8601dffad",
@@ -2068,6 +2195,8 @@
           "mix::MLAAD::suno_bark::SONICS::chirp-v2-xxl-alpha",
           "mix::MLAAD_original::SONICS::chirp-v2-xxl-alpha"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [],
         "near_duplicate_group": [],
@@ -2115,6 +2244,8 @@
           "mix::MLAAD::suno_bark::SONICS::chirp-v2-xxl-alpha",
           "mix::MLAAD_original::SONICS::chirp-v2-xxl-alpha"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [
           "calv12::mlaad_tiny::en::dorothy_and_wizard_oz_07_f000014::sonics::10003",
@@ -2412,6 +2543,8 @@
         "dataset": [],
         "generator_family": [],
         "generator": [],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [],
         "near_duplicate_group": [],
@@ -2466,6 +2599,15 @@
           "DFADD::pflow",
           "REAL"
         ],
+        "voice_generator_family": [
+          "DFADD::GradTTS",
+          "DFADD::NaturalSpeech2",
+          "DFADD::StyleTTS2",
+          "DFADD::matcha",
+          "DFADD::pflow",
+          "REAL"
+        ],
+        "music_generator_family": [],
         "content_group": [
           "dfadd::p232_262",
           "dfadd::p234_080",
@@ -3726,6 +3868,8 @@
           "Echoes::suno",
           "Echoes::udio"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [
           "echoes_fma::107429",
@@ -3836,6 +3980,25 @@
           "Echoes::stableaudio",
           "Echoes::suno",
           "Echoes::udio"
+        ],
+        "voice_generator_family": [],
+        "music_generator_family": [
+          "Echoes::FMA_original",
+          "Echoes::acestep",
+          "Echoes::audioldm",
+          "Echoes::brev",
+          "Echoes::diffrhythm",
+          "Echoes::elevenlabs",
+          "Echoes::mubert",
+          "Echoes::musicgen",
+          "Echoes::producer",
+          "Echoes::songgen",
+          "Echoes::stableaudio",
+          "Echoes::suno",
+          "Echoes::udio",
+          "FMA_original",
+          "diffrhythm",
+          "songgen"
         ],
         "content_group": [
           "fma_106336",
@@ -4565,6 +4728,8 @@
           "AudioLDM2",
           "MusicGen"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [
           "generated_music::fake_music_generator_0000",
@@ -4721,6 +4886,11 @@
           "MusicGen"
         ],
         "generator": [
+          "AudioLDM2",
+          "MusicGen"
+        ],
+        "voice_generator_family": [],
+        "music_generator_family": [
           "AudioLDM2",
           "MusicGen"
         ],
@@ -5971,6 +6141,8 @@
           "GTZAN_genre_8",
           "GTZAN_genre_9"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [],
         "near_duplicate_group": [],
@@ -6037,6 +6209,8 @@
           "GTZAN_genre_8",
           "GTZAN_genre_9"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [
           "gtzan::gtzan_v2_blues.00000",
@@ -6714,6 +6888,19 @@
           "REAL"
         ],
         "generator": [
+          "GTZAN_genre_0",
+          "GTZAN_genre_1",
+          "GTZAN_genre_2",
+          "GTZAN_genre_3",
+          "GTZAN_genre_4",
+          "GTZAN_genre_5",
+          "GTZAN_genre_6",
+          "GTZAN_genre_7",
+          "GTZAN_genre_8",
+          "GTZAN_genre_9"
+        ],
+        "voice_generator_family": [],
+        "music_generator_family": [
           "GTZAN_genre_0",
           "GTZAN_genre_1",
           "GTZAN_genre_2",
@@ -10665,6 +10852,8 @@
         "generator": [
           "guitarset_mic::real"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [
           "00_BN1-129-Eb_comp_mic",
           "00_BN1-129-Eb_solo_mic",
@@ -10958,6 +11147,8 @@
         "generator": [
           "guitarset_mic::real"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [
           "00_BN1-129-Eb_comp_mic",
           "00_BN1-129-Eb_solo_mic",
@@ -11746,6 +11937,8 @@
         "generator": [
           "LibriSpeech"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [
           "librispeech_dev_1272-128104-0000",
           "librispeech_dev_1272-128104-0010",
@@ -12323,6 +12516,10 @@
           "REAL"
         ],
         "generator": [
+          "LibriSpeech"
+        ],
+        "voice_generator_family": [],
+        "music_generator_family": [
           "LibriSpeech"
         ],
         "content_group": [
@@ -13006,6 +13203,8 @@
           "MLAAD::zonosTTS-v0.1",
           "MLAAD_original"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [
           "dorothy_and_wizard_oz_02_f000014",
           "dorothy_and_wizard_oz_02_f000150",
@@ -13265,6 +13464,32 @@
           "MLAAD::suno_bark",
           "MLAAD::zonosTTS-v0.1",
           "MLAAD_original"
+        ],
+        "voice_generator_family": [
+          "MLAAD::Cartesia.ai (Sonic-3)",
+          "MLAAD::Chatterbox",
+          "MLAAD::DeepGram",
+          "MLAAD::Edge-TTS",
+          "MLAAD::FireRedTTS-2.0",
+          "MLAAD::FishTTS",
+          "MLAAD::Higgs-Audio-V2",
+          "MLAAD::Microsoft VibeVoice 1.5B",
+          "MLAAD::MiniCPM-o-2.6",
+          "MLAAD::OpenVoiceV2",
+          "MLAAD::Qwen2.5-Omni",
+          "MLAAD::RVC",
+          "MLAAD::Resemble.ai (April 12th, 2025)",
+          "MLAAD::f5-tts",
+          "MLAAD::suno_bark",
+          "MLAAD::zonosTTS-v0.1",
+          "MLAAD_original"
+        ],
+        "music_generator_family": [
+          "Cartesia.ai (Sonic-3)",
+          "DeepGram",
+          "Edge-TTS",
+          "MLAAD_original",
+          "Resemble.ai (April 12th, 2025)"
         ],
         "content_group": [
           "dorothy_and_wizard_oz_01_f000032",
@@ -15228,6 +15453,8 @@
         "generator": [
           "mtg_jamendo_cc::real"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [
           "jamendo::artist::4182bed3dbbd51d3",
@@ -15518,6 +15745,8 @@
         "generator": [
           "mtg_jamendo_cc::real"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [
           "jamendo_1002000",
           "jamendo_1007900",
@@ -16587,6 +16816,8 @@
           "proc_voice_phase_locked_unseen",
           "proc_voice_pulse_lpc"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [
           "proc::mix::train::00000",
@@ -18761,6 +18992,8 @@
           "SONICS::udio-120s",
           "SONICS::udio-30s"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [
           "fake_00001_suno_0",
           "fake_00006_suno_0",
@@ -19277,6 +19510,8 @@
           "SONICS::udio-120s",
           "SONICS::udio-30s"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [
           "fake_00001_suno_0",
           "fake_00006_suno_0",
@@ -20444,6 +20679,8 @@
           "mix::bonafide::GTZAN_genre_9",
           "mix::bonafide::MusicGen"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [],
         "near_duplicate_group": [],
@@ -20642,6 +20879,21 @@
           "mix::bonafide::GTZAN_genre_8",
           "mix::bonafide::GTZAN_genre_9",
           "mix::bonafide::MusicGen"
+        ],
+        "voice_generator_family": [],
+        "music_generator_family": [
+          "AudioLDM2",
+          "GTZAN_genre_0",
+          "GTZAN_genre_1",
+          "GTZAN_genre_2",
+          "GTZAN_genre_3",
+          "GTZAN_genre_4",
+          "GTZAN_genre_5",
+          "GTZAN_genre_6",
+          "GTZAN_genre_7",
+          "GTZAN_genre_8",
+          "GTZAN_genre_9",
+          "MusicGen"
         ],
         "content_group": [],
         "split_group_id": [
@@ -22522,6 +22774,8 @@
         "dataset": [],
         "generator_family": [],
         "generator": [],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [],
         "near_duplicate_group": [],
@@ -22555,6 +22809,8 @@
         "dataset": [],
         "generator_family": [],
         "generator": [],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [],
         "near_duplicate_group": [],
@@ -22647,6 +22903,22 @@
           "MIX::MLAAD_original+Echoes::elevenlabs",
           "MIX::MLAAD_original+Echoes::musicgen",
           "MIX::MLAAD_original+Echoes::producer"
+        ],
+        "voice_generator_family": [
+          "MLAAD::Chatterbox",
+          "MLAAD::FireRedTTS-2.0",
+          "MLAAD::FishTTS",
+          "MLAAD_original"
+        ],
+        "music_generator_family": [
+          "Echoes::FMA_original",
+          "Echoes::acestep",
+          "Echoes::audioldm",
+          "Echoes::brev",
+          "Echoes::diffrhythm",
+          "Echoes::elevenlabs",
+          "Echoes::musicgen",
+          "Echoes::producer"
         ],
         "content_group": [
           "mix::dorothy_and_wizard_oz_02_f000150::fma_130401::20",
@@ -23072,6 +23344,15 @@
           "partial::Echoes::elevenlabs",
           "partial::Echoes::mubert"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [
+          "Echoes::acestep",
+          "Echoes::audioldm",
+          "Echoes::brev",
+          "Echoes::diffrhythm",
+          "Echoes::elevenlabs",
+          "Echoes::mubert"
+        ],
         "content_group": [
           "partial::music::fma_106336::fma_106336",
           "partial::music::fma_106336::fma_107429",
@@ -23305,6 +23586,11 @@
           "partial::MLAAD::Chatterbox",
           "partial::MLAAD::FireRedTTS-2.0"
         ],
+        "voice_generator_family": [
+          "MLAAD::Chatterbox",
+          "MLAAD::FireRedTTS-2.0"
+        ],
+        "music_generator_family": [],
         "content_group": [
           "partial::voice::dorothy_and_wizard_oz_08_f000065::dorothy_and_wizard_oz_08_f000065",
           "partial::voice::dorothy_and_wizard_oz_08_f000065::dorothy_and_wizard_oz_14_f000118",
@@ -23556,6 +23842,8 @@
           "WF6",
           "WF7"
         ],
+        "voice_generator_family": [],
+        "music_generator_family": [],
         "content_group": [],
         "split_group_id": [
           "wavefake::LJ002-0027",
@@ -23859,6 +24147,17 @@
           "WF7"
         ],
         "generator": [
+          "R",
+          "WF1",
+          "WF2",
+          "WF3",
+          "WF4",
+          "WF5",
+          "WF6",
+          "WF7"
+        ],
+        "voice_generator_family": [],
+        "music_generator_family": [
           "R",
           "WF1",
           "WF2",

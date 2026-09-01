@@ -130,6 +130,7 @@
       "selective_gate": {
         "status": "GENERATOR_CONFIRMATION_ONLY",
         "threshold": 0.3,
+        "projected_added_runtime_minutes": 6.266670108898876,
         "selected_for_submission": false
       },
       "nonfinite_diagnostic": {
@@ -141,7 +142,7 @@
         "direct": "REJECTED_FAIL_CLOSED",
         "student": "BLOCKED_BEFORE_TRAINING"
       },
-      "license_and_competition_approval": "NOT_CONFIRMED",
+      "license_and_competition_approval": "REVIEW_REQUIRED: no written DACON/rights-holder approval for competition use",
       "final_holdout": "NOT RUN"
     },
     "v13b_f2_calibration": {
@@ -154,6 +155,23 @@
       "selected_for_submission": false,
       "source_disjoint": "NOT MEASURED",
       "final_holdout": "NOT RUN"
+    },
+    "v13b_f2_generator_confirmation": {
+      "status": "F2_GENERATOR_SIGNAL_ONLY",
+      "f2_weight_frozen": 0.35,
+      "canonical_file_eer": 0.12121212121212122,
+      "f2_blend_file_eer": 0.07575757575757577,
+      "delta_ads_file_component": 0.02272727272727272,
+      "selected_for_submission": false,
+      "source_disjoint": "NOT MEASURED",
+      "final_holdout": "NOT RUN"
+    },
+    "v13b_global_history": {
+      "status": "PASS",
+      "history_files_scanned": 207,
+      "history_entries": 41,
+      "external_root_scanned": false,
+      "external_data_root": "NOT_CONFIGURED"
     }
   },
   "historical_results": {
@@ -168,5 +186,6 @@
     "new DACON submission"
   ],
   "development_base_commit": "e8434b9c368ee5de3368d8b0b04559cf19c3ffaa",
-  "current_git_commit": "d7e09603229a6ba0fb8d3c5e6867f0d010ae0676"
+  "report_generated_from_commit": "cf808adf60fb93aa02b3c62e8ec3e91236e8644e",
+  "current_git_commit_deprecated": "Runtime actual HEAD must be read with: git rev-parse HEAD"
 }

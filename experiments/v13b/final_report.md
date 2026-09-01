@@ -13,7 +13,19 @@
 
 - Branch: `x3`
 - development_base_commit: `e8434b9c368ee5de3368d8b0b04559cf19c3ffaa`
-- current_git_commit: `d7e09603229a6ba0fb8d3c5e6867f0d010ae0676`
+- report_generated_from_commit: `cf808adf60fb93aa02b3c62e8ec3e91236e8644e`
+
+<!-- GENERATED_STATE_START -->
+## GENERATED CURRENT STATE
+
+- ArtifactNet current one-crop generator Music EER: `0.1875` (GENERATOR_CONFIRMATION)
+- ArtifactNet frozen gate threshold: `0.3`
+- ArtifactNet added runtime: `6.266670108898876 min` (PROJECTED)
+- ArtifactNet license state: `REVIEW_REQUIRED: no written DACON/rights-holder approval for competition use`
+- F2 frozen weight: `0.35`; generator FILE EER: `0.07575757575757577`
+- Global history: files `207`, entries `41`, external root `NOT_CONFIGURED`
+- Source-disjoint full result: `NOT RUN`; FINAL: `NOT ACQUIRED / NOT RUN`.
+<!-- GENERATED_STATE_END -->
 
 ## DATA
 
@@ -47,14 +59,15 @@ Decision: `PASS <= 0.75`. The earlier interpretation of partial raw AUC `0.4033`
 | M0 | TEST5 Music SpecCNN | 0.312500 | NOT MEASURED | 0.000000 | 1.99 s / 132 rows, specialist-only MEASURED |
 | M1 | Log-mel + STFT constant-Q dual branch | 0.375000 | NOT MEASURED | -0.018750 | train 122.07 s; eval 8.73 s MEASURED |
 | M2 | Official PANNs 16 kHz frozen embedding + small head | 0.312500 | NOT MEASURED | 0.000000 | train/embedding 59.60 s; eval 46.56 s MEASURED |
-| M3 | ArtifactNet v9.4 forensic residual ONNX | 0.187500 one-crop after CAL-only policy freeze | NOT MEASURED | +0.037500, diagnostic only | gated +5.72 min / 1200 PROJECTED |
+| M3 | ArtifactNet v9.4 forensic residual ONNX | 0.187500 one-crop after CAL-only policy freeze | NOT MEASURED | +0.037500, diagnostic only | see generated-state runtime source below (PROJECTED) |
 
 - M1: `REJECT_REGRESSION`
 - M2 Music: `REJECT_NO_IMPROVEMENT`
 - Neither reached the clear screening threshold `EER <= 0.28`; no partial unfreeze or full fine-tune was run.
 - The failed SpecCNN, M1 and M2 Music evidence is preserved under `experiments/v13b/rejected/`.
 - M3 CAL-only frontend selection chose `peak_0.25`, one high-energy crop, and presence threshold `0.30`; CAL Music EER was `0.000000` on 12 Music rows. Generator confirmation after that freeze was `0.187500` versus TEST5 `0.312500` on 32 Music rows. This small-sample diagnostic is not a selection.
-- M3 multi-crop is rejected: 1 post-policy diagnostic segment produced NaN. Repeating that saved segment 8 times in one session and 4 fresh sessions was finite, so the failure is not reproducibly input-only, but it is retained and the direct evaluator remains fail-closed. One-crop had zero CAL/generator non-finite outputs. Competition use, redistribution and patent approval remain unconfirmed; no direct model or distilled student is eligible for submission.
+- Historical M3 median multi-crop diagnostic was `0.125000` Music EER; it is `NOT DEPLOYABLE` and must not be mixed with the current one-crop result.
+- M3 multi-crop is rejected: 1 post-policy diagnostic segment produced NaN. Repeating that saved segment 8 times in one session and 4 fresh sessions was finite, so the path is `INTERMITTENT / NON-DETERMINISTIC PATH SUSPECTED`, not resolved. The direct evaluator remains fail-closed. One-crop had zero CAL/generator non-finite outputs. Competition use, redistribution and patent approval are `REVIEW_REQUIRED`; no direct model or distilled student is eligible for submission.
 
 ## FILE ARCHITECTURE TABLE
 
@@ -123,12 +136,12 @@ Using generator-disjoint roots with deterministic virtual rendering:
 
 ## NEXT BOTTLENECK
 
-`MUSIC source diversity and deployable representation transfer` is now the single next bottleneck. M3 proves that a forensic-residual representation can reduce generator-disjoint Music EER (`0.3125 → 0.125`), but the selected lightweight model cannot yet capture that gain and M3 itself fails stability/runtime/license/source-disjoint gates. Public per-component EER is unavailable, so this is not presented as an official leaderboard decomposition.
+`approved metric-complete source-disjoint validation acquisition` is now the single next bottleneck. The current frozen M3 one-crop diagnostic is `0.3125 → 0.1875` on generator-disjoint Music, while `0.125` is historical multi-crop-only evidence. Public per-component EER is unavailable, so neither is presented as an official leaderboard decomposition.
 
 ## DECISION
 
 `KEEP_TEST5`
 
-M1 and M2 did not improve Music. M3 one-crop demonstrated a non-final generator-disjoint signal but is correctly held out of production by license/competition approval and multi-crop numerical-stability gates. F2 now has a CAL-only blend signal, but no source-disjoint confirmation. Adoption remains blocked by the missing second approved paired Music source, source-disjoint validation, sealed globally unused final, bootstrap, runtime and license gates.
+M1 and M2 did not improve Music. M3 one-crop demonstrated a non-final generator-disjoint signal but is correctly held out of production by license/competition approval and multi-crop numerical-stability gates. F2's CAL-frozen `0.35` blend confirmed FILE EER `0.121212 → 0.075758` on generator-disjoint without retuning, but it has no source-disjoint or partial/mixed blend confirmation. Adoption remains blocked by the missing second approved paired Music source, source-disjoint validation, sealed globally unused final, bootstrap, runtime and license gates.
 
 Full repository regression: `177 passed in 31.16s`.

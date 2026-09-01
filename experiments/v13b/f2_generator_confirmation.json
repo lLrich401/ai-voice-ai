@@ -1,0 +1,32 @@
+{
+  "status": "F2_GENERATOR_SIGNAL_ONLY",
+  "selection": {
+    "data": "cal_v13b only",
+    "f2_weight_frozen": 0.35,
+    "generator_weight_search": "FORBIDDEN_NOT_RUN"
+  },
+  "rows": 132,
+  "canonical_file_eer": 0.12121212121212122,
+  "f2_blend_file_eer": 0.07575757575757577,
+  "delta_file_eer": 0.04545454545454544,
+  "delta_ads_file_component": 0.02272727272727272,
+  "error_overlap": {
+    "both_correct": 114,
+    "both_wrong": 8,
+    "only_canonical_wrong": 8,
+    "only_candidate_wrong": 2,
+    "classification_note": "each detector thresholded at its own closest empirical EER point"
+  },
+  "partial_file": "NOT RUN: frozen canonical virtual-partial predictions are not cached",
+  "mixed_file": "NOT RUN: frozen canonical virtual-mixed predictions are not cached",
+  "runtime": {
+    "status": "MEASURED_COMPONENT_CACHE",
+    "f2_added_1200_file_minutes_projected": 3.1473696363647115,
+    "cache_inference_rerun": "NOT RUN; exact frozen score cache reused"
+  },
+  "source_disjoint": "NOT MEASURED",
+  "bootstrap": "NOT RUN",
+  "final_holdout": "NOT RUN",
+  "selected_artifacts_mutated": false,
+  "decision": "KEEP_TEST5"
+}

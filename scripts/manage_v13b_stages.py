@@ -79,7 +79,10 @@ def main() -> None:
     artifactnet_gate = load_optional("experiments/v13b/artifactnet_selective_gate.json")
     artifactnet_nonfinite = load_optional("experiments/v13b/artifactnet_nonfinite_analysis.json")
     artifactnet_direct_student = load_optional("experiments/v13b/artifactnet_direct_vs_student.json")
+    artifactnet_provenance = load_optional("experiments/v13b/artifactnet_candidate_provenance.json")
     f2_calibration = load_optional("experiments/v13b/f2_calibration.json")
+    f2_generator = load_optional("experiments/v13b/f2_generator_confirmation.json")
+    history_index = load_optional("experiments/v13b/global_history_index.json")
     gates = evaluate_gates(dataset, shortcut, policy)
     failed = [name for name, value in gates["adoption_checks"].items() if not value]
     stages = {
@@ -120,7 +123,7 @@ def main() -> None:
         "version": "V13B_STAGE_MANAGER_20260901",
         "branch": git_value("branch", "--show-current"),
         "development_base_commit": DEVELOPMENT_BASE_COMMIT,
-        "current_git_commit": git_value("rev-parse", "HEAD"),
+        "report_generated_from_commit": git_value("rev-parse", "HEAD"),
         "decision": "KEEP_TEST5",
         "current_stage": (4 if m1_evaluation and m2_evaluation else
                           7 if music_evaluation and file_evaluation else
@@ -154,10 +157,10 @@ def main() -> None:
         "historical_v13_preserved": bool(dataset["historical_v13_preserved"]),
         "final_holdout_v13b_read_or_scored": False,
     }
-    current_commit = report["current_git_commit"]
     latest["branch"] = report["branch"]
     latest["development_base_commit"] = DEVELOPMENT_BASE_COMMIT
-    latest["current_git_commit"] = current_commit
+    latest["report_generated_from_commit"] = report["report_generated_from_commit"]
+    latest.pop("current_git_commit", None)
     latest.pop("development_git_commit", None)
     latest["development"]["current_stage"] = report["current_stage"]
     latest["development"]["current_stage_name"] = (
@@ -212,6 +215,8 @@ def main() -> None:
         "selective_gate": ({
             "status": artifactnet_gate.get("status"),
             "threshold": artifactnet_gate.get("threshold_frozen_from_cal"),
+            "projected_added_runtime_minutes": artifactnet_gate.get(
+                "candidate_added_runtime_minutes_projected"),
             "selected_for_submission": False,
         } if artifactnet_gate else "NOT RUN"),
         "nonfinite_diagnostic": ({
@@ -223,7 +228,9 @@ def main() -> None:
             "direct": artifactnet_direct_student.get("direct", {}).get("status"),
             "student": artifactnet_direct_student.get("student", {}).get("status"),
         } if artifactnet_direct_student else "NOT RUN"),
-        "license_and_competition_approval": "NOT_CONFIRMED",
+        "license_and_competition_approval": (
+            artifactnet_provenance.get("competition_use_approval")
+            if artifactnet_provenance else "NOT RUN"),
         "final_holdout": "NOT RUN",
     }
     latest["development"]["v13b_f2_calibration"] = ({
@@ -234,6 +241,23 @@ def main() -> None:
         "source_disjoint": f2_calibration.get("source_disjoint"),
         "final_holdout": f2_calibration.get("final_holdout"),
     } if f2_calibration else "NOT RUN")
+    latest["development"]["v13b_f2_generator_confirmation"] = ({
+        "status": f2_generator.get("status"),
+        "f2_weight_frozen": f2_generator.get("selection", {}).get("f2_weight_frozen"),
+        "canonical_file_eer": f2_generator.get("canonical_file_eer"),
+        "f2_blend_file_eer": f2_generator.get("f2_blend_file_eer"),
+        "delta_ads_file_component": f2_generator.get("delta_ads_file_component"),
+        "selected_for_submission": False,
+        "source_disjoint": f2_generator.get("source_disjoint"),
+        "final_holdout": f2_generator.get("final_holdout"),
+    } if f2_generator else "NOT RUN")
+    latest["development"]["v13b_global_history"] = ({
+        "status": history_index.get("status"),
+        "history_files_scanned": history_index.get("history_files_scanned"),
+        "history_entries": history_index.get("history_entries"),
+        "external_root_scanned": history_index.get("external_root_scanned"),
+        "external_data_root": history_index.get("external_data_root"),
+    } if history_index else "NOT RUN")
     latest["not_run"] = [
         "V13B Voice exploratory candidate",
         "V13B source-disjoint robust validation",

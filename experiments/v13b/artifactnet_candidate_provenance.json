@@ -15,13 +15,19 @@
   },
   "license": "CC-BY-NC-4.0",
   "license_limits": "Research/non-commercial only. Upstream patent notice states that the copyright license grants no patent license.",
-  "competition_use_approval": "NOT CONFIRMED",
-  "redistribution_in_submission": "NOT APPROVED",
+  "license_evidence": {
+    "model_card_url": "https://huggingface.co/intrect/artifactnet",
+    "pinned_revision": "7c9b753a9d006b48e4bfaf85bf0157e135f4aad4",
+    "local_snapshot": "model/candidates/v13b/artifactnet/UPSTREAM_README.md",
+    "finding": "CC-BY-NC-4.0; upstream explicitly states commercial deployment and patent licensing require written permission."
+  },
+  "competition_use_approval": "REVIEW_REQUIRED: no written DACON/rights-holder approval for competition use",
+  "redistribution_in_submission": "REVIEW_REQUIRED: no written rights-holder approval for archive redistribution",
   "selection": "REJECTED_FOR_PRODUCTION_PENDING_ALL_GATES",
   "blocking_gates": [
     "one of 95 evaluated segments produced NaN",
     "source-disjoint Music validation is unavailable",
-    "competition-use and patent approval are not confirmed",
+    "competition-use, redistribution and patent approval are REVIEW_REQUIRED",
     "full median policy exceeds runtime budget",
     "fast/gated policy lacks independent calibration"
   ],

@@ -7,14 +7,13 @@ import argparse
 import json
 import os
 import pathlib
-from collections import defaultdict
-
 import pandas as pd
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 IDENTITY_COLUMNS = (
     "source", "dataset", "generator_family", "generator",
+    "voice_generator_family", "music_generator_family",
     "content_group", "split_group_id", "near_duplicate_group",
     "base_audio_id", "base_voice_id", "base_music_id",
     "parent_real_id", "parent_fake_id", "voice_content_group",
@@ -54,41 +53,46 @@ def role_for(path: pathlib.Path, frame: pd.DataFrame) -> set[str]:
     return {value for value in roles if value}
 
 
-def build_global_history_index(data_root: pathlib.Path | None = None) -> dict:
+def build_global_history_index(data_root: pathlib.Path | None = None,
+                               extra_frames: dict[str, pd.DataFrame] | None = None) -> dict:
     entries: dict[tuple[str, str], dict] = {}
     files_scanned: list[str] = []
     skipped: list[str] = []
-    for path in scan_csv_paths(data_root):
-        try:
-            frame = pd.read_csv(path, low_memory=False)
-        except (pd.errors.EmptyDataError, UnicodeDecodeError, ValueError, OSError):
-            skipped.append(str(path))
-            continue
+    def add_frame(frame: pd.DataFrame, location: str) -> None:
+        """Add a row-scoped manifest to the exact overlap index."""
         if not set(frame.columns) & set(IDENTITY_COLUMNS):
-            continue
-        files_scanned.append(str(path))
-        roles = role_for(path, frame)
-        # Index per source/dataset *row group*.  Aggregating every identity in a
-        # CSV into every source would hide provenance relationships and create
-        # misleading provenance evidence (even though it is conservative for
-        # overlap detection).
+            return
+        roles = role_for(pathlib.Path(location), frame)
         source_values = (frame["source"].fillna("<SOURCE_MISSING>").astype(str)
                          if "source" in frame else pd.Series("<SOURCE_MISSING>", index=frame.index))
         dataset_values = (frame["dataset"].fillna("<DATASET_MISSING>").astype(str)
                           if "dataset" in frame else pd.Series("<DATASET_MISSING>", index=frame.index))
         grouped = frame.assign(_history_source=source_values, _history_dataset=dataset_values)
+        location_path = pathlib.Path(location)
         for (source, dataset), subset in grouped.groupby(["_history_source", "_history_dataset"], dropna=False):
             key = (str(source), str(dataset))
             entry = entries.setdefault(key, {
                 "source": str(source), "dataset": str(dataset), "rows_observed": 0,
-                "roles": set(), "first_seen_file": str(path),
-                "first_seen_version": path.parent.name,
+                "roles": set(), "first_seen_file": location,
+                "first_seen_version": location_path.parent.name,
                 "identities": {column: set() for column in IDENTITY_COLUMNS},
             })
             entry["rows_observed"] += len(subset)
             entry["roles"].update(roles)
             for column in IDENTITY_COLUMNS:
                 entry["identities"][column].update(_tokens(subset, column))
+
+    for path in scan_csv_paths(data_root):
+        try:
+            frame = pd.read_csv(path, low_memory=False)
+        except (pd.errors.EmptyDataError, UnicodeDecodeError, ValueError, OSError):
+            skipped.append(str(path))
+            continue
+        files_scanned.append(str(path))
+        add_frame(frame, str(path))
+    for name, frame in (extra_frames or {}).items():
+        files_scanned.append(f"IN_MEMORY::{name}")
+        add_frame(frame, f"IN_MEMORY::{name}")
     materialized = []
     for entry in entries.values():
         materialized.append({
@@ -99,11 +103,15 @@ def build_global_history_index(data_root: pathlib.Path | None = None) -> dict:
             "identities": {key: sorted(value) for key, value in entry["identities"].items()},
         })
     return {
-        "version": "V13B_GLOBAL_HISTORY_INDEX_V1",
-        "status": "PASS",
+        "version": "V13B_GLOBAL_HISTORY_INDEX_V2",
+        "status": "PASS" if files_scanned and materialized else "FAIL_EMPTY",
         "files_scanned": files_scanned,
         "external_data_root": str(data_root) if data_root else "NOT_CONFIGURED",
+        "external_root_scanned": bool(data_root),
         "skipped_files": skipped,
+        "history_files_scanned": len(files_scanned),
+        "history_entries": len(materialized),
+        "skipped_files_count": len(skipped),
         "entries": sorted(materialized, key=lambda value: (value["source"], value["dataset"])),
     }
 
@@ -135,11 +143,14 @@ def main() -> None:
     args = parser.parse_args()
     root = pathlib.Path(args.data_root).resolve() if args.data_root else None
     payload = build_global_history_index(root)
+    if payload["status"] != "PASS":
+        raise RuntimeError("global history index is empty or invalid")
     output = ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"status": payload["status"], "files": len(payload["files_scanned"]),
-                      "entries": len(payload["entries"])}, indent=2))
+    print(json.dumps({"status": payload["status"], "files": payload["history_files_scanned"],
+                      "entries": payload["history_entries"],
+                      "external_root": payload["external_data_root"]}, indent=2))
 
 
 if __name__ == "__main__":

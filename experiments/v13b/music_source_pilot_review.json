@@ -26,5 +26,20 @@
   "tooling": "tools/import_paired_music_pilot_v13b.py",
   "downloaded_rows": 0,
   "approved_rows": 0,
-  "model_training": "BLOCKED"
+  "model_training": "BLOCKED",
+  "x3_ingest_requirements": {
+    "minimum_complete_real_fake_content_groups": 10,
+    "preferred_pilot_groups": "30-100",
+    "required_status": "APPROVED for every row",
+    "required_isolation": [
+      "source", "dataset", "content_group", "split_group_id", "near_duplicate_group",
+      "audio_sha256", "source_audio_sha256", "base_audio_id", "base_voice_id",
+      "base_music_id", "parent_real_id", "parent_fake_id", "voice_content_group",
+      "music_content_group", "generator_family", "voice_generator_family",
+      "music_generator_family"
+    ],
+    "cross_development_overlap_policy": "FAIL_CLOSED",
+    "dsp_relabeling_as_ai_fake": "FORBIDDEN",
+    "implementation": "scripts/complete_v13b_gates.py --paired-music"
+  }
 }
