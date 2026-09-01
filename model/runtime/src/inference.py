@@ -3,8 +3,7 @@ Unified inference aligned with script.py: PANNs + HTDemucs + DF_Arena + AASIST
 Supports silence, topk aggregation, presence calibration, DF_Arena fusion.
 """
 from .preprocess import load_audio, extract_segments, aggregate_predictions
-import torch, numpy as np, pathlib, warnings
-warnings.filterwarnings("ignore")
+import torch, numpy as np, pathlib
 
 def is_silence(wave, thresh=0.008):
     return float((wave**2).mean()**0.5) < thresh

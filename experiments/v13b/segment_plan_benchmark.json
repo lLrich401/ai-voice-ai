@@ -1,0 +1,14 @@
+{
+  "status": "ADOPTED",
+  "scope": "MEASURED_LOCAL segment extraction/energy planning only; model inference NOT RUN",
+  "waves": 6,
+  "repeats": 5,
+  "segment_scans_before_per_file": 3,
+  "segment_scans_after_per_file": 1,
+  "prediction_input_parity": true,
+  "before_seconds": 0.010961099993437529,
+  "after_seconds": 0.00334100000327453,
+  "speedup": 3.280784191168663,
+  "decode_executor": "persistent executor implemented; end-to-end benchmark pending",
+  "df_gpu_overlap": "NOT RUN: no eligible CUDA benchmark in this run"
+}

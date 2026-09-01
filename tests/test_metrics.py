@@ -1,7 +1,9 @@
 import numpy as np
+import pytest
 from sklearn.metrics import roc_curve
 
-from src.metrics import compute_dacon_metrics, compute_eer
+import src.metrics as metric_module
+from src.metrics import MetricUnavailableError, compute_dacon_metrics, compute_eer
 
 
 def official_eer(y_true, y_score):
@@ -16,10 +18,24 @@ def official_eer(y_true, y_score):
     return float((fpr[idx] + fnr[idx]) / 2)
 
 
-def test_eer_matches_official_implementation():
+def test_eer_official_noninterpolated():
     y_true = np.array([0, 1, 0, 1, 1, 0, 0, 1])
     y_score = np.array([0.05, 0.91, 0.72, 0.54, 0.54, 0.22, 0.43, 0.81])
     assert compute_eer(y_true, y_score) == official_eer(y_true, y_score)
+
+
+def test_eer_drop_intermediate_false(monkeypatch):
+    observed = {}
+    original = roc_curve
+
+    def checked(*args, **kwargs):
+        observed.update(kwargs)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(metric_module, "roc_curve", checked)
+    compute_eer([0, 1, 0, 1], [0.1, 0.9, 0.3, 0.7])
+    assert observed["drop_intermediate"] is False
+    assert observed["pos_label"] == 1
 
 
 def test_component_eer_is_conditioned_on_presence():
@@ -47,3 +63,21 @@ def test_component_eer_is_conditioned_on_presence():
     assert result["music_eer"] == official_eer(
         y_true["music_fake"][music_mask], y_pred["music_fake"][music_mask]
     )
+
+
+def test_nonfinite_prediction_fails():
+    with pytest.raises(RuntimeError, match="non-finite"):
+        compute_eer([0, 1], [0.1, np.nan])
+
+
+def test_metric_schema_exact():
+    truth = {key: np.array([0, 1]) for key in metric_module.TRUTH_COLUMNS}
+    prediction = dict(truth)
+    prediction["FILE_FAKE_PROB"] = prediction.pop("file_fake")
+    with pytest.raises(KeyError, match="schema mismatch"):
+        compute_dacon_metrics(truth, prediction)
+
+
+def test_single_class_explicit():
+    with pytest.raises(MetricUnavailableError, match="single-class"):
+        compute_eer([1, 1], [0.2, 0.8])

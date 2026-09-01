@@ -6,6 +6,7 @@ Segment extraction strategies.
 """
 import os
 import math
+import warnings
 import numpy as np
 import soundfile as sf
 
@@ -14,7 +15,7 @@ TARGET_SR = 16000
 def load_audio(path, target_sr=TARGET_SR, mono_mode="mean"):
     try:
         data, sr = sf.read(path, always_2d=False)
-    except Exception as e:
+    except (RuntimeError, TypeError) as e:
         try:
             import librosa
             data, sr = librosa.load(path, sr=target_sr, mono=False)
@@ -27,7 +28,13 @@ def load_audio(path, target_sr=TARGET_SR, mono_mode="mean"):
                     data = np.mean(data, axis=0)
                 else:
                     data = np.mean(data, axis=0)
-            return data.astype(np.float32), target_sr
+            data = data.astype(np.float32)
+            if not np.isfinite(data).all():
+                raise RuntimeError(f"non-finite samples after librosa fallback: {path}")
+            warnings.warn(
+                f"soundfile decode failed; used librosa decoder/resampler for {path}",
+                RuntimeWarning, stacklevel=2)
+            return data, target_sr
         except Exception as e2:
             raise RuntimeError(f"Failed to load {path}: {e} / {e2}")
     if data.ndim == 2:
@@ -50,11 +57,16 @@ def load_audio(path, target_sr=TARGET_SR, mono_mode="mean"):
             import librosa
             data = librosa.resample(data, orig_sr=sr, target_sr=target_sr)
         except ImportError:
-            from scipy.signal import resample
-            num_samples = int(len(data) * target_sr / sr)
-            data = resample(data, num_samples)
+            from scipy.signal import resample_poly
+            divisor = math.gcd(int(sr), int(target_sr))
+            warnings.warn(
+                "librosa unavailable; using deterministic scipy.resample_poly fallback",
+                RuntimeWarning, stacklevel=2)
+            data = resample_poly(data, int(target_sr)//divisor, int(sr)//divisor)
         sr = target_sr
     data = data.astype(np.float32)
+    if not np.isfinite(data).all():
+        raise RuntimeError(f"non-finite samples after loading/resampling: {path}")
     return data, sr
 
 def pad_or_trim(wave, target_len, mode="constant"):

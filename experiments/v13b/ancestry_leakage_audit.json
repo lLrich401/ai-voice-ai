@@ -1,0 +1,154 @@
+{
+  "status": "PASS_DEVELOPMENT_SPLITS",
+  "train_rows": 546,
+  "split_specific_rules": true,
+  "audits": {
+    "generator_disjoint": {
+      "kind": "generator_disjoint",
+      "rows": 132,
+      "rules": {
+        "must_be_zero": [
+          "content_group",
+          "split_group_id",
+          "near_duplicate_group",
+          "base_audio_id",
+          "base_voice_id",
+          "base_music_id",
+          "parent_real_id",
+          "parent_fake_id",
+          "voice_content_group",
+          "music_content_group",
+          "audio_sha256",
+          "source_audio_sha256",
+          "voice_generator_family",
+          "music_generator_family"
+        ],
+        "allowed_overlap": [
+          "source",
+          "dataset"
+        ]
+      },
+      "overlap": {
+        "content_group": {
+          "count": 0,
+          "examples": []
+        },
+        "split_group_id": {
+          "count": 0,
+          "examples": []
+        },
+        "near_duplicate_group": {
+          "count": 0,
+          "examples": []
+        },
+        "base_audio_id": {
+          "count": 0,
+          "examples": []
+        },
+        "base_voice_id": {
+          "count": 0,
+          "examples": []
+        },
+        "base_music_id": {
+          "count": 0,
+          "examples": []
+        },
+        "parent_real_id": {
+          "count": 0,
+          "examples": []
+        },
+        "parent_fake_id": {
+          "count": 0,
+          "examples": []
+        },
+        "voice_content_group": {
+          "count": 0,
+          "examples": []
+        },
+        "music_content_group": {
+          "count": 0,
+          "examples": []
+        },
+        "audio_sha256": {
+          "count": 0,
+          "examples": []
+        },
+        "source_audio_sha256": {
+          "count": 0,
+          "examples": []
+        },
+        "voice_generator_family": {
+          "count": 0,
+          "examples": []
+        },
+        "music_generator_family": {
+          "count": 0,
+          "examples": []
+        }
+      },
+      "pass": true
+    },
+    "calibration": {
+      "kind": "independent_calibration",
+      "overlap": {
+        "content_group": {
+          "count": 0,
+          "examples": []
+        },
+        "split_group_id": {
+          "count": 0,
+          "examples": []
+        },
+        "near_duplicate_group": {
+          "count": 0,
+          "examples": []
+        },
+        "base_audio_id": {
+          "count": 0,
+          "examples": []
+        },
+        "base_voice_id": {
+          "count": 0,
+          "examples": []
+        },
+        "base_music_id": {
+          "count": 0,
+          "examples": []
+        },
+        "parent_real_id": {
+          "count": 0,
+          "examples": []
+        },
+        "parent_fake_id": {
+          "count": 0,
+          "examples": []
+        },
+        "voice_content_group": {
+          "count": 0,
+          "examples": []
+        },
+        "music_content_group": {
+          "count": 0,
+          "examples": []
+        },
+        "audio_sha256": {
+          "count": 0,
+          "examples": []
+        },
+        "source_audio_sha256": {
+          "count": 0,
+          "examples": []
+        }
+      },
+      "pass": true
+    },
+    "source_disjoint": {
+      "status": "NOT CREATED"
+    },
+    "final_holdout": {
+      "status": "NOT CREATED / NOT SEALED"
+    }
+  },
+  "all_development_overlap_zero": true,
+  "final_holdout_metrics": "NOT READ / NOT RUN"
+}

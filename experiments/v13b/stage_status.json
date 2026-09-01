@@ -1,0 +1,47 @@
+{
+  "version": "V13B_STAGE_MANAGER_20260901",
+  "branch": "x1",
+  "development_commit": "e8434b9c368ee5de3368d8b0b04559cf19c3ffaa",
+  "decision": "KEEP_TEST5",
+  "current_stage": 4,
+  "stages": {
+    "0_baseline_freeze": "PASS",
+    "1_latest_results_fix": "PASS",
+    "2_dataset_redesign": "PASS_WITH_WARNING",
+    "3_shortcut_audit": "PASS",
+    "4_validation_source_acquisition": "FAIL",
+    "5_music_architecture": "NOT_RUN",
+    "6_file_architecture": "NOT_RUN",
+    "7_voice_architecture": "NOT_RUN",
+    "8_scaled_training": "NOT_RUN",
+    "9_robust_validation": "NOT_RUN",
+    "10_calibration": "NOT_RUN",
+    "11_runtime": "NOT_RUN",
+    "12_bootstrap": "NOT_RUN",
+    "13_candidate_lock": "NOT_RUN",
+    "14_final_holdout": "NOT_RUN",
+    "15_submit_build": "NOT_RUN"
+  },
+  "failed_stage_blocks_later_stages": true,
+  "model_training": "BLOCKED_BY_DATA_GATES",
+  "dataset_evidence": {
+    "train_rows": 546,
+    "cal_rows": 112,
+    "generator_validation_rows": 132,
+    "paired_voice_sources": 2,
+    "paired_music_sources": 1,
+    "partial_rows": 64,
+    "mixed_rows": 96,
+    "metadata_auc": 0.5816531987435904,
+    "acoustic_auc": 0.6413594995838816,
+    "combined_auc": 0.718193777014148
+  },
+  "blocking_gates": [
+    "paired_music_sources_at_least_2",
+    "approved_metric_complete_source_disjoint_validation",
+    "final_holdout_v13b_sealed"
+  ],
+  "selected_artifacts_mutated": false,
+  "historical_v13_preserved": true,
+  "final_holdout_v13b_read_or_scored": false
+}

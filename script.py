@@ -1,26 +1,26 @@
 ﻿#!/usr/bin/env python3
+"""DACON 236749 offline inference for the current V7/TEST5-compatible pipeline.
+
+Active components are Voice SpecCNN, Music SpecCNN, official 16 kHz PANNs,
+CPU INT8 DF-Arena and calibrated score fusion. HTDemucs is optional and is off
+by default; selected inference uses identity separation. Mandatory artifacts,
+input IDs and every model output are validated fail-closed.
 """
-DACON 236749 Real-Data Pipeline Inference: PANNs + HTDemucs + DF_Arena_1B + Voice/Music Detectors
-- Voice detector (AASIST) on vocals stem via HTDemucs
-- Music detector (SpecCNN) on music stem via HTDemucs
-- PANNs presence, DF_Arena file fake, fusion weights optimized on VAL
-- Fails clearly if mandatory models missing (no 0.5 fallback)
-- Exact ID mapping only
-"""
-import os, sys, pathlib, warnings, json, hashlib
-warnings.filterwarnings("ignore")
+import os, sys, pathlib, json, hashlib
+from dataclasses import dataclass
 os.environ["HF_HUB_OFFLINE"]="1"
 os.environ["TRANSFORMERS_OFFLINE"]="1"
 os.environ["HF_DATASETS_OFFLINE"]="1"
 
 # The official archive permits only model/, script.py and requirements.txt at
 # its top level. Runtime source is bundled inside model/runtime/.
-_RUNTIME_ROOT = pathlib.Path(__file__).resolve().parent / "model" / "runtime"
+BASE_DIR = pathlib.Path(__file__).resolve().parent
+MODEL_DIR = BASE_DIR / "model"
+_RUNTIME_ROOT = MODEL_DIR / "runtime"
 if _RUNTIME_ROOT.exists():
     sys.path.insert(0, str(_RUNTIME_ROOT))
 
 import numpy as np, pandas as pd, torch
-import soundfile as sf
 TARGET_SR=16000
 SEG_SEC=4.0
 OUTPUT_EPS=1e-6
@@ -42,26 +42,25 @@ from src.models.panns import (
     PANNsPresenceWrapper,
 )
 from src.models.demucs_wrapper import get_separator
+from src.preprocess import load_audio as canonical_load_audio
 
 def verify_mandatory_models():
     """Requirement 11 & 12: verify existence, fail if missing."""
     missing=[]
     checks=[
-        ("DF_Arena_ORT", pathlib.Path("model/df_arena/df_arena_1b_int8.ort")),
-        ("DF_Arena", pathlib.Path("model/df_arena/df_arena_1b_int8.onnx")),
-        ("DF_Arena_alt", pathlib.Path(__file__).parent / "model" / "df_arena" / "df_arena_1b_int8.onnx"),
-        ("PANNs", pathlib.Path("model/panns") / PANNs_CHECKPOINT_NAME),
-        ("PANNs_alt", pathlib.Path(__file__).parent / "model" / "panns" / PANNs_CHECKPOINT_NAME),
-        ("Voice_checkpoint", pathlib.Path("model/best.pt")),
-        ("Music_checkpoint", pathlib.Path("model/music_best.pt")),
-        ("Fusion_weights", pathlib.Path("model/fusion_weights.json")),
+        ("DF_Arena_ORT", MODEL_DIR / "df_arena/df_arena_1b_int8.ort"),
+        ("DF_Arena", MODEL_DIR / "df_arena/df_arena_1b_int8.onnx"),
+        ("PANNs", MODEL_DIR / "panns" / PANNs_CHECKPOINT_NAME),
+        ("Voice_checkpoint", MODEL_DIR / "best.pt"),
+        ("Music_checkpoint", MODEL_DIR / "music_best.pt"),
+        ("Fusion_weights", MODEL_DIR / "fusion_weights.json"),
     ]
     # Check existence with fallback
-    df_exists = checks[0][1].exists() or checks[1][1].exists() or checks[2][1].exists()
-    panns_exists = checks[3][1].exists() or checks[4][1].exists()
-    voice_exists = checks[5][1].exists()
-    music_exists = checks[6][1].exists()
-    fusion_exists = checks[7][1].exists()
+    df_exists = checks[0][1].exists() or checks[1][1].exists()
+    panns_exists = checks[2][1].exists()
+    voice_exists = checks[3][1].exists()
+    music_exists = checks[4][1].exists()
+    fusion_exists = checks[5][1].exists()
     if not df_exists:
         missing.append("model/df_arena/df_arena_1b_int8.onnx (1.37GB DF_Arena_1B)")
     if not panns_exists:
@@ -78,27 +77,16 @@ def verify_mandatory_models():
     return True
 
 def load_audio(path, target_sr=TARGET_SR):
-    try:
-        data, sr = sf.read(path, always_2d=False)
-    except Exception as e:
-        try:
-            import librosa
-            data, sr = librosa.load(path, sr=target_sr, mono=False)
-            if data.ndim == 2:
-                data = np.mean(data, axis=0)
-            return data.astype(np.float32), target_sr
-        except Exception as e2:
-            raise RuntimeError(f"Failed to load {path}: {e} / {e2}")
-    if data.ndim == 2:
-        data = np.mean(data, axis=1)
-    if sr != target_sr:
-        try:
-            import librosa
-            data = librosa.resample(data, orig_sr=sr, target_sr=target_sr)
-        except:
-            from scipy.signal import resample
-            data = resample(data, int(len(data)*target_sr/sr))
-    return data.astype(np.float32), target_sr
+    data, sr = canonical_load_audio(path, target_sr=target_sr)
+    if not np.isfinite(data).all():
+        raise RuntimeError(f"audio preprocessing produced non-finite samples: {path}")
+    return data, sr
+
+
+@dataclass(frozen=True)
+class SegmentPlan:
+    candidates: tuple
+    energies: tuple
 
 def extract_segments(wave, sr=16000, seg_sec=4.0):
     seg_len=int(seg_sec*sr)
@@ -112,12 +100,19 @@ def extract_segments(wave, sr=16000, seg_sec=4.0):
         segs.append(wave[start:start+seg_len])
     return segs
 
-def select_aux_segments(wave, sr=16000, seg_sec=4.0, policy="high_energy"):
-    """Adaptive 1/2/3-crop policy with deterministic validation candidates."""
-    candidates=extract_segments(wave,sr=sr,seg_sec=seg_sec)
-    energies=[float(np.mean(np.asarray(seg,dtype=np.float32)**2)) for seg in candidates]
-    duration=len(wave)/float(sr)
+
+def build_segment_plan(wave, sr=16000, seg_sec=4.0):
+    candidates=tuple(extract_segments(wave,sr=sr,seg_sec=seg_sec))
+    energies=tuple(float(np.mean(np.asarray(segment,dtype=np.float32)**2))
+                   for segment in candidates)
+    return SegmentPlan(candidates,energies)
+
+
+def select_segments_from_plan(plan, duration, policy="high_energy", maximum=None):
+    candidates=list(plan.candidates); energies=list(plan.energies)
     count=1 if duration<=8.0 else (2 if duration<=25.0 else 3)
+    if maximum is not None and int(maximum)>0:
+        count=min(count,int(maximum))
     count=min(count,len(candidates))
     if policy=="high_energy":
         selected=sorted(np.argsort(energies)[-count:].tolist())
@@ -130,8 +125,7 @@ def select_aux_segments(wave, sr=16000, seg_sec=4.0, policy="high_energy"):
         order=np.argsort(energies)[::-1].tolist(); selected=[]
         minimum_gap=2 if len(candidates)>=5 else 1
         for index in order:
-            if all(abs(index-other)>=minimum_gap for other in selected):
-                selected.append(index)
+            if all(abs(index-other)>=minimum_gap for other in selected): selected.append(index)
             if len(selected)==count: break
         for index in order:
             if len(selected)==count: break
@@ -139,7 +133,12 @@ def select_aux_segments(wave, sr=16000, seg_sec=4.0, policy="high_energy"):
         selected=sorted(selected)
     else:
         raise ValueError(f"unsupported auxiliary segment policy: {policy}")
-    return [candidates[i] for i in selected]
+    return [candidates[index] for index in selected]
+
+def select_aux_segments(wave, sr=16000, seg_sec=4.0, policy="high_energy"):
+    """Adaptive 1/2/3-crop policy with deterministic validation candidates."""
+    duration=len(wave)/float(sr)
+    return select_segments_from_plan(build_segment_plan(wave,sr,seg_sec),duration,policy)
 
 
 def limit_aux_segments(segments, maximum):
@@ -154,7 +153,9 @@ def limit_aux_segments(segments, maximum):
 select_aux_segment=select_aux_segments
 
 def aggregate_predictions(probs, method="topk_mean", top_k=2):
-    probs=np.asarray(probs)
+    probs=np.asarray(probs,dtype=np.float64)
+    if probs.size==0 or not np.isfinite(probs).all():
+        raise RuntimeError("segment aggregation received empty or non-finite probabilities")
     if method=="topk_mean":
         k=min(top_k,len(probs))
         return float(np.mean(np.sort(probs)[-k:]))
@@ -215,11 +216,8 @@ def is_silence(wave, thresh=0.008):
 
 def load_df_arena(device="cpu"):
     # Mandatory, fail if not found
-    paths=[
-        pathlib.Path("model/df_arena/df_arena_1b_int8.onnx"),
-        pathlib.Path("model/df_arena/df_arena_1b_int8.ort"),
-        pathlib.Path(__file__).parent / "model" / "df_arena" / "df_arena_1b_int8.onnx",
-    ]
+    paths=[MODEL_DIR / "df_arena/df_arena_1b_int8.onnx",
+           MODEL_DIR / "df_arena/df_arena_1b_int8.ort"]
     model_path=next((p for p in paths if p.exists()), None)
     if model_path is None:
         raise FileNotFoundError("DF_Arena ORT/ONNX model not found under model/df_arena")
@@ -247,9 +245,14 @@ def df_arena_fake_probability(logits):
         logits=logits[None,:]
     if logits.shape[-1]!=2:
         raise ValueError(f"DF_Arena expected 2 logits {DF_ARENA_LABELS}, got {logits.shape}")
+    if not np.isfinite(logits).all():
+        raise RuntimeError("DF_Arena produced non-finite logits")
     shifted=logits-np.max(logits,axis=-1,keepdims=True)
     exp=np.exp(shifted)
-    return exp[:,DF_ARENA_FAKE_INDEX]/np.sum(exp,axis=-1)
+    probabilities=exp[:,DF_ARENA_FAKE_INDEX]/np.sum(exp,axis=-1)
+    if not np.isfinite(probabilities).all():
+        raise RuntimeError("DF_Arena produced non-finite probabilities")
+    return probabilities
 
 def df_arena_predict(sess, wave, sr=16000, seg_sec=DF_SEG_SEC):
     segs=_df_arena_segments(wave,sr,seg_sec)
@@ -398,23 +401,19 @@ def _strict_checkpoint_model(ckpt_path, device, expected_task):
 
 
 def load_voice_model(device):
-    cands=[pathlib.Path("model/best.pt"), pathlib.Path("model/voice_aasist.pt"), pathlib.Path(__file__).parent/"model"/"best.pt"]
-    ckpt_path=next((p for p in cands if p.exists()), None)
+    ckpt_path=MODEL_DIR / "best.pt"
     if ckpt_path is None or not ckpt_path.exists():
         raise FileNotFoundError("Voice checkpoint not found: model/best.pt (train via scripts/run_all_stages.py)")
     return _strict_checkpoint_model(ckpt_path, device, "voice")
 
 def load_music_model(device):
-    cands=[pathlib.Path("model/music_best.pt"), pathlib.Path(__file__).parent/"model"/"music_best.pt"]
-    ckpt_path=next((p for p in cands if p.exists()), None)
+    ckpt_path=MODEL_DIR / "music_best.pt"
     if ckpt_path is None or not ckpt_path.exists():
         raise FileNotFoundError("Music checkpoint not found: model/music_best.pt (train via scripts/run_all_stages.py)")
     return _strict_checkpoint_model(ckpt_path, device, "music")
 
 def load_panns(device):
-    cands=[pathlib.Path("model/panns")/PANNs_CHECKPOINT_NAME,
-           pathlib.Path(__file__).parent/"model"/"panns"/PANNs_CHECKPOINT_NAME]
-    ckpt_path=next((p for p in cands if p.exists()), None)
+    ckpt_path=MODEL_DIR / "panns" / PANNs_CHECKPOINT_NAME
     if ckpt_path is None or not ckpt_path.exists():
         raise FileNotFoundError(f"PANNs checkpoint not found: model/panns/{PANNs_CHECKPOINT_NAME}")
     model=PANNsPresenceWrapper(use_pretrained=True,checkpoint_path=ckpt_path)
@@ -425,47 +424,50 @@ def load_panns(device):
     return model
 
 def load_fusion_weights():
-    p=pathlib.Path("model/fusion_weights.json")
-    if not p.exists():
-        p=pathlib.Path(__file__).parent/"model"/"fusion_weights.json"
+    p=MODEL_DIR / "fusion_weights.json"
     if p.exists():
         with open(p) as f:
             w=json.load(f)
         expected={
             "pipeline_version":PIPELINE_VERSION,
-            "voice_checkpoint_sha256":_sha256_file(pathlib.Path("model/best.pt")),
-            "music_checkpoint_sha256":_sha256_file(pathlib.Path("model/music_best.pt")),
+            "voice_checkpoint_sha256":_sha256_file(MODEL_DIR / "best.pt"),
+            "music_checkpoint_sha256":_sha256_file(MODEL_DIR / "music_best.pt"),
             "panns_sha256":PANNs_CHECKPOINT_SHA256,
         }
         stale={key:(w.get(key),value) for key,value in expected.items() if w.get(key)!=value}
         if stale:
             raise RuntimeError(f"Stale fusion weights; recalibration required: {stale}")
-        # Keep the detector sub-ensemble on a proper convex combination even
-        # when a hand-edited JSON file contains unnormalised values.
+        # Detector weights are a calibrated contract; hand-edited invalid
+        # values fail closed instead of being silently normalised.
         detector_keys=("w_voice_file", "w_music_file", "w_prob_or")
         try:
             detector=np.asarray([float(w.get(k, d)) for k,d in zip(detector_keys, (0.5,0.3,0.2))], dtype=np.float64)
-            if not np.isfinite(detector).all() or (detector < 0).any() or detector.sum() <= 0:
+            if (not np.isfinite(detector).all() or (detector < 0).any() or
+                    not np.isclose(detector.sum(),1.0,atol=1e-8)):
                 raise ValueError("invalid detector weights")
-            detector=detector/detector.sum()
             for key, value in zip(detector_keys, detector):
                 w[key]=float(value)
-        except (TypeError, ValueError):
-            print("Warning: invalid detector fusion weights; using 0.5/0.3/0.2")
-            w.update({"w_voice_file":0.5, "w_music_file":0.3, "w_prob_or":0.2})
+        except (TypeError, ValueError) as error:
+            raise RuntimeError("invalid detector fusion weights") from error
         # DF_Arena has a separately calibrated output scale.  Its blend is
         # explicit so that a future validation run can tune it without a code
         # change; 0.5 preserves the previously validated submission behaviour.
         try:
-            w["w_df_arena"]=float(np.clip(float(w.get("w_df_arena", 0.5)), 0.0, 1.0))
-        except (TypeError, ValueError):
-            w["w_df_arena"]=0.5
+            df_weight=float(w.get("w_df_arena",0.5))
+            if not np.isfinite(df_weight) or not 0.0<=df_weight<=1.0:
+                raise ValueError("w_df_arena outside [0,1]")
+            w["w_df_arena"]=df_weight
+        except (TypeError,ValueError) as error:
+            raise RuntimeError("invalid w_df_arena fusion weight") from error
         legacy=w.get("w_df_component",0.0)
         for key in ("w_df_voice_component","w_df_music_component"):
             try:
-                w[key]=float(np.clip(float(w.get(key,legacy)),0.0,1.0))
-            except (TypeError,ValueError):
-                w[key]=0.0
+                value=float(w.get(key,legacy))
+                if not np.isfinite(value) or not 0.0<=value<=1.0:
+                    raise ValueError(f"{key} outside [0,1]")
+                w[key]=value
+            except (TypeError,ValueError) as error:
+                raise RuntimeError(f"invalid {key} fusion weight") from error
         print(
             "loaded fusion "
             f"pipeline={w.get('pipeline_version')} "
@@ -484,7 +486,8 @@ def _sha256_file(path):
             digest.update(chunk)
     return digest.hexdigest()
 
-def _run_torch_segments(model, segment_groups, device, use_amp=True, outputs_are_logits=True):
+def _run_torch_segments(model, segment_groups, device, use_amp=True, outputs_are_logits=True,
+                        detector_name="torch_model"):
     """Run one model over all segments from a file batch, retaining bounds."""
     bounds=[]; flat=[]
     for segs in segment_groups:
@@ -500,10 +503,15 @@ def _run_torch_segments(model, segment_groups, device, use_amp=True, outputs_are
                 output=model(batch)
         else:
             output=model(batch)
-    if outputs_are_logits:
-        output={key:torch.sigmoid(value).detach().float().cpu().numpy() for key,value in output.items()}
-    else:
-        output={key:value.detach().float().cpu().numpy() for key,value in output.items()}
+    converted={}
+    for key,value in output.items():
+        if not torch.isfinite(value).all():
+            raise RuntimeError(f"{detector_name}/{key} produced non-finite model output")
+        array=(torch.sigmoid(value) if outputs_are_logits else value).detach().float().cpu().numpy()
+        if not np.isfinite(array).all():
+            raise RuntimeError(f"{detector_name}/{key} produced non-finite probabilities")
+        converted[key]=array
+    output=converted
     return output, bounds
 
 def fuse_prediction_features(file_fake_df, voice_fake_model, music_fake_model,
@@ -511,10 +519,15 @@ def fuse_prediction_features(file_fake_df, voice_fake_model, music_fake_model,
                              music_present_model, voice_present_panns,
                              music_present_panns, fusion_weights):
     """Canonical score fusion shared by validation and submitted inference."""
-    values=np.nan_to_num(np.asarray([
+    values=np.asarray([
         file_fake_df,voice_fake_model,music_fake_model,file_voice,file_music,
         voice_present_model,music_present_model,voice_present_panns,music_present_panns,
-    ],dtype=np.float64),nan=0.5,posinf=1.0,neginf=0.0)
+    ],dtype=np.float64)
+    if not np.isfinite(values).all():
+        names=("df","voice_fake","music_fake","voice_file","music_file",
+               "voice_present","music_present","panns_voice","panns_music")
+        bad=[names[index] for index in np.flatnonzero(~np.isfinite(values))]
+        raise RuntimeError(f"fusion received non-finite detector outputs: {bad}")
     (file_fake_df,voice_fake_model,music_fake_model,file_voice,file_music,
      voice_present_model,music_present_model,voice_present_panns,music_present_panns)=values
     w_panns=float(fusion_weights.get("w_panns_presence",0.6))
@@ -582,15 +595,31 @@ def infer_wave_features_batch(voice_model, music_model, df_sess, panns_model,
     for wave in waves:
         vocals,music=separator.separate(wave,sr=TARGET_SR)
         voice_policy=str((aggregation_config or {}).get("voice_segment_policy","high_energy"))
-        segment_groups_v.append(limit_aux_segments(
-            select_aux_segments(vocals,sr=TARGET_SR,seg_sec=SEG_SEC,policy=voice_policy),specialist_max_segments))
-        segment_groups_m.append(limit_aux_segments(
-            select_aux_segments(music,sr=TARGET_SR,seg_sec=SEG_SEC),specialist_max_segments))
-        segment_groups_o.append(limit_aux_segments(
-            select_aux_segments(wave,sr=TARGET_SR,seg_sec=SEG_SEC),panns_max_segments))
-    v_out,v_bounds=_run_torch_segments(voice_model,segment_groups_v,device,use_amp=True)
-    m_out,m_bounds=_run_torch_segments(music_model,segment_groups_m,device,use_amp=True)
-    p_out,p_bounds=_run_torch_segments(panns_model,segment_groups_o,device,use_amp=False,outputs_are_logits=False)
+        duration=len(wave)/float(TARGET_SR)
+        if separator_type=="identity":
+            # Selected TEST5 path: all three consumers see the same waveform.
+            # Scan candidate energies once, then apply each bounded policy.
+            plan=build_segment_plan(wave,TARGET_SR,SEG_SEC)
+            segment_groups_v.append(select_segments_from_plan(
+                plan,duration,voice_policy,specialist_max_segments))
+            segment_groups_m.append(select_segments_from_plan(
+                plan,duration,"high_energy",specialist_max_segments))
+            segment_groups_o.append(select_segments_from_plan(
+                plan,duration,"high_energy",panns_max_segments))
+        else:
+            segment_groups_v.append(limit_aux_segments(
+                select_aux_segments(vocals,TARGET_SR,SEG_SEC,voice_policy),specialist_max_segments))
+            segment_groups_m.append(limit_aux_segments(
+                select_aux_segments(music,TARGET_SR,SEG_SEC),specialist_max_segments))
+            segment_groups_o.append(limit_aux_segments(
+                select_aux_segments(wave,TARGET_SR,SEG_SEC),panns_max_segments))
+    v_out,v_bounds=_run_torch_segments(
+        voice_model,segment_groups_v,device,use_amp=True,detector_name="voice")
+    m_out,m_bounds=_run_torch_segments(
+        music_model,segment_groups_m,device,use_amp=True,detector_name="music")
+    p_out,p_bounds=_run_torch_segments(
+        panns_model,segment_groups_o,device,use_amp=False,outputs_are_logits=False,
+        detector_name="panns")
     gate_threshold=(df_config or {}).get("gate_voice_presence_threshold")
     df_indices=select_df_indices(v_out,v_bounds,gate_threshold)
     df_probs=[0.5]*len(waves)
@@ -644,7 +673,8 @@ def fuse_feature_record(feature, fusion_weights):
         feature["vp_model"],feature["mp_model"],feature["vp_panns"],feature["mp_panns"],
         row_weights)
 
-def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_weights, audio_paths, device, use_demucs=False):
+def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_weights,
+                      audio_paths, device, use_demucs=False, decode_executor=None):
     """Inference for a small group of files with batched GPU model calls."""
     separator=get_separator(device=device, use_demucs=use_demucs)
     separator_type="htdemucs" if getattr(separator,"use_demucs",False) else "identity"
@@ -655,10 +685,13 @@ def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_wei
     # Audio decoding/resampling is independent and the official machine has
     # six CPU cores.  Load the next inference batch concurrently, then reserve
     # all six cores for DF-Arena's sequential INT8 graph.
-    from concurrent.futures import ThreadPoolExecutor
     workers=min(6,len(audio_paths))
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        loaded=list(pool.map(lambda path:load_audio(str(path)),audio_paths))
+    if decode_executor is None:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            loaded=list(pool.map(lambda path:load_audio(str(path)),audio_paths))
+    else:
+        loaded=list(decode_executor.map(lambda path:load_audio(str(path)),audio_paths))
     for index,(audio_path,(wave,sr)) in enumerate(zip(audio_paths,loaded)):
         records.append((index,audio_path,wave))
     if not records:
@@ -684,7 +717,10 @@ def infer_files_batch(voice_model, music_model, df_sess, panns_model, fusion_wei
         panns_max_segments=int(fusion_weights.get("panns_max_segments",3)),
         aggregation_config=fusion_weights, separator=separator)
     for (index,audio_path,_),feature in zip(records,features):
-        results[index]=[audio_path.stem]+fuse_feature_record(feature,fusion_weights)
+        probabilities=np.asarray(fuse_feature_record(feature,fusion_weights),dtype=np.float64)
+        if not np.isfinite(probabilities).all():
+            raise RuntimeError(f"non-finite final probabilities for file {audio_path}")
+        results[index]=[audio_path.stem]+probabilities.tolist()
     return results
 
 def infer_file(voice_model, music_model, df_sess, panns_model, fusion_weights,
@@ -711,10 +747,57 @@ def order_results_by_sample(results, sample_ids):
     return ordered
 
 
+AUDIO_EXTENSIONS=(".wav",".mp3",".flac",".m4a",".ogg")
+
+
+def discover_test_directory(explicit=None):
+    """Resolve only the explicit path or known evaluator input directories."""
+    candidates=[pathlib.Path(explicit).expanduser() if explicit else None]
+    if explicit is None:
+        candidates.extend((BASE_DIR / "data/test", BASE_DIR / "open"))
+    for candidate in candidates:
+        if candidate is None or not candidate.is_dir():
+            continue
+        if any(path.is_file() and path.suffix.lower() in AUDIO_EXTENSIONS
+               for path in candidate.rglob("*")):
+            return candidate.resolve()
+    shown=[str(path) for path in candidates if path is not None]
+    raise FileNotFoundError(f"No audio input found in allowed directories: {shown}")
+
+
+def discover_audio_files(test_path):
+    files=sorted({path.resolve() for path in pathlib.Path(test_path).rglob("*")
+                  if path.is_file() and path.suffix.lower() in AUDIO_EXTENSIONS})
+    stems=[path.stem for path in files]
+    if len(stems)!=len(set(stems)):
+        raise ValueError("Duplicate test file stems make exact ID mapping ambiguous")
+    if not files:
+        raise FileNotFoundError(f"No audio files found in {test_path}")
+    return files
+
+
+def validate_sample_ids(sample_path, audio_files):
+    sample=pd.read_csv(sample_path)
+    if sample.empty or not len(sample.columns):
+        raise ValueError(f"sample submission is empty: {sample_path}")
+    identifiers=sample.iloc[:,0].astype(str).tolist()
+    sample_stems=[pathlib.Path(identifier).stem for identifier in identifiers]
+    audio_stems=[path.stem for path in audio_files]
+    if len(sample_stems)!=len(set(sample_stems)):
+        raise ValueError("sample submission contains duplicate IDs")
+    if set(sample_stems)!=set(audio_stems):
+        missing=sorted(set(sample_stems)-set(audio_stems))
+        extra=sorted(set(audio_stems)-set(sample_stems))
+        raise RuntimeError(
+            f"sample/audio ID mismatch before inference: missing_audio={missing[:10]} "
+            f"extra_audio={extra[:10]}")
+    return sample, identifiers
+
+
 def main():
     import argparse
     parser=argparse.ArgumentParser()
-    parser.add_argument("--test_dir", default="./data/test")
+    parser.add_argument("--test_dir", default=None)
     parser.add_argument("--output", default="./output/submission.csv")
     parser.add_argument("--use_demucs", action="store_true", help="use HTDemucs separation; if set, must be available else fail (requirement 7)")
     parser.add_argument("--batch_files", type=int, default=16, help="files per inference batch; tuned for the official L4 22.4GB server")
@@ -726,17 +809,15 @@ def main():
         print("Running without HTDemucs (identity separation, unified train/inference) - requirement 7 alternative")
     # Verify mandatory models first (fail fast)
     verify_mandatory_models()
-    requested=pathlib.Path(args.test_dir)
-    candidates=[requested, pathlib.Path("./data/test"), pathlib.Path("./open"), pathlib.Path("./data")]
-    test_path=next((p for p in candidates if p.exists() and any(
-        next(p.rglob(ext),None) is not None for ext in ("*.wav","*.mp3","*.flac","*.m4a","*.ogg"))), None)
-    if test_path is None:
-        raise FileNotFoundError(f"No official input directory found among {[str(p) for p in candidates]}")
-    audio_files=sorted(test_path.rglob("*.wav"))+sorted(test_path.rglob("*.mp3"))+sorted(test_path.rglob("*.flac"))+sorted(test_path.rglob("*.m4a"))+sorted(test_path.rglob("*.ogg"))
-    audio_files=sorted(set(audio_files))
-    if len(audio_files)==0:
-        raise FileNotFoundError(f"No audio files found in {test_path}")
+    test_path=discover_test_directory(args.test_dir)
+    audio_files=discover_audio_files(test_path)
     print(f"found {len(audio_files)} files under {test_path}")
+    sample_path=next((candidate for candidate in (
+        test_path.parent/"sample_submission.csv",BASE_DIR/"sample_submission.csv")
+        if candidate.exists()),None)
+    sample_frame=sample_ids=None
+    if sample_path is not None:
+        sample_frame,sample_ids=validate_sample_ids(sample_path,audio_files)
     device="cuda" if torch.cuda.is_available() else "cpu"
     print(f"device {device}")
     if args.batch_files < 1:
@@ -759,27 +840,23 @@ def main():
     dummy_np=np.random.randn(1,DF_INPUT_SAMPLES).astype(np.float32)
     _=df_sess.run(None, {df_sess.get_inputs()[0].name: dummy_np})
     print("warmup ok")
-    # sample_submission exact mapping only
-    sample_path=None
-    for cand in [test_path.parent/"sample_submission.csv", pathlib.Path("./data/sample_submission.csv"), pathlib.Path("./open/sample_submission.csv"), pathlib.Path("./sample_submission.csv"), pathlib.Path(__file__).parent/"sample_submission.csv"]:
-        if pathlib.Path(cand).exists():
-            sample_path=cand; break
-    # Do not recursively pick up another competition's sample submission from
-    # a neighbouring project directory. The official contract uses one of the
-    # explicit paths above.
     results=[]
     import time, tqdm
     start=time.time()
     batch_starts=range(0,len(audio_files),args.batch_files)
     iterator=tqdm.tqdm(batch_starts,total=(len(audio_files)+args.batch_files-1)//args.batch_files,unit="batch") if len(audio_files)>10 else batch_starts
-    for start_index in iterator:
-        results.extend(infer_files_batch(voice_model,music_model,df_sess,panns_model,fusion_weights,audio_files[start_index:start_index+args.batch_files],device,use_demucs=args.use_demucs))
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=min(6,args.batch_files)) as decode_executor:
+        for start_index in iterator:
+            results.extend(infer_files_batch(
+                voice_model,music_model,df_sess,panns_model,fusion_weights,
+                audio_files[start_index:start_index+args.batch_files],device,
+                use_demucs=args.use_demucs,decode_executor=decode_executor))
     elapsed=time.time()-start
     print(f"inference {len(results)} files in {elapsed:.1f}s ({elapsed/len(results):.2f}s/file)" if len(results)>0 else "no files")
     # Exact mapping only (no substring)
-    if sample_path:
-        sdf=pd.read_csv(sample_path)
-        sample_ids=sdf.iloc[:,0].astype(str).tolist()
+    if sample_frame is not None:
+        sdf=sample_frame
         ordered=order_results_by_sample(results,sample_ids)
         df=pd.DataFrame(ordered,columns=[sdf.columns[0],"FILE_FAKE_PROB","VOICE_FAKE_PROB","MUSIC_FAKE_PROB","VOICE_PRESENT_PROB","MUSIC_PRESENT_PROB"])
     else:

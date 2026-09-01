@@ -1,0 +1,41 @@
+{
+  "version": "V13B_SELECTION_POLICY_FROZEN_20260901",
+  "frozen_before_results": true,
+  "primary_metric_order": [
+    "FILE_EER",
+    "MUSIC_EER_UNSEEN",
+    "SOURCE_DISJOINT_ADS",
+    "PARTIAL_FILE_EER",
+    "VOICE_EER_WORST",
+    "CPS"
+  ],
+  "robust_weights": {
+    "mean_domain": 0.30,
+    "unseen_generator": 0.25,
+    "worst_domain": 0.20,
+    "channel_robustness": 0.15,
+    "partial_mixed": 0.10
+  },
+  "data_hard_gates": {
+    "metadata_auc_max": 0.75,
+    "acoustic_auc_max": 0.75,
+    "combined_auc_hard_max": 0.75,
+    "combined_auc_target_max": 0.65,
+    "combined_auc_ideal_range": [0.5, 0.6],
+    "paired_voice_sources_min": 2,
+    "paired_music_sources_min": 2,
+    "voice_fake_generators_min": 8,
+    "music_fake_generators_min": 6,
+    "approved_metric_complete_source_disjoint_validation": true,
+    "sealed_unused_final_holdout": true
+  },
+  "adoption_gates": {
+    "file_eer_improves": true,
+    "unseen_music_improves": true,
+    "source_disjoint_improves": true,
+    "cps_minimum_delta": -0.01,
+    "bootstrap_win_rate_minimum": 0.5,
+    "official_runtime_minutes_maximum": 60,
+    "submission_validation_pass": true
+  }
+}

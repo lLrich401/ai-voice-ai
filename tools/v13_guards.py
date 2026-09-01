@@ -16,6 +16,16 @@ def assert_final_holdout_v13_forbidden(*paths: object) -> None:
             raise RuntimeError(f"V13 final holdout is sealed: {value}")
 
 
+def assert_final_holdout_v13b_forbidden(*paths: object) -> None:
+    """Fail closed before a V13B candidate lock and one-shot authorization."""
+    if os.getenv("FINAL_HOLDOUT_FORBIDDEN", "1") != "1":
+        raise RuntimeError("FINAL_HOLDOUT_FORBIDDEN must remain 1 during V13B development")
+    for value in paths:
+        text = str(pathlib.Path(value)).replace("\\", "/").lower()
+        if "final_holdout_v13b" in text or "final-holdout-v13b" in text:
+            raise RuntimeError(f"V13B final holdout is forbidden before candidate lock: {value}")
+
+
 def assert_no_hidden_test_training_path(*paths: object) -> None:
     """Reject test/hidden/evaluation paths as training input."""
     forbidden = ("/data/test/", "/hidden_test/", "/private_test/", "/evaluation_test/")

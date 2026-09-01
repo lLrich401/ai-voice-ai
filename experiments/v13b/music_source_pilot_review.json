@@ -1,0 +1,30 @@
+{
+  "status": "NOT ACQUIRED",
+  "decision": "KEEP_DATA_GATE_BLOCKED",
+  "reviewed_at": "2026-09-01",
+  "pilot_policy": "10-100 paired content groups; no bulk download before provenance and shortcut gates",
+  "candidates": {
+    "MuseBench": {
+      "source_url": "https://huggingface.co/datasets/Anonymousv22222/MuseBench-part1/blob/main/README.md",
+      "structure": "paired Jamendo human/AI filenames across eight paired generators",
+      "decision": "REVIEW_REQUIRED",
+      "reason": "collection is hundreds of GB and individual Jamendo tracks retain heterogeneous CC terms; generator-output terms also vary"
+    },
+    "ArtifactBench_v1_1": {
+      "source_url": "https://huggingface.co/datasets/intrect/artifactbench",
+      "structure": "22 fake generators and six real-source labels; evaluation benchmark, not content-paired",
+      "decision": "VALIDATION_CANDIDATE_REVIEW_REQUIRED",
+      "reason": "real audio includes user-retrieved links and sources overlapping existing FMA/SONICS history; row-level rights and global-history isolation unresolved"
+    },
+    "HAIM": {
+      "source_url": "https://huggingface.co/datasets/mippia/HAIM",
+      "structure": "large human/AI/hybrid music corpus",
+      "decision": "REVIEW_REQUIRED",
+      "reason": "245 GB release, platform-link subsets, and upstream attribution/terms require subset-level review before any pilot"
+    }
+  },
+  "tooling": "tools/import_paired_music_pilot_v13b.py",
+  "downloaded_rows": 0,
+  "approved_rows": 0,
+  "model_training": "BLOCKED"
+}

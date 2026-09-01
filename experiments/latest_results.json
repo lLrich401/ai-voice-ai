@@ -1,116 +1,94 @@
 {
-  "schema_version": 2,
-  "status": "MEASURED_LOCAL_UNLESS_MARKED",
-  "timestamp": "2026-08-31T16:54:30.6086397+09:00",
-  "base_git_commit": "c5b120578482e22006a47e7b324f2c33b3886690",
-  "implementation_git_commit": "a651f0518d3bdf2dc32802f1282ad46402e22016",
-  "branch": "test4",
-  "pipeline_version": "dacon236749-20260831-v7-voice-robust",
-  "checkpoints": {
-    "voice_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
-    "music_sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
-    "df_sha256": "a3b5746088fa57529d1291cca40c05077997ccf33574074f3c6e28712e96420b",
-    "panns_sha256": "eee61e89d4ef120bfe0e900f0fb9e4814a2597bbd1f3bf8e149868a7d508bc10"
-  },
-  "splits": {
-    "fusion_calibration_sha256": "0748fb5d545f3b79842109094c931a31b98ed203d2b817bece7f1490039864a4",
-    "final_holdout_sha256": "233c542b9773c7fe5cd82a67414e3192c9c2b066baea6ab7e9a80d8607a81a9e",
-    "sizes": {"train": 2025, "val_a": 533, "val_b": 293, "fusion_calibration": 656, "final_holdout": 463}
-  },
-  "reported_public_submission": {
-    "status": "USER_REPORTED_DACON_PUBLIC_HISTORICAL",
-    "total": 0.6461396931,
-    "ads": 0.6276746032,
-    "cps": 0.8123255026
-  },
-  "v6_final_holdout": {
-    "status": "MEASURED_HISTORICAL_ONE_SHOT",
-    "file_eer": 0.11010101010101012,
-    "voice_eer": 0.16454246324295052,
-    "music_eer": 0.015863050393437127,
-    "ads": 0.9072820871828737,
-    "voice_auc": 0.9414294750158129,
-    "music_auc": 0.9874973375931843,
-    "cps": 0.9644634063044986,
-    "total": 0.9130002190950363
-  },
-  "v7_final_holdout": {
-    "status": "NOT RUN",
-    "reason": "v6 final holdout was already consumed and is protected from v7 model selection"
-  },
-  "v7_validation_fresh_128_per_domain": {
-    "status": "MEASURED_NON_FINAL_LOCAL_VALIDATION",
-    "before_mean_voice_eer": 0.171875,
-    "after_mean_file_eer": 0.12083333333333335,
-    "after_mean_voice_eer": 0.16666666666666669,
-    "after_mean_music_eer": 0.02083333333333335,
-    "after_mean_ads": 0.9,
-    "after_mean_voice_auc": 0.9452311197916667,
-    "after_mean_music_auc": 0.9960123697916666,
-    "after_mean_cps": 0.9706217447916666,
-    "before_mean_total": 0.90607177734375,
-    "after_mean_total": 0.9070621744791666,
-    "before_worst_total": 0.8871875,
-    "after_worst_total": 0.8873828125,
-    "val_a_total": 0.9277506510416667,
-    "val_b_unseen_generator_total": 0.8973307291666668,
-    "val_c_codec_total": 0.9157845052083333,
-    "val_d_telephone_total": 0.8873828125,
-    "details": "experiments/v7/domain_results.json"
-  },
-  "fusion": {
-    "voice_file": 0.0,
-    "music_file": 0.5,
-    "probability_or": 0.5,
-    "df_arena": 0.25,
-    "df_voice_component": 0.3,
-    "df_music_component": 0.0,
-    "panns_presence": 0.75,
-    "voice_segment_policy": "high_energy",
-    "voice_fake_aggregation": "max",
-    "df_gate_policy": "off",
-    "adaptive_df": false
-  },
-  "calibration": {
-    "status": "MEASURED_INDEPENDENT_CALIBRATION",
-    "samples": 656,
-    "before_robust_objective": 0.8874136387814853,
-    "after_robust_objective": 0.8883663603678957,
-    "fold_totals": {"cal_a": 0.8845309602503132, "cal_b": 0.8975664628587389, "cal_c": 0.8879328867172409},
-    "worst_fold": {"name": "cal_a", "total": 0.8845309602503132},
-    "final_holdout": "NOT RUN"
-  },
-  "provenance": {
-    "approved": 500,
-    "review_required": 2285,
-    "rejected": 0,
-    "approved_only_training": "NOT RUN: approved subset contains no fake class"
-  },
-  "leakage_audit": {"files": 2785, "exact_cross_family": 0, "near_cross_family": 0, "status": "PASS"},
-  "runtime_benchmark": {
-    "status": "MEASURED_VAL_A_64_FILES",
-    "fastest_local_batch": 8,
-    "fastest_seconds": 63.41711169999326,
-    "fastest_projected_1200_minutes": 19.817847406247893,
-    "submission_default_batch": 16,
-    "default_projected_1200_minutes": 22.184790437495394,
-    "official_server_runtime": "NOT RUN"
-  },
-  "submission": {
-    "size_bytes": 935626709,
-    "sha256": "946e1e2d322c8e4d1df34ae2c7f8b74bd44fdb8c9f1b7269fba680a0ee861cb0",
-    "top_level": ["model", "script.py", "requirements.txt"],
-    "candidate_checkpoints_excluded": true,
+  "schema_version": 3,
+  "status": "CURRENT_SELECTED_SUBMISSION_SOURCE_OF_TRUTH",
+  "timestamp": "2026-09-01T00:00:00+09:00",
+  "branch": "x1",
+  "development_git_commit": "e8434b9c368ee5de3368d8b0b04559cf19c3ffaa",
+  "selected_submission": {
+    "name": "TEST5",
+    "status": "USER_REPORTED_DACON_PUBLIC_ACTUAL",
+    "pipeline_version": "dacon236749-20260831-v7-voice-robust",
+    "leaderboard": {
+      "ads": 0.6386349206,
+      "cps": 0.9366803175,
+      "total": 0.6684394603,
+      "runtime": "30m52s"
+    },
+    "artifacts": {
+      "script_sha256": "8abd4888f09aa00be18790e5257bf0cafc2fff5fd9e167571c880509a665119b",
+      "voice_checkpoint_sha256": "ae354126b741f2212224da4ac6815558085ef892e32564baf2f5bb1cf326bac6",
+      "music_checkpoint_sha256": "ed87097507ed89991dd49952fbdcb9c5ceb0c256d871a385d9cdbcf9945c84c1",
+      "fusion_sha256": "87d46c317398bed0a9dc87c6b451246851ba6c34683e4468a0251461f7c42402",
+      "panns_sha256": "eee61e89d4ef120bfe0e900f0fb9e4814a2597bbd1f3bf8e149868a7d508bc10",
+      "df_arena_sha256": "35a69bf6df8d96208309be6e0217ddf0dd6286649da867497a2753236009bdaf",
+      "requirements_sha256": "45ba713cfc2674474144d10c3441775121956fa51e142c3bbedbfa142aaba308",
+      "submit_zip_sha256": "5898ad19b5c92e46d54aca529336b99f9e17838806766c654a3585051388fdcb",
+      "submit_zip_bytes": 935635645
+    },
     "archive_validation": "PASS",
     "offline_smoke_test": "PASS"
   },
-  "tests": {"pytest": "46 passed", "seconds": 10.14},
+  "development": {
+    "dataset_version": "DATASET_V13B_PILOT_20260901_1",
+    "dataset_status": "DATASET_NOT_READY",
+    "current_stage": 4,
+    "current_stage_name": "validation source acquisition blocked",
+    "v13b_decision": "KEEP_TEST5_UNTIL_ALL_ADOPTION_GATES_PASS",
+    "v13_historical_status": "FAILED_SOURCE_SHORTCUT_GATE",
+    "v13_shortcut_auc": {
+      "metadata": 0.9823616322701689,
+      "acoustic": 0.9657692307692307,
+      "combined": 0.9900984990619137
+    },
+    "final_holdout_v13": "HISTORICAL_SEALED_NOT_USED_FOR_V13B_SELECTION",
+    "v13b_rows": {
+      "train": 546,
+      "cal": 112,
+      "generator_validation": 132,
+      "partial": 64,
+      "mixed": 96
+    },
+    "v13b_paired_sources": {
+      "voice": 2,
+      "music": 1
+    },
+    "v13b_shortcut_audit": {
+      "metadata_auc": 0.5816531987435904,
+      "acoustic_auc": 0.6413594995838816,
+      "combined_auc": 0.718193777014148,
+      "hard_gate": "PASS"
+    },
+    "v13b_correctness": {
+      "strict_metric_schema": "PASS",
+      "nonfinite_fail_closed": "PASS",
+      "base_dir_paths": "PASS",
+      "sample_id_precheck": "PASS",
+      "ancestry_development_overlap": 0,
+      "segment_plan_parity": "PASS",
+      "segment_scans_before": 3,
+      "segment_scans_after": 1
+    },
+    "v13b_blockers": [
+      "second approved paired music source missing",
+      "approved metric-complete source-disjoint validation missing",
+      "completely unused FINAL_HOLDOUT_V13B not acquired or sealed"
+    ],
+    "tests": {
+      "status": "PASS",
+      "pytest": "146 passed",
+      "seconds": 8.20
+    },
+    "final_holdout_v13b": "NOT CREATED / NOT RUN"
+  },
+  "historical_results": {
+    "v7_to_v13": "Preserved in versioned experiment directories and git history",
+    "previous_latest_results": "Historical values remain in version history and versioned experiment reports."
+  },
   "not_run": [
-    "v7 final holdout",
-    "new AASIST training: CUDA unavailable",
-    "SSL backbone: no licensed offline checkpoint bundled",
-    "approved-only checkpoint: approved subset is one-class",
-    "official DACON evaluator runtime",
-    "new DACON leaderboard submission"
+    "V13B model training",
+    "V13B robust validation",
+    "V13B bootstrap",
+    "FINAL_HOLDOUT_V13B evaluation",
+    "new DACON submission"
   ]
 }

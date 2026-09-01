@@ -79,11 +79,12 @@ def test_validate_multisegment_includes_mix_rows(monkeypatch):
     music = np.sin(np.linspace(0, 20, 16000)).astype(np.float32) * 0.1
     monkeypatch.setattr("src.dataset.load_audio",
                         lambda path, target_sr=16000: ((voice if "voice" in path else music), target_sr))
-    rows = []
-    for fake in (0, 1):
-        rows.append({"path": "MIX::voice.wav|music.wav", "file_fake": fake,
-                     "voice_fake": fake, "music_fake": fake,
-                     "voice_present": 1, "music_present": 1, "augment": "none"})
+    rows = [
+        {"path": "MIX::voice.wav|music.wav", "file_fake": fake,
+         "voice_fake": fake, "music_fake": fake,
+         "voice_present": present, "music_present": present, "augment": "none"}
+        for present, fake in ((1, 0), (1, 1), (0, 0), (0, 1))
+    ]
 
     class ConstantModel(torch.nn.Module):
         def forward(self, wave):

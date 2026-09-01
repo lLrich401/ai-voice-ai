@@ -9,6 +9,12 @@ The machine-readable source of truth is
 [`experiments/latest_results.json`](experiments/latest_results.json). Older
 reports are historical and must not be quoted as current results.
 
+Current selected submission is **TEST5**. Its user-reported DACON public result
+is ADS `0.6386349206`, CPS `0.9366803175`, TOTAL `0.6684394603`, runtime
+`30m52s`. These values are `USER_REPORTED_PUBLIC`, not local measurements. The
+byte-frozen archive remains under `archive/pre_v13_selected/`; V13B is an
+untrained dataset pilot and has not replaced TEST5.
+
 ## Selected pipeline
 
 - DF-Arena 1B dynamic INT8 ONNX, 64,600 samples at 16 kHz, logits

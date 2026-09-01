@@ -3,6 +3,8 @@ import os
 import pytest
 import soundfile as sf
 import json
+import importlib.util
+import pathlib
 
 import script
 
@@ -158,11 +160,17 @@ def test_adaptive_df_second_crop_is_distant_and_conditioned():
 
 def test_all_five_probabilities_are_finite_and_clipped():
     result = script.fuse_prediction_features(
-        2.0, -1.0, 3.0, 2.0, -1.0, np.nan, 3.0, 0.5, 0.5,
+        2.0, -1.0, 3.0, 2.0, -1.0, 0.5, 3.0, 0.5, 0.5,
         {"w_df_voice_component": 0.0, "w_df_music_component": 0.0,
          "w_panns_presence": 1.0})
     assert np.isfinite(result).all()
     assert all(script.OUTPUT_EPS <= value <= 1.0 - script.OUTPUT_EPS for value in result)
+
+
+def test_nonfinite_model_output_fails():
+    with pytest.raises(RuntimeError, match="voice_present"):
+        script.fuse_prediction_features(
+            0.5, 0.5, 0.5, 0.5, 0.5, np.nan, 0.5, 0.5, 0.5, {})
 
 
 def test_exact_sample_mapping_and_output_shape():
@@ -194,6 +202,8 @@ def test_offline_flags_and_missing_models_fail_fast(tmp_path, monkeypatch):
     assert os.environ["HF_HUB_OFFLINE"] == "1"
     assert os.environ["TRANSFORMERS_OFFLINE"] == "1"
     monkeypatch.chdir(tmp_path)
+    script.verify_mandatory_models()  # CWD-independent bundled paths.
+    monkeypatch.setattr(script, "MODEL_DIR", tmp_path / "model")
     with pytest.raises(FileNotFoundError):
         script.verify_mandatory_models()
 
@@ -205,7 +215,102 @@ def test_stale_fusion_weights_fail(tmp_path, monkeypatch):
         "pipeline_version": "old", "voice_checkpoint_sha256": "old",
         "music_checkpoint_sha256": "old",
     }), encoding="utf-8")
-    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(script, "MODEL_DIR", model_dir)
     monkeypatch.setattr(script, "_sha256_file", lambda path: "current")
     with pytest.raises(RuntimeError, match="Stale fusion"):
         script.load_fusion_weights()
+
+
+def test_script_paths_are_base_dir_safe(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    assert script.MODEL_DIR == script.BASE_DIR / "model"
+    script.verify_mandatory_models()
+
+
+def test_wrong_data_directory_not_auto_selected(tmp_path, monkeypatch):
+    nested = tmp_path / "data" / "training"
+    nested.mkdir(parents=True)
+    sf.write(nested / "train.wav", np.zeros(160, np.float32), 16000)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(script, "BASE_DIR", tmp_path / "bundle")
+    with pytest.raises(FileNotFoundError):
+        script.discover_test_directory(None)
+
+
+def test_sample_ids_match_audio_before_inference(tmp_path):
+    audio = tmp_path / "A.wav"
+    sf.write(audio, np.zeros(160, np.float32), 16000)
+    sample = tmp_path / "sample_submission.csv"
+    sample.write_text("id,FILE_FAKE_PROB\nB,0\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="before inference"):
+        script.validate_sample_ids(sample, [audio])
+
+
+def test_identity_separator_segment_plan_reuse(monkeypatch):
+    calls = 0
+    original = script.build_segment_plan
+
+    def counted(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        return original(*args, **kwargs)
+
+    def fake_torch(model, groups, device, **kwargs):
+        count = sum(map(len, groups))
+        bounds = []
+        start = 0
+        for group in groups:
+            bounds.append((start, start + len(group)))
+            start += len(group)
+        output = {name: np.full(count, 0.5) for name in (
+            "file_fake", "voice_fake", "music_fake", "voice_present", "music_present")}
+        return output, bounds
+
+    class Identity:
+        use_demucs = False
+
+        @staticmethod
+        def separate(wave, sr=16000):
+            return wave, wave
+
+    monkeypatch.setattr(script, "build_segment_plan", counted)
+    monkeypatch.setattr(script, "_run_torch_segments", fake_torch)
+    monkeypatch.setattr(script, "df_arena_predict_batch", lambda session, waves, **kwargs: (
+        [0.5] * len(waves), [{"primary": 0.5, "second": None, "primary_start": 0,
+                              "second_start": None, "used_second": False}] * len(waves)))
+    wave = np.linspace(-0.2, 0.2, 30 * 16000, dtype=np.float32)
+    result = script.infer_wave_features_batch(None, None, None, None, [wave], "cpu",
+                                               separator=Identity())
+    assert calls == 1
+    assert len(result) == 1
+
+
+def test_segment_reuse_prediction_parity():
+    wave = np.random.default_rng(7).normal(0, 0.1, 30 * 16000).astype(np.float32)
+    legacy = script.limit_aux_segments(script.select_aux_segments(wave), 3)
+    plan = script.build_segment_plan(wave)
+    reused = script.select_segments_from_plan(plan, len(wave) / 16000, "high_energy", 3)
+    assert len(legacy) == len(reused)
+    for left, right in zip(legacy, reused):
+        np.testing.assert_array_equal(left, right)
+
+
+def test_training_submission_preprocess_parity(tmp_path):
+    path = tmp_path / "eight_k.wav"
+    sf.write(path, np.linspace(-0.2, 0.2, 8000, dtype=np.float32), 8000)
+    spec = importlib.util.spec_from_file_location(
+        "root_preprocess", pathlib.Path(__file__).resolve().parents[1] / "src/preprocess.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    development, sr_development = module.load_audio(path, target_sr=16000)
+    submission, sr_submission = script.load_audio(path, target_sr=16000)
+    assert sr_development == sr_submission == 16000
+    np.testing.assert_array_equal(development, submission)
+
+
+def test_no_global_warning_suppression():
+    root = pathlib.Path(__file__).resolve().parents[1]
+    for relative in ("script.py", "src/inference.py", "src/preprocess.py"):
+        source = (root / relative).read_text(encoding="utf-8")
+        assert 'warnings.filterwarnings("ignore")' not in source
+        assert "warnings.simplefilter(\"ignore\")" not in source

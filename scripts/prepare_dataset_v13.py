@@ -10,6 +10,7 @@ import os
 import pathlib
 import shutil
 
+import numpy as np
 import pandas as pd
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -53,10 +54,12 @@ def resolve(path_value: object) -> pathlib.Path:
 
 def status(row: pd.Series) -> tuple[str, str]:
     source = str(row.source)
-    if source in APPROVED_SOURCE_LICENSES:
+    if (source in APPROVED_SOURCE_LICENSES
+            and str(row.get("source_url", "")).strip()
+            and str(row.get("license", "")).strip()):
         return APPROVED_SOURCE_LICENSES[source]
-    if str(row.get("allowed_for_competition", "")).strip().upper() == "YES":
-        return str(row.get("license", "recorded upstream terms")), "APPROVED"
+    # A legacy YES flag is not independent license evidence and must never
+    # auto-promote a row into production approval.
     return str(row.get("license", "UNKNOWN")), "REVIEW_REQUIRED"
 
 
@@ -175,6 +178,14 @@ def main() -> None:
     source["sha256"] = hashes
     source["license"] = licenses
     source["competition_use_status"] = statuses
+    source["approval_basis"] = np.where(
+        source.competition_use_status.eq("APPROVED"),
+        "explicit hard-coded source review with source_url and license", "")
+    source["license_source"] = np.where(
+        source.competition_use_status.eq("APPROVED"), source.source_url.astype(str), "")
+    source["license_snapshot_sha256"] = ""
+    source["reviewed_at"] = np.where(
+        source.competition_use_status.eq("APPROVED"), "2026-09-01", "")
     source["generator_family"] = source.apply(fake_generator, axis=1)
     source["generator_version"] = column_or(source, "version", "unknown").fillna("unknown")
     source["language"] = source.source_path.str.extract(r"[\\/](ko|en|de|fr|es|it|pl|ru|uk)[\\/]", expand=False).fillna("unknown")

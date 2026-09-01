@@ -1,0 +1,222 @@
+{
+  "status": "PASS",
+  "decision": "DATASET_GATE_PASS",
+  "scope": "TRAIN direct paired_core only; virtual partial/mixed rows structurally audited separately",
+  "manifest": "data/splits_v13b/train.csv",
+  "rows": 386,
+  "folds": 5,
+  "fold_isolation": "StratifiedGroupKFold(content_group)",
+  "hard_threshold": 0.75,
+  "threshold_policy": {
+    "hard_combined_max": 0.75,
+    "target_combined_max": 0.65,
+    "ideal_combined_range": [
+      0.5,
+      0.6
+    ]
+  },
+  "recommended_thresholds": {
+    "metadata": 0.6,
+    "acoustic": 0.65,
+    "combined": 0.65
+  },
+  "metadata_only": {
+    "auc": 0.5816531987435904,
+    "numeric": [
+      "sample_rate",
+      "duration",
+      "bytes_per_second"
+    ],
+    "categorical": [
+      "source",
+      "dataset",
+      "extension",
+      "codec",
+      "augment",
+      "channel_policy"
+    ]
+  },
+  "acoustic_only": {
+    "auc": 0.6413594995838816,
+    "features": [
+      "rms",
+      "silence_ratio",
+      "clipping_ratio",
+      "zcr",
+      "spectral_centroid",
+      "spectral_rolloff",
+      "spectral_flatness",
+      "high_frequency_ratio"
+    ]
+  },
+  "combined": {
+    "auc": 0.718193777014148
+  },
+  "source_prediction_acoustic": {
+    "balanced_accuracy": 0.761010101010101,
+    "classes": [
+      "dfadd_vctk_paired",
+      "echoes_fma_paired",
+      "mlaad_tiny_matched"
+    ],
+    "chance_reference": 0.3333333333333333,
+    "features": [
+      "rms",
+      "silence_ratio",
+      "clipping_ratio",
+      "zcr",
+      "spectral_centroid",
+      "spectral_rolloff",
+      "spectral_flatness",
+      "high_frequency_ratio"
+    ]
+  },
+  "metadata_feature_ablation": [
+    {
+      "feature": "duration",
+      "auc_without": 0.45971703938360764,
+      "auc_drop": 0.12193615935998281
+    },
+    {
+      "feature": "sample_rate",
+      "auc_without": 0.5816531987435904,
+      "auc_drop": 0.0
+    },
+    {
+      "feature": "extension",
+      "auc_without": 0.5819485086847969,
+      "auc_drop": -0.00029530994120641196
+    },
+    {
+      "feature": "codec",
+      "auc_without": 0.5819485086847969,
+      "auc_drop": -0.00029530994120641196
+    },
+    {
+      "feature": "augment",
+      "auc_without": 0.5819485086847969,
+      "auc_drop": -0.00029530994120641196
+    },
+    {
+      "feature": "channel_policy",
+      "auc_without": 0.5819485086847969,
+      "auc_drop": -0.00029530994120641196
+    },
+    {
+      "feature": "source",
+      "auc_without": 0.5831029020913313,
+      "auc_drop": -0.0014497033477408605
+    },
+    {
+      "feature": "dataset",
+      "auc_without": 0.5831029020913313,
+      "auc_drop": -0.0014497033477408605
+    },
+    {
+      "feature": "bytes_per_second",
+      "auc_without": 0.5834519047491207,
+      "auc_drop": -0.0017987060055302262
+    }
+  ],
+  "acoustic_feature_ablation": [
+    {
+      "feature": "zcr",
+      "auc_without": 0.5737872157641816,
+      "auc_drop": 0.06757228381970004
+    },
+    {
+      "feature": "rms",
+      "auc_without": 0.6025396654943757,
+      "auc_drop": 0.038819834089505956
+    },
+    {
+      "feature": "spectral_centroid",
+      "auc_without": 0.6131708233778088,
+      "auc_drop": 0.028188676206072794
+    },
+    {
+      "feature": "silence_ratio",
+      "auc_without": 0.617117238046659,
+      "auc_drop": 0.024242261537222642
+    },
+    {
+      "feature": "high_frequency_ratio",
+      "auc_without": 0.6213052699401327,
+      "auc_drop": 0.020054229643748922
+    },
+    {
+      "feature": "spectral_flatness",
+      "auc_without": 0.6325807404225617,
+      "auc_drop": 0.008778759161319871
+    },
+    {
+      "feature": "spectral_rolloff",
+      "auc_without": 0.6408494187763429,
+      "auc_drop": 0.0005100808075386709
+    },
+    {
+      "feature": "clipping_ratio",
+      "auc_without": 0.6413594995838816,
+      "auc_drop": 0.0
+    }
+  ],
+  "likely_causes": [
+    {
+      "feature": "duration",
+      "auc_without": 0.45971703938360764,
+      "auc_drop": 0.12193615935998281
+    },
+    {
+      "feature": "zcr",
+      "auc_without": 0.5737872157641816,
+      "auc_drop": 0.06757228381970004
+    },
+    {
+      "feature": "rms",
+      "auc_without": 0.6025396654943757,
+      "auc_drop": 0.038819834089505956
+    },
+    {
+      "feature": "spectral_centroid",
+      "auc_without": 0.6131708233778088,
+      "auc_drop": 0.028188676206072794
+    },
+    {
+      "feature": "silence_ratio",
+      "auc_without": 0.617117238046659,
+      "auc_drop": 0.024242261537222642
+    },
+    {
+      "feature": "high_frequency_ratio",
+      "auc_without": 0.6213052699401327,
+      "auc_drop": 0.020054229643748922
+    },
+    {
+      "feature": "spectral_flatness",
+      "auc_without": 0.6325807404225617,
+      "auc_drop": 0.008778759161319871
+    }
+  ],
+  "automatic_remediation_candidates": [
+    "use identical crop/pad policy and duration-stratified sampling"
+  ],
+  "class_balance": {
+    "0": 193,
+    "1": 193
+  },
+  "source_label_balance": {
+    "0": {
+      "dfadd_vctk_paired": 60,
+      "echoes_fma_paired": 33,
+      "mlaad_tiny_matched": 100
+    },
+    "1": {
+      "dfadd_vctk_paired": 60,
+      "echoes_fma_paired": 33,
+      "mlaad_tiny_matched": 100
+    }
+  },
+  "features_file": "experiments/v13b/source_shortcut_audit_features.csv",
+  "source_label_fingerprints_file": "experiments/v13b/source_shortcut_audit_source_label_fingerprints.csv",
+  "final_holdout_v13b": "NOT READ / NOT RUN"
+}

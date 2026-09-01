@@ -1,0 +1,71 @@
+{
+  "version": "V13B_SOURCE_REGISTRY_20260901",
+  "policy": "Only explicit APPROVED entries may enter production training; status is never inferred by code.",
+  "sources": {
+    "mlaad_tiny_matched": {
+      "status": "APPROVED",
+      "license": "CC BY-NC 4.0",
+      "evidence": "existing pinned MLAAD snapshot and manifest",
+      "approval_basis": "pinned source manifest records URL, revision, CC BY-NC 4.0, and competition-use review",
+      "license_source": "data/public_v9/mlaad_tiny_manifest.csv",
+      "license_snapshot_sha256": "10a43f18db51d2afeafafb46b8f1bb3436434921b728dddb198ca852fd878d8b",
+      "reviewed_at": "2026-09-01",
+      "role": "paired voice"
+    },
+    "echoes_fma_paired": {
+      "status": "APPROVED",
+      "license": "generated CC BY-SA 4.0; selected FMA originals have explicit CC licenses",
+      "evidence": "data/public_v9/echoes_fma_paired_manifest.csv",
+      "approval_basis": "generated tracks CC BY-SA 4.0 and selected FMA originals retain explicit row-level CC URLs",
+      "license_source": "data/public_v9/echoes_fma_paired_manifest.csv",
+      "license_snapshot_sha256": "c5ed2108cdd091df7c668fc72bd0a4d9c3d2a19b3db27934219e06fcea60eea4",
+      "reviewed_at": "2026-09-01",
+      "role": "paired music"
+    },
+    "dfadd_vctk_paired": {
+      "status": "APPROVED",
+      "license": "MIT dataset release; VCTK CC BY 4.0",
+      "evidence": "external provenance/dfadd_repo/LICENSE and README.md",
+      "approval_basis": "official DFADD release is MIT; upstream VCTK originals are CC BY 4.0; exact pair filenames and archive hash recorded",
+      "license_source": "external provenance/dfadd_repo/LICENSE",
+      "license_snapshot_sha256": "c30560542bcd1305f605ee1077c0d18057e757d59591b53f7d1eecab8f1225e9",
+      "reviewed_at": "2026-09-01",
+      "role": "paired voice"
+    },
+    "wavefake_ajay_mirror": {
+      "status": "REVIEW_REQUIRED",
+      "reason": "official WaveFake is CC BY-SA 4.0, but the local mirror snapshot/version mapping is not recorded"
+    },
+    "sonics_official": {
+      "status": "REVIEW_REQUIRED",
+      "license": "CC BY-NC 4.0",
+      "role": "fake-only music review; prohibited from unpaired production scaling",
+      "reason": "row-level source and generator-output evidence is incomplete"
+    },
+    "aime": {
+      "status": "REVIEW_REQUIRED",
+      "reason": "generated tracks and MTG-Jamendo originals have different/per-track terms"
+    },
+    "musebench": {
+      "status": "REVIEW_REQUIRED",
+      "reason": "collection license does not replace heterogeneous Jamendo per-track licenses"
+    },
+    "fakemusiccaps": {
+      "status": "REVIEW_REQUIRED",
+      "reason": "CC BY-NC 4.0 repository; MusicCaps originals are not redistributed and source rights require row-level review"
+    },
+    "scdf": {
+      "status": "REVIEW_REQUIRED",
+      "reason": "candidate completely unseen voice final; must be acquired and globally history-audited before sealing"
+    },
+    "speechfake": {
+      "status": "REVIEW_REQUIRED",
+      "reason": "CC BY 4.0 with documented upstream exceptions; per-subset review required"
+    },
+    "artifactbench_v1_1": {
+      "status": "REVIEW_REQUIRED",
+      "reason": "CC BY-NC 4.0 benchmark with 22 generators and six real-source labels, but real audio includes user-retrieved YouTube IDs and FMA/SONICS overlap; row-level rights and global-history disjointness must be resolved",
+      "candidate_role": "music unseen/source-disjoint validation only, never automatic training approval"
+    }
+  }
+}

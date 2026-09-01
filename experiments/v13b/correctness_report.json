@@ -1,0 +1,48 @@
+{
+  "status": "PASS_WITH_DATA_GATES_BLOCKED",
+  "timestamp": "2026-09-01T11:07:26+09:00",
+  "baseline": "TEST5",
+  "changes": {
+    "metric_exact_schema": "PASS",
+    "official_noninterpolated_eer": "PASS",
+    "drop_intermediate_false": "PASS",
+    "nonfinite_metric_and_inference": "FAIL_CLOSED",
+    "single_class_metric": "EXPLICITLY_UNAVAILABLE",
+    "base_dir_artifact_paths": "PASS",
+    "test_directory_discovery": "FAIL_CLOSED",
+    "sample_audio_id_precheck": "PASS",
+    "canonical_preprocess_byte_parity": "PASS",
+    "global_warning_suppression": "ABSENT",
+    "mixed_partial_ancestry": "PRESERVED",
+    "development_ancestry_overlap": 0
+  },
+  "tests": {
+    "scope": "full repository pytest",
+    "result": "146 passed",
+    "seconds": 8.20
+  },
+  "efficiency": {
+    "segment_scans_before": 3,
+    "segment_scans_after": 1,
+    "segment_input_parity": true,
+    "segment_planning_before_seconds": 0.010961099993437529,
+    "segment_planning_after_seconds": 0.00334100000327453,
+    "segment_planning_speedup": 3.280784191168663,
+    "decode_executor": "persistent executor adopted; end-to-end runtime NOT RUN",
+    "df_gpu_overlap": "NOT RUN",
+    "official_runtime_after": "NOT RUN"
+  },
+  "selected_submission": {
+    "decision": "KEEP_TEST5",
+    "frozen_zip_validator": "PASS",
+    "frozen_zip_offline_smoke": "PASS",
+    "frozen_zip_smoke_files": 3,
+    "frozen_zip_smoke_seconds_per_file": 1.02,
+    "frozen_zip_sha256": "5898ad19b5c92e46d54aca529336b99f9e17838806766c654a3585051388fdcb",
+    "working_tree_candidate_archive": "NOT BUILT: dataset/model adoption gates failed"
+  },
+  "model_training": "NOT RUN",
+  "robust_validation": "NOT RUN",
+  "bootstrap": "NOT RUN",
+  "final_holdout_v13b": "NOT CREATED / NOT READ / NOT RUN"
+}

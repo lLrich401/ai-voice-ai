@@ -1,108 +1,103 @@
+"""Strict DACON 236749 metric implementation.
+
+Score = 0.9 * ADS + 0.1 * CPS. Component fake EER is conditioned on the
+corresponding component being present. Production evaluation is fail-closed:
+schema mismatches, non-finite values, unequal lengths, and single-class metrics
+are never converted to an apparently valid 0.5 score.
 """
-DACON metric
-Score = 0.9 * ADS + 0.1 * CPS
-"""
+
+from __future__ import annotations
+
 import numpy as np
 from sklearn.metrics import roc_auc_score, roc_curve
 
-def compute_eer(y_true, y_score):
-    y_true = np.asarray(y_true, dtype=np.int32)
-    y_score = np.asarray(y_score, dtype=np.float64)
-    if len(np.unique(y_true)) < 2:
-        return 0.5
-    mask = np.isfinite(y_score)
-    y_true = y_true[mask]
-    y_score = y_score[mask]
-    if len(y_true) == 0:
-        return 0.5
+
+TRUTH_COLUMNS = ("file_fake", "voice_fake", "music_fake", "voice_present", "music_present")
+PREDICTION_COLUMNS = TRUTH_COLUMNS
+
+
+class MetricUnavailableError(ValueError):
+    """Raised when an official metric cannot be computed from supplied rows."""
+
+
+def _validated_binary_inputs(y_true, y_score, *, allow_nonfinite: bool,
+                             metric: str) -> tuple[np.ndarray, np.ndarray]:
+    truth = np.asarray(y_true, dtype=np.int32).reshape(-1)
+    score = np.asarray(y_score, dtype=np.float64).reshape(-1)
+    if len(truth) != len(score):
+        raise ValueError(f"{metric}: truth/prediction length mismatch {len(truth)} != {len(score)}")
+    finite = np.isfinite(score)
+    if not finite.all():
+        indices = np.flatnonzero(~finite).tolist()
+        if not allow_nonfinite:
+            raise RuntimeError(f"{metric}: non-finite predictions at rows {indices[:10]}")
+        truth, score = truth[finite], score[finite]
+    if len(truth) == 0:
+        raise MetricUnavailableError(f"{metric}: no finite rows")
+    labels = np.unique(truth)
+    if not set(labels.tolist()) <= {0, 1}:
+        raise ValueError(f"{metric}: labels must be binary 0/1, got {labels.tolist()}")
+    if len(labels) < 2:
+        raise MetricUnavailableError(f"{metric}: single-class truth {labels.tolist()}")
+    return truth, score
+
+
+def compute_eer(y_true, y_score, *, allow_nonfinite: bool = False) -> float:
+    truth, score = _validated_binary_inputs(
+        y_true, y_score, allow_nonfinite=allow_nonfinite, metric="EER")
     fpr, tpr, _ = roc_curve(
-        y_true,
-        y_score,
-        pos_label=1,
-        drop_intermediate=False,
-    )
-    fnr = 1 - tpr
-    idx = int(np.argmin(np.abs(fpr - fnr)))
-    return float((fpr[idx] + fnr[idx]) / 2.0)
+        truth, score, pos_label=1, drop_intermediate=False)
+    fnr = 1.0 - tpr
+    index = int(np.argmin(np.abs(fpr - fnr)))
+    return float((fpr[index] + fnr[index]) / 2.0)
 
-def compute_auc(y_true, y_score):
-    y_true = np.asarray(y_true, dtype=np.int32)
-    y_score = np.asarray(y_score, dtype=np.float64)
-    if len(np.unique(y_true)) < 2:
-        return 0.5
-    mask = np.isfinite(y_score)
-    y_true = y_true[mask]
-    y_score = y_score[mask]
-    if len(y_true) == 0:
-        return 0.5
-    try:
-        return float(roc_auc_score(y_true, y_score))
-    except:
-        return 0.5
 
-def compute_dacon_metrics(y_true_dict, y_pred_dict):
-    mapping = {
-        "file_fake": ["file_fake","FILE_FAKE","file_fake_prob","FILE_FAKE_PROB"],
-        "voice_fake": ["voice_fake","VOICE_FAKE","voice_fake_prob","VOICE_FAKE_PROB"],
-        "music_fake": ["music_fake","MUSIC_FAKE","music_fake_prob","MUSIC_FAKE_PROB"],
-        "voice_present": ["voice_present","VOICE_PRESENT","voice_present_prob","VOICE_PRESENT_PROB"],
-        "music_present": ["music_present","MUSIC_PRESENT","music_present_prob","MUSIC_PRESENT_PROB"],
-    }
-    yt = {}
-    yp = {}
-    for norm, candidates in mapping.items():
-        found_true = None
-        found_pred = None
-        for c in candidates:
-            if c in y_true_dict:
-                found_true = y_true_dict[c]
-            if c in y_pred_dict:
-                found_pred = y_pred_dict[c]
-        if found_true is None:
-            for k,v in y_true_dict.items():
-                if norm in k.lower():
-                    if "present" in norm and "present" in k.lower():
-                        found_true = v; break
-                    elif "present" not in norm and "present" not in k.lower() and "fake" in norm:
-                        found_true = v; break
-        if found_pred is None:
-            for k,v in y_pred_dict.items():
-                if norm in k.lower():
-                    found_pred = v; break
-        if found_true is not None:
-            yt[norm] = np.asarray(found_true)
-        if found_pred is not None:
-            yp[norm] = np.asarray(found_pred)
-    if len(yt)==0:
-        yt = y_true_dict
-        yp = y_pred_dict
-    file_eer = compute_eer(yt["file_fake"], yp["file_fake"]) if "file_fake" in yt and "file_fake" in yp else 0.5
-    # DACON scores component-fake EER only on files where the corresponding
-    # source exists.  Including absent-source rows makes the local score look
-    # artificially good and leads to the wrong fusion/training decisions.
-    if all(k in yt and k in yp for k in ("voice_fake", "voice_present")):
-        voice_mask = np.asarray(yt["voice_present"]).astype(int) == 1
-        voice_eer = compute_eer(np.asarray(yt["voice_fake"])[voice_mask], np.asarray(yp["voice_fake"])[voice_mask])
-    else:
-        voice_eer = 0.5
-    if all(k in yt and k in yp for k in ("music_fake", "music_present")):
-        music_mask = np.asarray(yt["music_present"]).astype(int) == 1
-        music_eer = compute_eer(np.asarray(yt["music_fake"])[music_mask], np.asarray(yp["music_fake"])[music_mask])
-    else:
-        music_eer = 0.5
-    voice_auc = compute_auc(yt["voice_present"], yp["voice_present"]) if "voice_present" in yt and "voice_present" in yp else 0.5
-    music_auc = compute_auc(yt["music_present"], yp["music_present"]) if "music_present" in yt and "music_present" in yp else 0.5
-    ads = 0.5*(1-file_eer) + 0.2*(1-voice_eer) + 0.3*(1-music_eer)
-    cps = 0.5*voice_auc + 0.5*music_auc
-    total = 0.9*ads + 0.1*cps
+def compute_auc(y_true, y_score, *, allow_nonfinite: bool = False) -> float:
+    truth, score = _validated_binary_inputs(
+        y_true, y_score, allow_nonfinite=allow_nonfinite, metric="AUC")
+    return float(roc_auc_score(truth, score))
+
+
+def _exact_columns(values: dict, expected: tuple[str, ...], role: str) -> dict[str, np.ndarray]:
+    keys = set(values)
+    missing = set(expected) - keys
+    unexpected = keys - set(expected)
+    if missing or unexpected:
+        raise KeyError(
+            f"official {role} schema mismatch: missing={sorted(missing)} unexpected={sorted(unexpected)}")
+    return {name: np.asarray(values[name]) for name in expected}
+
+
+def compute_dacon_metrics(y_true_dict, y_pred_dict, *,
+                          allow_nonfinite: bool = False) -> dict[str, float]:
+    """Compute the official metric from exact canonical column names only."""
+    truth = _exact_columns(y_true_dict, TRUTH_COLUMNS, "truth")
+    prediction = _exact_columns(y_pred_dict, PREDICTION_COLUMNS, "prediction")
+    lengths = {name: len(np.asarray(value).reshape(-1)) for name, value in truth.items()}
+    lengths.update({f"pred:{name}": len(np.asarray(value).reshape(-1))
+                    for name, value in prediction.items()})
+    if len(set(lengths.values())) != 1:
+        raise ValueError(f"official metric columns have unequal lengths: {lengths}")
+
+    file_eer = compute_eer(
+        truth["file_fake"], prediction["file_fake"], allow_nonfinite=allow_nonfinite)
+    voice_mask = np.asarray(truth["voice_present"]).astype(int) == 1
+    music_mask = np.asarray(truth["music_present"]).astype(int) == 1
+    voice_eer = compute_eer(
+        np.asarray(truth["voice_fake"])[voice_mask],
+        np.asarray(prediction["voice_fake"])[voice_mask], allow_nonfinite=allow_nonfinite)
+    music_eer = compute_eer(
+        np.asarray(truth["music_fake"])[music_mask],
+        np.asarray(prediction["music_fake"])[music_mask], allow_nonfinite=allow_nonfinite)
+    voice_auc = compute_auc(
+        truth["voice_present"], prediction["voice_present"], allow_nonfinite=allow_nonfinite)
+    music_auc = compute_auc(
+        truth["music_present"], prediction["music_present"], allow_nonfinite=allow_nonfinite)
+    ads = 1.0 - 0.5 * file_eer - 0.2 * voice_eer - 0.3 * music_eer
+    cps = 0.5 * voice_auc + 0.5 * music_auc
+    total = 0.9 * ads + 0.1 * cps
     return {
-        "file_eer": float(file_eer),
-        "voice_eer": float(voice_eer),
-        "music_eer": float(music_eer),
-        "voice_auc": float(voice_auc),
-        "music_auc": float(music_auc),
-        "ads": float(ads),
-        "cps": float(cps),
-        "score": float(total),
-        "total": float(total),
+        "file_eer": file_eer, "voice_eer": voice_eer, "music_eer": music_eer,
+        "voice_auc": voice_auc, "music_auc": music_auc,
+        "ads": float(ads), "cps": float(cps), "score": float(total), "total": float(total),
     }

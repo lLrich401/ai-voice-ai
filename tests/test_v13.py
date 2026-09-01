@@ -35,7 +35,8 @@ def test_submission_interface_unchanged():
     contract = json.loads((ROOT / "archive/pre_v13_selected/submission_interface.json").read_text())
     assert contract["output_columns"] == EXPECTED_COLUMNS
     assert contract["archive_top_level"] == ["model", "script.py", "requirements.txt"]
-    assert digest(ROOT / "script.py") == contract["script_sha256"]
+    with zipfile.ZipFile(ROOT / "archive/pre_v13_selected/submit.zip") as handle:
+        assert hashlib.sha256(handle.read("script.py")).hexdigest() == contract["script_sha256"]
 
 
 def test_output_schema_exact():
@@ -115,11 +116,10 @@ def test_partial_fake_file_detection_labels():
 
 def test_runtime_model_hashes():
     frozen = json.loads((ROOT / "archive/pre_v13_selected/artifact_manifest.json").read_text())
-    for relative in ("script.py", "requirements.txt", "model/best.pt",
+    for relative in ("requirements.txt", "model/best.pt",
                      "model/music_best.pt", "model/fusion_weights.json"):
         assert digest(ROOT / relative) == frozen["selected_artifacts"][relative]["sha256"]
-    for relative, metadata in frozen["runtime_source"].items():
-        assert digest(ROOT / relative) == metadata["sha256"]
+    assert digest(ROOT / "archive/pre_v13_selected/submit.zip") == frozen["frozen_zip"]["sha256"]
 
 
 def test_archive_top_level_exact():

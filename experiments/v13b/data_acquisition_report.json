@@ -1,0 +1,38 @@
+{
+  "version": "V13B_ACQUISITION_20260901",
+  "external_data_root": "C:\\Users\\lLrich\\ai_voice_data_v13b",
+  "git_contains_training_audio": false,
+  "acquired": {
+    "dfadd_vctk_paired": {
+      "status": "APPROVED",
+      "rows": 200,
+      "real": 100,
+      "fake": 100,
+      "content_groups": 100,
+      "generator_families": [
+        "GradTTS",
+        "Matcha-TTS",
+        "NaturalSpeech2",
+        "StyleTTS2",
+        "PFlow-TTS"
+      ],
+      "dfadd_url": "https://huggingface.co/datasets/isjwdu/DFADD",
+      "dfadd_revision": "dfc1eeab3cb0068db8e87a2b89a1ebd103665b1f",
+      "dfadd_license": "MIT",
+      "vctk_license": "CC BY 4.0",
+      "vctk_archive_sha256": "db1f7f01973f00ea612cd2b110d06b3fabbc504d2fdd69646b66beed09eef0b9",
+      "manifest_sha256": "062dc490e9bb42331b25af93283d1f7ba604c20e57d479d679e7734de68a70e0",
+      "pairing": "exact speaker_utterance basename; missing originals excluded"
+    }
+  },
+  "reviewed_not_adopted": {
+    "musebench": "REVIEW_REQUIRED: about 159 GB for part 1 and heterogeneous Jamendo per-track rights; not downloaded",
+    "aime": "REVIEW_REQUIRED: generated and real tracks have different/per-track terms",
+    "fakemusiccaps": "REVIEW_REQUIRED: CC BY-NC 4.0 plus underlying MusicCaps source-right review",
+    "wavefake_local_mirror": "REVIEW_REQUIRED: local mirror revision mapping is unresolved",
+    "scdf": "REVIEW_REQUIRED: possible unused final source; not acquired or sealed",
+    "artifactbench_v1_1": "REVIEW_REQUIRED: attractive 22-generator unseen-music benchmark, but its real arm includes YouTube retrieval and historical FMA/SONICS sources; use only after row-rights and global-history filtering"
+  },
+  "decision": "Do not manufacture the second paired music source by relabeling DSP transformations as AI fake.",
+  "next_acquisition": "Obtain a row-license-resolved paired music corpus with at least 10 independent content groups, then reserve a distinct unused source for FINAL_HOLDOUT_V13B."
+}
